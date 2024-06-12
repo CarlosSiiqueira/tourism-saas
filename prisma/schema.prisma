@@ -1,0 +1,299 @@
+// docs: https://pris.ly/d/prisma-schema
+
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+model Endereco {
+    id            String          @id @default(uuid())
+    logradouro    String
+    numero        String
+    complemento   String?
+    cep           String
+    cidade        String
+    uf            String
+    Pessoas       Pessoas[]
+    LocalEmbarque LocalEmbarque[]
+    Destinos      Destinos[]
+    Fornecedor    Fornecedor[]
+}
+
+model Pessoas {
+    id              String    @id @default(uuid())
+    nome            String
+    cpf             String
+    sexo            String
+    dataCadastro    DateTime  @default(now())
+    observacoes     String?
+    telefone        String?
+    telefoneWpp     String?
+    email           String
+    contato         String?
+    telefoneContato String?
+    ativo           Boolean   @default(true)
+    dataNascimento  DateTime?
+
+    Usuarios         Usuarios           @relation(fields: [usuarioCadastro], references: [id])
+    usuarioCadastro  String
+    Endereco         Endereco[]
+    ExcursaoQuartos  ExcursaoQuartos[]
+    ExcursaoOnibus   ExcursaoOnibus[]
+    ExcursaoEmbarque ExcursaoEmbarque[]
+    Excursao         Excursao[]
+    Vendas           Vendas[]
+    Fornecedor       Fornecedor[]
+    Transacoes       Transacoes[]
+}
+
+model Usuarios {
+    id              String   @id @default(uuid())
+    nome            String
+    username        String   @unique
+    password        String
+    dataCadastro    DateTime @default(now())
+    usuarioCadastro String?
+    tipo            Int
+    email           String
+    ativo           Boolean  @default(true)
+    comissao        Float?
+    meta            Float?
+
+    Pessoas          Pessoas[]
+    Pacotes          Pacotes[]
+    FormaPagamento   FormaPagamento[]
+    ContaBancaria    ContaBancaria[]
+    Produtos         Produtos[]
+    ExcursaoQuartos  ExcursaoQuartos[]
+    ExcursaoOnibus   ExcursaoOnibus[]
+    LocalEmbarque    LocalEmbarque[]
+    ExcursaoEmbarque ExcursaoEmbarque[]
+    Excursao         Excursao[]
+    Vendas           Vendas[]
+    Destinos         Destinos[]
+    Transacoes       Transacoes[]
+    Fornecedor       Fornecedor[]
+}
+
+model Pacotes {
+    id             String   @id @default(uuid())
+    nome           String
+    valor          Float
+    descricao      String
+    ativo          Boolean  @default(true)
+    dataCadastro   DateTime @default(now())
+    origem         Int      @default(1)
+    tipoTransporte Int      @default(1)
+
+    LocalEmbarque       LocalEmbarque @relation(fields: [codigoLocalEmbarque], references: [id])
+    codigoLocalEmbarque String
+    Destinos            Destinos      @relation(fields: [codigoDestino], references: [id])
+    codigoDestino       String
+    Usuarios            Usuarios      @relation(fields: [usuarioCadastro], references: [id])
+    usuarioCadastro     String
+    Excursao            Excursao[]
+    Vendas              Vendas[]
+    Transacoes          Transacoes[]
+}
+
+model FormaPagamento {
+    id                 String   @id @default(uuid())
+    nome               String
+    dataCadastro       DateTime @default(now())
+    taxa               Float
+    qtdDiasRecebimento Int
+    ativo              Boolean  @default(true)
+
+    ContaBancaria       ContaBancaria @relation(fields: [codigoContaBancaria], references: [id])
+    codigoContaBancaria String
+    Usuarios            Usuarios      @relation(fields: [usuarioCadastro], references: [id])
+    usuarioCadastro     String
+    Vendas              Vendas[]
+    Transacoes          Transacoes[]
+}
+
+model ContaBancaria {
+    id           String   @id @default(uuid())
+    nome         String
+    ativo        Boolean  @default(true)
+    saldo        Float    @default(0)
+    dataCadastro DateTime @default(now())
+
+    Usuarios        Usuarios         @relation(fields: [usuarioCadastro], references: [id])
+    usuarioCadastro String
+    FormaPagamento  FormaPagamento[]
+}
+
+model Produtos {
+    id           String   @id @default(uuid())
+    nome         String
+    estoque      Int
+    dataCompra   DateTime
+    dataCadastro DateTime
+    ativo        Boolean  @default(true)
+
+    Fornecedor       Fornecedor[]
+    codigoFornecedor String
+    Usuarios         Usuarios     @relation(fields: [usuarioCadastro], references: [id])
+    usuarioCadastro  String
+    Vendas           Vendas[]
+    Transacoes       Transacoes[]
+}
+
+model ExcursaoQuartos {
+    id           String   @id @default(uuid())
+    numeroQuarto String
+    dataCadastro DateTime @default(now())
+
+    Excursao         Excursao @relation(fields: [codigoExcursao], references: [id])
+    codigoExcursao   String
+    Passageiro       Pessoas  @relation(fields: [codigoPassageiro], references: [id])
+    codigoPassageiro String
+    Usuarios         Usuarios @relation(fields: [usuarioCadastro], references: [id])
+    usuarioCadastro  String
+}
+
+model ExcursaoOnibus {
+    id            String   @id @default(uuid())
+    numeroCadeira String
+    dataCadastro  DateTime @default(now())
+
+    Pessoa           Pessoas  @relation(fields: [codigoPassageiro], references: [id])
+    codigoPassageiro String
+    Excursao         Excursao @relation(fields: [codigoExcursao], references: [id])
+    codigoExcursao   String
+    Usuarios         Usuarios @relation(fields: [usuarioCadastro], references: [id])
+    usuarioCadastro  String
+}
+
+model LocalEmbarque {
+    id           String   @id @default(uuid())
+    nome         String
+    observacoes  String
+    horaEmbarque String
+    dataCadastro DateTime @default(now())
+    ativo        Boolean
+
+    Endereco         Endereco           @relation(fields: [codigoEndereco], references: [id])
+    codigoEndereco   String
+    Usuarios         Usuarios           @relation(fields: [usuarioCadastro], references: [id])
+    usuarioCadastro  String
+    ExcursaoEmbarque ExcursaoEmbarque[]
+    Pacotes          Pacotes[]
+}
+
+model ExcursaoEmbarque {
+    id           String   @id @default(uuid())
+    embarcou     Boolean  @default(false)
+    horaEmbarque String
+    dataCadastro DateTime @default(now())
+
+    LocalEmbarque    LocalEmbarque[]
+    Excursao         Excursao        @relation(fields: [codigoExcursao], references: [id])
+    codigoExcursao   String
+    codigoPassageiro Pessoas[]
+    Usuarios         Usuarios        @relation(fields: [usuarioCadastro], references: [id])
+    usuarioCadastro  String
+}
+
+model Excursao {
+    id              String   @id @default(uuid())
+    nome            String
+    dataInicio      DateTime
+    dataFim         DateTime
+    observacoes     String?
+    dataCadastro    DateTime @default(now())
+    ativo           Boolean  @default(true)
+    gerouFinanceiro Boolean  @default(false)
+    vagas           Int
+
+    Pessoas          Pessoas            @relation(fields: [codigoPassageiro], references: [id])
+    codigoPassageiro String
+    Pacotes          Pacotes            @relation(fields: [codigoPacote], references: [id])
+    codigoPacote     String
+    Usuarios         Usuarios           @relation(fields: [usuarioCadastro], references: [id])
+    usuarioCadastro  String
+    ExcursaoQuartos  ExcursaoQuartos[]
+    ExcursaoOnibus   ExcursaoOnibus[]
+    ExcursaoEmbarque ExcursaoEmbarque[]
+    Transacoes       Transacoes[]
+}
+
+model Vendas {
+    id    String @id @default(uuid())
+    valor Float
+    tipo  Int
+    qtd   Int
+
+    Pessoas              Pessoas        @relation(fields: [codigoCliente], references: [id])
+    codigoCliente        String
+    FormaPagamento       FormaPagamento @relation(fields: [codigoFormaPagamento], references: [id])
+    codigoFormaPagamento String
+    Produtos             Produtos?      @relation(fields: [codigoProduto], references: [id])
+    codigoProduto        String?
+    Pacotes              Pacotes?       @relation(fields: [codigoPacote], references: [id])
+    codigoPacote         String?
+    Usuarios             Usuarios       @relation(fields: [usuarioCadastro], references: [id])
+    usuarioCadastro      String
+}
+
+model Destinos {
+    id           String   @id @default(uuid())
+    nome         String
+    ativo        Boolean  @default(true)
+    dataCadastro DateTime
+
+    Endereco        Endereco  @relation(fields: [codigoEndereco], references: [id])
+    codigoEndereco  String
+    Usuarios        Usuarios  @relation(fields: [usuarioCadastro], references: [id])
+    usuarioCadastro String
+    Pacotes         Pacotes[]
+}
+
+model Transacoes {
+    id                        String   @id @default(uuid())
+    tipo                      Int
+    valor                     Float
+    vistoAdmin                Boolean  @default(false)
+    data                      DateTime
+    efetivado                 Boolean  @default(false)
+    observacao                String?
+    ativo                     Boolean
+    numeroComprovanteBancario String?
+
+    Pessoas              Pessoas        @relation(fields: [codigoPessoa], references: [id])
+    codigoPessoa         String
+    Fornecedor           Fornecedor     @relation(fields: [codigoFornecedor], references: [id])
+    codigoFornecedor     String
+    Excursao             Excursao?      @relation(fields: [codigoExcursao], references: [id])
+    codigoExcursao       String?
+    Produtos             Produtos?      @relation(fields: [codigoProduto], references: [id])
+    codigoProduto        String?
+    Pacotes              Pacotes?       @relation(fields: [codigoPacote], references: [id])
+    codigoPacote         String?
+    FormaPagamento       FormaPagamento @relation(fields: [codigoFormaPagamento], references: [id])
+    codigoFormaPagamento String
+    Usuarios             Usuarios       @relation(fields: [usuarioCadastro], references: [id])
+    usuarioCadastro      String
+}
+
+model Fornecedor {
+    id    String  @id @default(uuid())
+    cnpj  String
+    site  String?
+    ativo Boolean @default(true)
+
+    Pessoas         Pessoas      @relation(fields: [codigoPessoa], references: [id])
+    codigoPessoa    String
+    Endereco        Endereco     @relation(fields: [codigoEndereco], references: [id])
+    codigoEndereco  String
+    Usuario         Usuarios     @relation(fields: [usuarioCadastro], references: [id])
+    usuarioCadastro String
+    Produtos        Produtos?    @relation(fields: [produtosId], references: [id])
+    produtosId      String?
+    Transacoes      Transacoes[]
+}
