@@ -1,3 +1,4 @@
+import { dateValidate } from "../../shared/helper/date";
 import prismaManager from "../database/database";
 import { IVendas, IVendasDTO, IVendasResponse } from "../interfaces/Vendas";
 
@@ -9,6 +10,7 @@ class VendasRepository implements IVendas {
         valor,
         tipo,
         qtd,
+        efetivada = false,
         codigoCliente,
         codigoFormaPagamento,
         codigoProduto = null,
@@ -19,6 +21,7 @@ class VendasRepository implements IVendas {
         try {
 
             const id = crypto.randomUUID()
+            let data = new Date(Date.now())
 
             const venda = await this.prisma.vendas.create({
                 data: {
@@ -26,6 +29,8 @@ class VendasRepository implements IVendas {
                     valor,
                     tipo,
                     qtd,
+                    efetivada,
+                    data,
                     codigoCliente,
                     codigoFormaPagamento,
                     codigoProduto,
@@ -72,6 +77,7 @@ class VendasRepository implements IVendas {
         valor,
         tipo,
         qtd,
+        efetivada,
         codigoCliente,
         codigoFormaPagamento,
         codigoProduto,
@@ -81,11 +87,15 @@ class VendasRepository implements IVendas {
 
         try {
 
+            let data = new Date(Date.now())
+
             const venda = await this.prisma.vendas.update({
                 data: {
                     valor,
                     tipo,
                     qtd,
+                    efetivada,
+                    data,
                     codigoCliente,
                     codigoFormaPagamento,
                     codigoProduto,

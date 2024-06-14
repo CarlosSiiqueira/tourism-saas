@@ -1,5 +1,6 @@
 import prismaManager from "../database/database"
 import { IExcursaoQuartos, IExcursaoQuartosDTO, IExcursaoQuartosResponse } from "../interfaces/ExcursaoQuartos"
+import { dateValidate } from "../../shared/helper/date"
 
 class ExcursaoQuartosRepository implements IExcursaoQuartos {
 
@@ -16,6 +17,7 @@ class ExcursaoQuartosRepository implements IExcursaoQuartos {
         try {
 
             const id = crypto.randomUUID()
+            dataCadastro = dateValidate(dataCadastro)
 
             const excursaoQuartos = await this.prisma.excursaoQuartos.create({
                 data: {
@@ -34,7 +36,7 @@ class ExcursaoQuartosRepository implements IExcursaoQuartos {
 
             return ['Quartos definidos com sucesso']
         } catch (error) {
-            return ['']
+            return ['Erro ao registrar quarto']
         }
     }
 
@@ -43,6 +45,10 @@ class ExcursaoQuartosRepository implements IExcursaoQuartos {
         const excursaoQuartos = await this.prisma.excursaoQuartos.findMany({
             where: {
                 codigoExcursao: idExcursao
+            },
+            include: {
+                Passageiro: true,
+                Excursao: true
             }
         })
 
@@ -60,11 +66,13 @@ class ExcursaoQuartosRepository implements IExcursaoQuartos {
         codigoPassageiro,
         usuarioCadastro }: IExcursaoQuartosDTO, id: string): Promise<string[]> => {
 
+        dataCadastro = dateValidate(dataCadastro)
+
         const excursaoQuartos = await this.prisma.excursaoQuartos.update({
             data: {
                 numeroQuarto: numeroQuarto,
                 dataCadastro: dataCadastro,
-                codigoExcursao: codigoExcursao,
+                // codigoExcursao: codigoExcursao,
                 codigoPassageiro: codigoPassageiro,
                 usuarioCadastro: usuarioCadastro
             },

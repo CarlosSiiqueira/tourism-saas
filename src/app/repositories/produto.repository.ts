@@ -19,6 +19,7 @@ class ProdutoRepository implements IProduto {
 
             const id = crypto.randomUUID()
             dataCadastro = dateValidate(dataCadastro)
+            dataCompra = dateValidate(dataCompra)
 
             const produto = await this.prisma.produtos.create({
                 data: {
@@ -81,6 +82,9 @@ class ProdutoRepository implements IProduto {
         usuarioCadastro }: IProdutoDTO, id: string): Promise<string[]> => {
 
         try {
+            
+            dataCadastro = dateValidate(dataCadastro)
+            dataCompra = dateValidate(dataCompra)
 
             const produto = await this.prisma.produtos.update({
                 data: {

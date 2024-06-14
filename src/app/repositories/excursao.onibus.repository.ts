@@ -34,22 +34,27 @@ class ExcursaoOnibusRepository implements IExcursaoOnibus {
                 throw new Error('excursao sem Onibus configurados')
             }
 
-            return ['Onibus definidos com sucesso']
+            return ['Cadeira do onibus definidos com sucesso']
         } catch (error) {
-            return ['']
+            return ['Erro ao definir cadeira']
         }
     }
 
-    find = async (idExcursao: string): Promise<IExcursaoOnibusResponse[]> => {
+    find = async (idExcursao: string, idCadeira: string): Promise<IExcursaoOnibusResponse[]> => {
 
         const excursaoOnibus = await this.prisma.excursaoOnibus.findMany({
             where: {
-                codigoExcursao: idExcursao
+                codigoExcursao: idExcursao,
+                id: idCadeira
+            },
+            include: {
+                Pessoa: true,
+                Excursao: true
             }
         })
 
         if (!excursaoOnibus) {
-            throw new Error('não existem Onibus definidos para essa excursao')
+            throw new Error('não existem cadeiras Onibus definidos para essa excursao')
         }
 
         return excursaoOnibus
@@ -68,7 +73,7 @@ class ExcursaoOnibusRepository implements IExcursaoOnibus {
             data: {
                 numeroCadeira: numeroCadeira,
                 dataCadastro: dataCadastro,
-                codigoExcursao: codigoExcursao,
+                // codigoExcursao: codigoExcursao,
                 codigoPassageiro: codigoPassageiro,
                 usuarioCadastro: usuarioCadastro
             },

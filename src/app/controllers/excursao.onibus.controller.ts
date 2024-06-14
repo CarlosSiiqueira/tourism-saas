@@ -18,7 +18,7 @@ class ExcursaoOnibusController {
 
     find = async (request: Request, response: Response): Promise<void> => {
 
-        const res = await this.excursaoOnibusRepository.find(request.params.idExcursao)
+        const res = await this.excursaoOnibusRepository.find(request.params.idExcursao, request.params.idCadeira)
 
         response.status(200).send(res)
     }

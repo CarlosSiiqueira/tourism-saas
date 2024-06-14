@@ -46,7 +46,6 @@ model Pessoas {
     ExcursaoEmbarque ExcursaoEmbarque[]
     Excursao         Excursao[]
     Vendas           Vendas[]
-    Fornecedor       Fornecedor[]
     Transacoes       Transacoes[]
 }
 
@@ -136,7 +135,7 @@ model Produtos {
     dataCadastro DateTime
     ativo        Boolean  @default(true)
 
-    Fornecedor       Fornecedor[]
+    Fornecedor       Fornecedor   @relation(fields: [codigoFornecedor], references: [id])
     codigoFornecedor String
     Usuarios         Usuarios     @relation(fields: [usuarioCadastro], references: [id])
     usuarioCadastro  String
@@ -224,10 +223,12 @@ model Excursao {
 }
 
 model Vendas {
-    id    String @id @default(uuid())
-    valor Float
-    tipo  Int
-    qtd   Int
+    id        String   @id @default(uuid())
+    valor     Float
+    tipo      Int
+    qtd       Int
+    efetivada Boolean  @default(false)
+    data      DateTime @default(now())
 
     Pessoas              Pessoas        @relation(fields: [codigoCliente], references: [id])
     codigoCliente        String
@@ -282,18 +283,23 @@ model Transacoes {
 }
 
 model Fornecedor {
-    id    String  @id @default(uuid())
-    cnpj  String
-    site  String?
-    ativo Boolean @default(true)
+    id              String   @id @default(uuid())
+    nome            String
+    fantasia        String
+    cnpj            String
+    site            String?
+    ativo           Boolean  @default(true)
+    dataCadastro    DateTime @default(now())
+    observacoes     String?
+    telefone        String?
+    email           String
+    contato         String?
+    telefoneContato String?
 
-    Pessoas         Pessoas      @relation(fields: [codigoPessoa], references: [id])
-    codigoPessoa    String
     Endereco        Endereco     @relation(fields: [codigoEndereco], references: [id])
     codigoEndereco  String
-    Usuario         Usuarios     @relation(fields: [usuarioCadastro], references: [id])
-    usuarioCadastro String
-    Produtos        Produtos?    @relation(fields: [produtosId], references: [id])
-    produtosId      String?
     Transacoes      Transacoes[]
+    Usuarios        Usuarios     @relation(fields: [usuarioCadastro], references: [id])
+    usuarioCadastro String
+    Produtos        Produtos[]
 }

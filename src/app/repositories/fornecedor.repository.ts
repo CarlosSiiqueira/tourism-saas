@@ -1,3 +1,4 @@
+import { dateValidate } from "../../shared/helper/date";
 import prismaManager from "../database/database";
 import { IFornecedor, IFornecedorDTO, IFornecedorResponse } from "../interfaces/Fornecedor";
 
@@ -6,28 +7,42 @@ class FornecedorRepository implements IFornecedor {
     private prisma = prismaManager.getPrisma()
 
     create = async ({
+        nome,
+        fantasia,
         cnpj,
         site = '',
-        ativo = true,
-        codigoPessoa,
-        usuarioCadastro,
-        produtosId = ''
-    }: IFornecedorDTO, codigoEndereco: string): Promise<string[]> => {
+        ativo,
+        dataCadastro,
+        observacoes = '',
+        telefone = '',
+        email,
+        contato = '',
+        telefoneContato = '',
+        codigoEndereco,
+        usuarioCadastro
+    }: IFornecedorDTO): Promise<string[]> => {
 
         try {
 
             const id = crypto.randomUUID()
-            
+            dataCadastro = dateValidate(dataCadastro)
+
             const fornecedor = await this.prisma.fornecedor.create({
                 data: {
                     id,
+                    nome,
+                    fantasia,
                     cnpj,
                     site,
                     ativo,
-                    codigoPessoa,
+                    dataCadastro,
+                    observacoes,
+                    telefone,
+                    email,
+                    contato,
+                    telefoneContato,
                     codigoEndereco,
-                    usuarioCadastro,
-                    produtosId,
+                    usuarioCadastro
                 }
             })
 
@@ -45,7 +60,6 @@ class FornecedorRepository implements IFornecedor {
             },
             include: {
                 Endereco: true,
-                Pessoas: true
             }
         })
 
@@ -64,7 +78,6 @@ class FornecedorRepository implements IFornecedor {
             },
             include: {
                 Endereco: true,
-                Pessoas: true
             }
         })
 
@@ -76,22 +89,36 @@ class FornecedorRepository implements IFornecedor {
     }
 
     update = async ({
+        nome,
+        fantasia,
         cnpj,
-        site = '',
-        codigoPessoa,
-        usuarioCadastro,
-        produtosId = '',
-        codigoEndereco
+        site,
+        ativo,
+        dataCadastro,
+        observacoes,
+        telefone,
+        email,
+        contato,
+        telefoneContato,
+        codigoEndereco,
+        usuarioCadastro
     }: IFornecedorDTO, id: string): Promise<string[]> => {
 
         const fornecedor = await this.prisma.fornecedor.update({
             data: {
+                nome,
+                fantasia,
                 cnpj,
                 site,
-                codigoPessoa,
+                ativo,
+                dataCadastro,
+                observacoes,
+                telefone,
+                email,
+                contato,
+                telefoneContato,
                 codigoEndereco,
-                usuarioCadastro,
-                produtosId
+                usuarioCadastro
             },
             where: {
                 id

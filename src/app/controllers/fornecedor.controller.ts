@@ -2,6 +2,7 @@ import { injectable, inject } from "tsyringe";
 import { Request, Response } from "express"
 import { FornecedorRepository } from "../repositories/fornecedor.repository"
 import { EnderecoRepository } from "../repositories/endereco.repository";
+import { EnderecoService } from "../services/endereco.service";
 
 @injectable()
 class FornecedorController {
@@ -10,31 +11,33 @@ class FornecedorController {
         @inject("FornecedorRepository")
         private fornecedorRepository: FornecedorRepository,
         @inject("EnderecoRepository")
-        private enderecoRepository: EnderecoRepository
+        private enderecoRepository: EnderecoRepository,
+        private enderecoService: EnderecoService = new EnderecoService(enderecoRepository)
     ) { }
 
     create = async (request: Request, response: Response): Promise<void> => {
-        var codigoEndereco: string = ''
+        let codigoEndereco: string = ''
 
         try {
+            codigoEndereco = await this.enderecoService.findOrCreateAddress({
+                id: request.body.codigoEndereco || null,
+                cep: request.body.cep || '',
+                cidade: request.body.cidade || '',
+                complemento: request.body.complemento || '',
+                logradouro: request.body.logradouro || '',
+                numero: request.body.numero || '',
+                uf: request.body.uf || ''
+            })
 
-            const endereco = await this.enderecoRepository.findByCepAndNumber(request.body.cep, request.body.numero)
-
-            if (endereco) {
-                codigoEndereco = endereco.id
-            }
-
-            if (!codigoEndereco) {
-                const endereco = await this.enderecoRepository.create(request.body)
-                codigoEndereco = endereco
-            }
+            request.body.codigoEndereco = codigoEndereco
 
         } catch (error) {
-            response.status(500).send('Erro ao incluir endereço, verifique body')
+            response.status(500).send(`Erro ao incluir endereço, verifique body (cep,numero) para buscar endereço
+                 ou (cep, cidade, complemento, logradouro, numero, uf) para criar novo `)
             return;
         }
 
-        const res = await this.fornecedorRepository.create(request.body, codigoEndereco)
+        const res = await this.fornecedorRepository.create(request.body)
 
         response.status(200).send(res)
     }

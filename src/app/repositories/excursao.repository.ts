@@ -24,8 +24,10 @@ class ExcursaoRepository implements IExcursao {
 
             const id = crypto.randomUUID()
             dataCadastro = dateValidate(dataCadastro)
+            dataInicio = dateValidate(dataInicio)
+            dataFim = dateValidate(dataFim)
 
-            const excursao = this.prisma.excursao.create({
+            const excursao = await this.prisma.excursao.create({
                 data: {
                     id: id,
                     nome: nome,
@@ -54,6 +56,10 @@ class ExcursaoRepository implements IExcursao {
         const excursao = await this.prisma.excursao.findUnique({
             where: {
                 id
+            },
+            include: {
+                Pessoas: true,
+                Pacotes: true
             }
         })
 
@@ -70,6 +76,10 @@ class ExcursaoRepository implements IExcursao {
         const excursoes = await this.prisma.excursao.findMany({
             where: {
                 ativo: true
+            },
+            include: {
+                Pessoas: true,
+                Pacotes: true
             }
         })
 
@@ -115,6 +125,8 @@ class ExcursaoRepository implements IExcursao {
     }: IExcursaoDTO, id: string): Promise<string[]> => {
 
         dataCadastro = dateValidate(dataCadastro)
+        dataInicio = dateValidate(dataInicio)
+        dataFim = dateValidate(dataFim)
 
         const excursao = await this.prisma.excursao.update({
             data: {
@@ -126,7 +138,7 @@ class ExcursaoRepository implements IExcursao {
                 ativo: ativo,
                 gerouFinanceiro: gerouFinanceiro,
                 vagas: vagas,
-                codigoPassageiro: codigoPassageiro,
+                // codigoPassageiro: codigoPassageiro,
                 codigoPacote: codigoPacote,
                 usuarioCadastro: usuarioCadastro,
             },

@@ -13,7 +13,7 @@ class LocalEmbarqueRepository implements ILocalEmbarque {
         dataCadastro,
         codigoEndereco,
         usuarioCadastro,
-        ativo }: ILocalEmbarqueDTO): Promise<string[]> => {
+        ativo = true }: ILocalEmbarqueDTO): Promise<string[]> => {
 
         try {
 

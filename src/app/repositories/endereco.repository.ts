@@ -45,7 +45,7 @@ class EnderecoRepository implements IEndereco {
         })
 
         if (!endereco) {
-            throw new Error("Endereco não encontrada")
+            throw new Error("Endereco não encontrado")
         }
 
         return endereco

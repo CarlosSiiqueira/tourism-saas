@@ -10,6 +10,7 @@ export interface IVendasDTO {
     valor: number
     tipo: number
     qtd: number
+    efetivada: boolean
     codigoCliente: string
     codigoFormaPagamento: string
     codigoProduto: string | null

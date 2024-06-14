@@ -21,7 +21,7 @@ class FormaPagamentoRepository implements IFormaPagamento {
             const id = crypto.randomUUID()
             dataCadastro = dateValidate(dataCadastro)
 
-            const formaPagamento = this.prisma.formaPagamento.create({
+            const formaPagamento = await this.prisma.formaPagamento.create({
                 data: {
                     id,
                     nome,
@@ -43,7 +43,7 @@ class FormaPagamentoRepository implements IFormaPagamento {
 
     find = async (id: string): Promise<IFormaPagamentoResponse | null> => {
 
-        const formaPagamento = this.prisma.formaPagamento.findUnique({
+        const formaPagamento = await this.prisma.formaPagamento.findUnique({
             where: {
                 id
             }
@@ -59,7 +59,7 @@ class FormaPagamentoRepository implements IFormaPagamento {
 
     findAll = async (): Promise<IFormaPagamentoResponse[]> => {
 
-        const formaPagamento = this.prisma.formaPagamento.findMany({
+        const formaPagamento = await this.prisma.formaPagamento.findMany({
             where: {
                 ativo: true
             }
@@ -84,7 +84,7 @@ class FormaPagamentoRepository implements IFormaPagamento {
 
         dataCadastro = dateValidate(dataCadastro)
 
-        const formaPagamento = this.prisma.formaPagamento.update({
+        const formaPagamento = await this.prisma.formaPagamento.update({
             data: {
                 nome,
                 dataCadastro,
@@ -108,7 +108,7 @@ class FormaPagamentoRepository implements IFormaPagamento {
 
     delete = async (id: string): Promise<string[]> => {
 
-        const formaPagamento = this.prisma.formaPagamento.update({
+        const formaPagamento = await this.prisma.formaPagamento.update({
             data: {
                 ativo: false
             },

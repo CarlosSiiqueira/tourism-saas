@@ -1,6 +1,6 @@
 export interface IExcursaoOnibus {
     create(data: IExcursaoOnibusDTO): Promise<string[]>
-    find(idExcursao: string): Promise<IExcursaoOnibusResponse[]>
+    find(idExcursao: string, idCadeira: string): Promise<IExcursaoOnibusResponse[]>
     update(data: IExcursaoOnibusDTO, id: string): Promise<string[]>
 }
 
