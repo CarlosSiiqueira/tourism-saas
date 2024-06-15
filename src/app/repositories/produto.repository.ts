@@ -1,10 +1,106 @@
 import { dateValidate } from "../../shared/helper/date"
 import prismaManager from "../database/database"
-import { IProduto, IProdutoDTO, IProdutoResponse } from "../interfaces/Produto"
+import { IIndex } from "../interfaces/Helper"
+import { IProduto, IProdutoDTO, IProdutoIndexResponse, IProdutoResponse } from "../interfaces/Produto"
 
 class ProdutoRepository implements IProduto {
 
     private prisma = prismaManager.getPrisma()
+
+    index = async ({
+        orderBy,
+        order,
+        skip,
+        take,
+        filter }: IIndex): Promise<{ count: number; rows: IProdutoIndexResponse[] }> => {
+
+        const where = {
+            NOT: {
+                id: undefined
+            }
+        }
+
+        Object.entries(filter as { [key: string]: string }).map(([key, value]) => {
+
+            switch (key) {
+                case 'nome':
+                    Object.assign(where, {
+                        OR: [
+                            {
+                                nome: {
+                                    contains: value,
+                                    mode: "insensitive"
+                                }
+                            },
+                            {
+                                Fornecedor: {
+                                    nome: {
+                                        contains: value,
+                                        mode: "insensitive"
+                                    }
+                                }
+                            }
+                        ]
+                    })
+                    break;
+
+                case 'estoque':
+                    Object.assign(where, {
+                        AND: [
+                            {
+                                estoque: {
+                                    equals: parseInt(value),
+                                    // mode: "insensitive"
+                                }
+                            }
+                        ]
+                    })
+                    break;
+            }
+        })
+
+        const [count, rows] = await this.prisma.$transaction([
+            this.prisma.produtos.count({ where }),
+            this.prisma.produtos.findMany({
+                skip,
+                take,
+                orderBy: {
+                    [orderBy as string]: order
+                },
+                where,
+                select: {
+                    id: true,
+                    nome: true,
+                    estoque: true,
+                    dataCompra: true,
+                    dataCadastro: true,
+                    ativo: true,
+                    codigoFornecedor: true,
+                    usuarioCadastro: true,
+                    Fornecedor: {
+                        select: {
+                            id: true,
+                            nome: true,
+                            fantasia: true,
+                            cnpj: true,
+                            site: true,
+                            ativo: true,
+                            dataCadastro: true,
+                            observacoes: true,
+                            telefone: true,
+                            email: true,
+                            contato: true,
+                            telefoneContato: true,
+                            codigoEndereco: true,
+                            usuarioCadastro: true
+                        }
+                    }
+                }
+            })
+        ])
+
+        return { count, rows }
+    }
 
     create = async ({
         nome,
@@ -46,6 +142,9 @@ class ProdutoRepository implements IProduto {
         const produto = await this.prisma.produtos.findUnique({
             where: {
                 id
+            },
+            include: {
+                Fornecedor: true
             }
         })
 
@@ -62,6 +161,9 @@ class ProdutoRepository implements IProduto {
         const produtos = await this.prisma.produtos.findMany({
             where: {
                 ativo: true
+            },
+            include: {
+                Fornecedor: true
             }
         })
 
@@ -82,7 +184,7 @@ class ProdutoRepository implements IProduto {
         usuarioCadastro }: IProdutoDTO, id: string): Promise<string[]> => {
 
         try {
-            
+
             dataCadastro = dateValidate(dataCadastro)
             dataCompra = dateValidate(dataCompra)
 

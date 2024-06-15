@@ -3,6 +3,7 @@ import { produtoController } from "../controllers"
 
 const produto = Router()
 
+produto.get('/index', produtoController.index)
 produto.get('/find/:id', produtoController.find)
 produto.get('/findAll', produtoController.findAll)
 produto.post('/create', produtoController.create)
