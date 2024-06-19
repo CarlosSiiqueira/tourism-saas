@@ -3,6 +3,7 @@ import { Request, Response } from "express"
 import { FornecedorRepository } from "../repositories/fornecedor.repository"
 import { EnderecoRepository } from "../repositories/endereco.repository";
 import { EnderecoService } from "../services/endereco.service";
+import { formatIndexFilters } from "../../shared/utils/filters";
 
 @injectable()
 class FornecedorController {
@@ -14,6 +15,16 @@ class FornecedorController {
     private enderecoRepository: EnderecoRepository,
     private enderecoService: EnderecoService = new EnderecoService(enderecoRepository)
   ) { }
+
+  index = async (request: Request, response: Response): Promise<void> => {
+
+    const { orderBy, order, skip, take, filter } = formatIndexFilters(request)
+
+    const res = await this.fornecedorRepository.index({ orderBy, order, skip, take, filter })
+
+    response.status(200).send(res)
+
+  }
 
   create = async (request: Request, response: Response): Promise<void> => {
     let codigoEndereco: string = ''

@@ -1,10 +1,101 @@
 import prismaManager from "../database/database";
 import { Warning } from "../errors";
 import { IFornecedor, IFornecedorDTO, IFornecedorResponse } from "../interfaces/Fornecedor";
+import { IIndex } from "../interfaces/Helper";
 
 class FornecedorRepository implements IFornecedor {
 
   private prisma = prismaManager.getPrisma()
+
+  index = async ({ orderBy, order, skip, take, filter }: IIndex): Promise<{ count: number, rows: IFornecedorResponse[] }> => {
+
+    const where = {
+      NOT: {
+        id: undefined
+      }
+    }
+
+    Object.entries(filter as { [key: string]: string }).map(([key, value]) => {
+
+      switch (key) {
+        case 'nome':
+        case 'fantasia':
+          Object.assign(where, {
+            OR: [
+              {
+                nome: {
+                  contains: value,
+                  mode: "insensitive"
+                }
+              },
+              {
+                fantasia: {
+                  contains: value,
+                  mode: "insensitive"
+                }
+              },
+              {
+                Usuarios: {
+                  nome: {
+                    contains: value,
+                    mode: "insensitive"
+                  }
+                }
+              }
+            ]
+          })
+          break;
+
+        case 'cnpj':
+          Object.assign(where, {
+            OR: [
+              {
+                cnpj: {
+                  contains: value,
+                  mode: "insensitive"
+                }
+              }
+            ]
+          })
+          break;
+
+        case 'email':
+          Object.assign(where, {
+            OR: [
+              {
+                email: {
+                  contains: value,
+                  mode: "insensitive"
+                }
+              }
+            ]
+          })
+          break;
+      }
+    })
+
+    const [count, rows] = await this.prisma.$transaction([
+      this.prisma.fornecedor.count({ where }),
+      this.prisma.fornecedor.findMany({
+        skip,
+        take,
+        orderBy: {
+          [orderBy as string]: order
+        },
+        where,
+        include: {
+          Endereco: true,
+          Usuarios: {
+            select: {
+              nome: true
+            }
+          }
+        }
+      })
+    ])
+
+    return { count, rows }
+  }
 
   create = async ({
     nome,

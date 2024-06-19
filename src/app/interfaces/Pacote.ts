@@ -1,4 +1,10 @@
+import { IIndex } from "./Helper"
+
 export interface IPacote {
+  index(data: IIndex): Promise<{
+    count: number,
+    rows: IPacoteResponse[]
+  }>
   create(data: IPacoteDTO): Promise<string[]>
   find(id: string): Promise<IPacoteResponse>
   findAll(): Promise<IPacoteResponse[]>

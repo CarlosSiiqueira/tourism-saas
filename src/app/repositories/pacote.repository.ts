@@ -2,10 +2,69 @@ import { dateValidate } from "../../shared/helper/date"
 import prismaManager from "../database/database"
 import { Warning } from "../errors"
 import { IPacote, IPacoteDTO, IPacoteResponse } from "../interfaces/Pacote"
+import { IIndex } from "../interfaces/Helper"
 
 class PacoteRepository implements IPacote {
 
   private prisma = prismaManager.getPrisma()
+
+  index = async ({ orderBy, order, skip, take, filter }: IIndex): Promise<{ count: number, rows: IPacoteResponse[] }> => {
+
+    const where = {
+      NOT: {
+        id: undefined
+      }
+    }
+
+    Object.entries(filter as { [key: string]: string }).map(([key, value]) => {
+
+      switch (key) {
+        case 'nome':
+          Object.assign(where, {
+            OR: [
+              {
+                nome: {
+                  contains: value,
+                  mode: "insensitive"
+                }
+              },
+            ]
+          })
+          break;
+
+        case 'valor':
+          Object.assign(where, {
+            OR: [
+              {
+                valor: {
+                  equals: parseFloat(value),
+                }
+              }
+            ]
+          })
+          break;
+      }
+    })
+
+    const [count, rows] = await this.prisma.$transaction([
+      this.prisma.pacotes.count({ where }),
+      this.prisma.pacotes.findMany({
+        skip,
+        take,
+        orderBy: {
+          [orderBy as string]: order
+        },
+        where,
+        include: {
+          LocalEmbarque: true,
+          Destinos: true,
+
+        }
+      })
+    ])
+
+    return { count, rows }
+  }
 
   create = async ({
     nome,

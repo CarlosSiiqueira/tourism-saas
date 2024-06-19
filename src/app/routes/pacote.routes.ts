@@ -3,6 +3,7 @@ import { pacoteController } from "../controllers"
 
 const pacote = Router()
 
+pacote.get('/index', pacoteController.index)
 pacote.get('/find/:id', pacoteController.find)
 pacote.get('/findAll', pacoteController.findAll)
 pacote.post('/create', pacoteController.create)

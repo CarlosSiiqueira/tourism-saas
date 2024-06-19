@@ -1,6 +1,7 @@
 import { PacoteRepository } from '../repositories/pacote.repository'
 import { inject, injectable } from "tsyringe"
 import { Request, Response } from 'express'
+import { formatIndexFilters } from '../../shared/utils/filters'
 
 @injectable()
 class PacoteController {
@@ -9,6 +10,15 @@ class PacoteController {
     @inject("PacoteRepository")
     private pacoteRepository: PacoteRepository
   ) { }
+
+  index = async (request: Request, response: Response): Promise<void> => {
+
+    const { orderBy, order, skip, take, filter } = formatIndexFilters(request)
+
+    const res = await this.pacoteRepository.index({ orderBy, order, skip, take, filter })
+
+    response.status(200).send(res)
+  }
 
   create = async (request: Request, response: Response): Promise<void> => {
 

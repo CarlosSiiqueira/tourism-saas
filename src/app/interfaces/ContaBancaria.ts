@@ -1,4 +1,10 @@
+import { IIndex } from "./Helper"
+
 export interface IContaBancaria {
+  index(data: IIndex): Promise<{
+    count: number
+    rows: IContaBancariaResponse[]
+  }>
   create(data: IContaBancariaDTO): Promise<string[]>
   find(id: string): Promise<IContaBancariaResponse>
   findAll(): Promise<IContaBancariaResponse[]>
@@ -15,5 +21,8 @@ export interface IContaBancariaDTO {
 }
 
 export interface IContaBancariaResponse extends IContaBancariaDTO {
-  id: string
+  id: string,
+  Usuarios: {
+    nome: string
+  }
 }

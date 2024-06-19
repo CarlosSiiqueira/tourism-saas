@@ -1,6 +1,7 @@
 import { ContaBancariaRepository } from '../repositories/conta.bancaria.repository'
 import { inject, injectable } from "tsyringe"
 import { Request, Response } from "express"
+import { formatIndexFilters } from '../../shared/utils/filters'
 
 @injectable()
 class ContaBancariaController {
@@ -8,6 +9,16 @@ class ContaBancariaController {
     @inject("ContaBancariaRepository")
     private contaBancariaRepository: ContaBancariaRepository
   ) { }
+
+  index = async (request: Request, response: Response): Promise<void> => {
+
+    const { orderBy, order, skip, take, filter } = formatIndexFilters(request)
+
+    const res = await this.contaBancariaRepository.index({ orderBy, order, skip, take, filter })
+
+    response.status(200).send(res)
+
+  }
 
   create = async (request: Request, response: Response): Promise<void> => {
 

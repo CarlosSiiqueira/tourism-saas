@@ -1,4 +1,10 @@
+import { IIndex } from "./Helper"
+
 export interface IFornecedor {
+  index(data: IIndex): Promise<{
+    count: number
+    rows: IFornecedorResponse[]
+  }>
   create(data: IFornecedorDTO): Promise<string[]>
   find(id: string): Promise<IFornecedorResponse | null>
   findAll(): Promise<IFornecedorResponse[]>

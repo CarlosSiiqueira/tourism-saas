@@ -1,10 +1,87 @@
 import prismaManager from "../database/database"
 import { Warning } from "../errors"
 import { IContaBancaria, IContaBancariaDTO, IContaBancariaResponse } from "../interfaces/ContaBancaria"
+import { IIndex } from "../interfaces/Helper"
 
 class ContaBancariaRepository implements IContaBancaria {
 
   private prisma = prismaManager.getPrisma()
+
+  index = async ({ orderBy, order, skip, take, filter }: IIndex): Promise<{ count: number, rows: IContaBancariaResponse[] }> => {
+
+    const where = {
+      NOT: {
+        id: undefined
+      }
+    }
+
+    Object.entries(filter as { [key: string]: string }).map(([key, value]) => {
+
+      switch (key) {
+        case 'nome':
+          Object.assign(where, {
+            OR: [
+              {
+                nome: {
+                  contains: value,
+                  mode: "insensitive"
+                }
+              },
+              {
+                Usuarios: {
+                  nome: {
+                    contains: value,
+                    mode: "insensitive"
+                  }
+                }
+              }
+            ]
+          })
+          break;
+
+        case 'saldo':
+          Object.assign(where, {
+            OR: [
+              {
+                saldo: {
+                  equals: parseInt(value),
+                  // mode: "insensitive"
+                }
+              }
+            ]
+          })
+          break;
+      }
+    })
+
+    const [count, rows] = await this.prisma.$transaction([
+      this.prisma.contaBancaria.count({ where }),
+      this.prisma.contaBancaria.findMany({
+        skip,
+        take,
+        orderBy: {
+          [orderBy as string]: order
+        },
+        where,
+        select: {
+          id: true,
+          nome: true,
+          ativo: true,
+          saldo: true,
+          dataCadastro: true,
+          usuarioCadastro: true,
+          Usuarios: {
+            select: {
+              nome: true,
+            }
+          }
+        }
+      })
+    ])
+
+    return { count, rows }
+
+  }
 
   create = async ({
     nome,
@@ -38,6 +115,9 @@ class ContaBancariaRepository implements IContaBancaria {
     const contaBancaria = await this.prisma.contaBancaria.findUnique({
       where: {
         id
+      },
+      include: {
+        Usuarios: true
       }
     })
 
@@ -53,6 +133,9 @@ class ContaBancariaRepository implements IContaBancaria {
     const contasBancarias = await this.prisma.contaBancaria.findMany({
       where: {
         ativo: true
+      },
+      include: {
+        Usuarios: true
       }
     })
 
