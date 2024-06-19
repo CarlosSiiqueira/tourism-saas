@@ -6,68 +6,68 @@ import { EnderecoService } from '../services/endereco.service'
 
 @injectable()
 class PessoaController {
-    constructor(
-        @inject("PessoaRepository")
-        private pessoaRepository: PessoaRepository,
-        @inject("EnderecoRepository")
-        private enderecoRepository: EnderecoRepository,
-        private enderecoService: EnderecoService = new EnderecoService(enderecoRepository)
-    ) { }
+  constructor(
+    @inject("PessoaRepository")
+    private pessoaRepository: PessoaRepository,
+    @inject("EnderecoRepository")
+    private enderecoRepository: EnderecoRepository,
+    private enderecoService: EnderecoService = new EnderecoService(enderecoRepository)
+  ) { }
 
 
-    create = async (request: Request, response: Response): Promise<void> => {
+  create = async (request: Request, response: Response): Promise<void> => {
 
-        let codigoEndereco: string = ''
+    let codigoEndereco: string = ''
 
-        try {
-            codigoEndereco = await this.enderecoService.findOrCreateAddress({
-                id: request.body.codigoEndereco || null,
-                cep: request.body.cep || '',
-                cidade: request.body.cidade || '',
-                complemento: request.body.complemento || '',
-                logradouro: request.body.logradouro || '',
-                numero: request.body.numero || '',
-                uf: request.body.uf || ''
-            })
+    try {
+      codigoEndereco = await this.enderecoService.findOrCreateAddress({
+        id: request.body.codigoEndereco || null,
+        cep: request.body.cep || '',
+        cidade: request.body.cidade || '',
+        complemento: request.body.complemento || '',
+        logradouro: request.body.logradouro || '',
+        numero: request.body.numero || '',
+        uf: request.body.uf || ''
+      })
 
 
-        } catch (error) {
-            response.status(500).send(`Erro ao incluir endereço, verifique body (cep,numero) para buscar endereço
+    } catch (error) {
+      response.status(500).send(`Erro ao incluir endereço, verifique body (cep,numero) para buscar endereço
                  ou (cep, cidade, complemento, logradouro, numero, uf) para criar novo `)
-            return;
-        }
-        const res = await this.pessoaRepository.create(request.body, codigoEndereco)
-
-        response.status(200).send(res)
+      return;
     }
+    const res = await this.pessoaRepository.create(request.body, codigoEndereco)
 
-    find = async (request: Request, response: Response): Promise<void> => {
+    response.status(200).send(res)
+  }
 
-        const res = await this.pessoaRepository.find(request.params.id)
+  find = async (request: Request, response: Response): Promise<void> => {
 
-        response.status(200).send(res)
-    }
+    const res = await this.pessoaRepository.find(request.params.id)
 
-    findAll = async (request: Request, response: Response): Promise<void> => {
+    response.status(200).send(res)
+  }
 
-        const res = await this.pessoaRepository.findAll()
+  findAll = async (request: Request, response: Response): Promise<void> => {
 
-        response.status(200).send(res)
-    }
+    const res = await this.pessoaRepository.findAll()
 
-    update = async (request: Request, response: Response): Promise<void> => {
+    response.status(200).send(res)
+  }
 
-        const res = await this.pessoaRepository.update(request.body, request.params.id)
+  update = async (request: Request, response: Response): Promise<void> => {
 
-        response.status(200).send(res)
-    }
+    const res = await this.pessoaRepository.update(request.body, request.params.id)
 
-    delete = async (request: Request, response: Response): Promise<void> => {
+    response.status(200).send(res)
+  }
 
-        const res = await this.pessoaRepository.delete(request.params.id)
+  delete = async (request: Request, response: Response): Promise<void> => {
 
-        response.status(200).send(res)
-    }
+    const res = await this.pessoaRepository.delete(request.params.id)
+
+    response.status(200).send(res)
+  }
 
 }
 

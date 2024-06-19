@@ -1,122 +1,111 @@
-import { dateValidate } from "../../shared/helper/date"
 import prismaManager from "../database/database"
+import { Warning } from "../errors"
 import { IContaBancaria, IContaBancariaDTO, IContaBancariaResponse } from "../interfaces/ContaBancaria"
 
 class ContaBancariaRepository implements IContaBancaria {
 
-    private prisma = prismaManager.getPrisma()
+  private prisma = prismaManager.getPrisma()
 
-    create = async ({
-        nome,
-        ativo,
-        saldo = 0,
-        dataCadastro,
-        usuarioCadastro
-    }: IContaBancariaDTO): Promise<string[]> => {
+  create = async ({
+    nome,
+    saldo = 0,
+    usuarioCadastro
+  }: IContaBancariaDTO): Promise<string[]> => {
 
-        try {
+    try {
 
-            const id = crypto.randomUUID()
-            dataCadastro = dateValidate(dataCadastro)
+      const id = crypto.randomUUID()
 
-            await this.prisma.contaBancaria.create({
-                data: {
-                    id,
-                    nome,
-                    ativo,
-                    saldo,
-                    dataCadastro,
-                    usuarioCadastro
-                }
-            })
-
-            return ['Conta bancária cadastrada com sucesso!']
-
-
-        } catch (error) {
-            const a = error
-            return ['not found']
+      await this.prisma.contaBancaria.create({
+        data: {
+          id,
+          nome,
+          saldo,
+          usuarioCadastro
         }
+      })
+
+      return ['Conta bancária cadastrada com sucesso!']
+
+    } catch (error) {
+      const a = error
+      return ['not found']
+    }
+  }
+
+  find = async (id: string): Promise<IContaBancariaResponse> => {
+
+    const contaBancaria = await this.prisma.contaBancaria.findUnique({
+      where: {
+        id
+      }
+    })
+
+    if (!contaBancaria) {
+      throw new Warning("Conta não encontrada", 400);
     }
 
-    find = async (id: string): Promise<IContaBancariaResponse> => {
+    return contaBancaria
+  }
 
-        const contaBancaria = await this.prisma.contaBancaria.findUnique({
-            where: {
-                id
-            }
-        })
+  findAll = async (): Promise<IContaBancariaResponse[]> => {
 
-        if (!contaBancaria) {
-            throw new Error("Conta não encontrada");
-        }
+    const contasBancarias = await this.prisma.contaBancaria.findMany({
+      where: {
+        ativo: true
+      }
+    })
 
-        return contaBancaria
+    if (!contasBancarias) {
+      throw new Warning("Sem contas cadastradas na base", 400)
     }
 
-    findAll = async (): Promise<IContaBancariaResponse[]> => {
+    return contasBancarias
+  }
 
-        const contasBancarias = await this.prisma.contaBancaria.findMany({
-            where: {
-                ativo: true
-            }
-        })
+  delete = async (id: string): Promise<string> => {
 
-        if (!contasBancarias) {
-            throw new Error("Sem contas cadastradas na base")
-        }
+    const contaBancaria = await this.prisma.contaBancaria.update({
+      data: {
+        ativo: false
+      },
+      where: {
+        id: id
+      }
+    })
 
-        return contasBancarias
+    if (!contaBancaria) {
+      throw new Warning('Registro não encontrado', 400)
     }
 
-    delete = async (id: string): Promise<string> => {
+    return id
 
-        const contaBancaria = await this.prisma.contaBancaria.update({
-            data: {
-                ativo: false
-            },
-            where: {
-                id: id
-            }
-        })
+  }
 
-        if (!contaBancaria) {
-            throw new Error('Registro não encontrado')
-        }
+  update = async ({
+    nome,
+    saldo,
+    usuarioCadastro
+  }: IContaBancariaDTO, id: string): Promise<string[]> => {
 
-        return id
+    const contaBancaria = await this.prisma.contaBancaria.update({
+      data: {
+        nome: nome,
+        saldo: saldo,
+        dataCadastro: new Date(),
+        usuarioCadastro: usuarioCadastro
+      },
+      where: {
+        id: id
+      }
+    })
 
+    if (!contaBancaria) {
+      throw new Warning('Registro não encontrado', 400)
     }
 
-    update = async ({
-        nome,
-        ativo,
-        saldo,
-        dataCadastro,
-        usuarioCadastro
-    }: IContaBancariaDTO, id: string): Promise<string[]> => {
-
-        dataCadastro = dateValidate(dataCadastro)
-        
-        const contaBancaria = await this.prisma.contaBancaria.update({
-            data: {
-                nome: nome,
-                ativo: ativo,
-                saldo: saldo,
-                dataCadastro: dataCadastro,
-                usuarioCadastro: usuarioCadastro
-            },
-            where: {
-                id: id
-            }
-        })
-
-        if (!contaBancaria) {
-            throw new Error('Registro não encontrado')
-        }
-
-        return ['Registro Atualizado com sucesso'];
-    }
+    return ['Registro Atualizado com sucesso'];
+  }
 }
 
 export { ContaBancariaRepository }

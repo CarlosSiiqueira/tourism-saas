@@ -1,138 +1,134 @@
-import { dateValidate } from "../../shared/helper/date";
 import prismaManager from "../database/database";
+import { Warning } from "../errors";
 import { IVendas, IVendasDTO, IVendasResponse } from "../interfaces/Vendas";
 
 class VendasRepository implements IVendas {
 
-    private prisma = prismaManager.getPrisma()
+  private prisma = prismaManager.getPrisma()
 
-    create = async ({
-        valor,
-        tipo,
-        qtd,
-        efetivada = false,
-        codigoCliente,
-        codigoFormaPagamento,
-        codigoProduto = null,
-        codigoPacote = null,
-        usuarioCadastro
-    }: IVendasDTO): Promise<string[]> => {
+  create = async ({
+    valor,
+    tipo,
+    qtd,
+    codigoCliente,
+    codigoFormaPagamento,
+    codigoProduto = null,
+    codigoPacote = null,
+    usuarioCadastro
+  }: IVendasDTO): Promise<string[]> => {
 
-        try {
+    try {
 
-            const id = crypto.randomUUID()
-            let data = new Date(Date.now())
+      const id = crypto.randomUUID()
 
-            const venda = await this.prisma.vendas.create({
-                data: {
-                    id,
-                    valor,
-                    tipo,
-                    qtd,
-                    efetivada,
-                    data,
-                    codigoCliente,
-                    codigoFormaPagamento,
-                    codigoProduto,
-                    codigoPacote,
-                    usuarioCadastro
-                }
-            })
-
-            return ['Venda criada com sucesso']
-
-        } catch (error) {
-            return ['Não foi possível criar venda']
+      const venda = await this.prisma.vendas.create({
+        data: {
+          id,
+          valor,
+          tipo,
+          qtd,
+          codigoCliente,
+          codigoFormaPagamento,
+          codigoProduto,
+          codigoPacote,
+          usuarioCadastro
         }
+      })
 
+      return ['Venda criada com sucesso']
+
+    } catch (error) {
+      throw new Warning('Não foi possível criar venda', 400)
     }
 
-    find = async (id: string): Promise<IVendasResponse | null> => {
+  }
 
-        const venda = await this.prisma.vendas.findUnique({
-            where: {
-                id
-            }
-        })
+  find = async (id: string): Promise<IVendasResponse | null> => {
 
-        if (!venda) {
-            throw new Error("Venda não encontrada")
-        }
+    const venda = await this.prisma.vendas.findUnique({
+      where: {
+        id
+      }
+    })
 
-        return venda
+    if (!venda) {
+      throw new Warning("Venda não encontrada", 400)
     }
 
-    findAll = async (): Promise<IVendasResponse[]> => {
+    return venda
+  }
 
-        const vendas = await this.prisma.vendas.findMany()
+  findAll = async (): Promise<IVendasResponse[]> => {
 
-        if (!vendas) {
-            throw new Error("Sem vendas na base")
-        }
+    const vendas = await this.prisma.vendas.findMany()
 
-        return vendas
+    if (!vendas) {
+      throw new Warning("Sem vendas na base", 400)
     }
 
-    update = async ({
-        valor,
-        tipo,
-        qtd,
-        efetivada,
-        codigoCliente,
-        codigoFormaPagamento,
-        codigoProduto,
-        codigoPacote,
-        usuarioCadastro
-    }: IVendasDTO, id: string): Promise<string[]> => {
+    return vendas
+  }
 
-        try {
+  update = async ({
+    valor,
+    tipo,
+    qtd,
+    efetivada,
+    codigoCliente,
+    codigoFormaPagamento,
+    codigoProduto,
+    codigoPacote,
+    usuarioCadastro
+  }: IVendasDTO, id: string): Promise<string[]> => {
 
-            let data = new Date(Date.now())
+    try {
 
-            const venda = await this.prisma.vendas.update({
-                data: {
-                    valor,
-                    tipo,
-                    qtd,
-                    efetivada,
-                    data,
-                    codigoCliente,
-                    codigoFormaPagamento,
-                    codigoProduto,
-                    codigoPacote,
-                    usuarioCadastro
-                },
-                where: {
-                    id
-                }
-            })
+      let data = new Date(Date.now())
 
-            if (!venda) {
-                throw new Error("Venda não encontrada")
-            }
-
-            return ['Venda atualizada com sucesso']
-
-        } catch (error) {
-            return ['Erro ao atualizar venda']
+      const venda = await this.prisma.vendas.update({
+        data: {
+          valor,
+          tipo,
+          qtd,
+          efetivada,
+          data,
+          codigoCliente,
+          codigoFormaPagamento,
+          codigoProduto,
+          codigoPacote,
+          usuarioCadastro
+        },
+        where: {
+          id
         }
+      })
 
+      if (!venda) {
+        throw new Warning("Venda não encontrada", 400)
+      }
+
+      return ['Venda atualizada com sucesso']
+
+    } catch (error) {
+      throw new Warning('Erro ao atualizar venda', 400)
     }
 
-    delete = async (id: string): Promise<string[]> => {
+  }
 
-        const venda = await this.prisma.vendas.delete({
-            where: {
-                id
-            }
-        })
+  delete = async (id: string): Promise<string[]> => {
 
-        if (!venda) {
-            throw new Error("Venda não encontrada")
-        }
+    const venda = await this.prisma.vendas.delete({
+      where: {
+        id
+      }
+    })
 
-        return ['Venda excluída com sucesso']
+    if (!venda) {
+      throw new Warning("Venda não encontrada", 400)
     }
+
+    return ['Venda excluída com sucesso']
+  }
 
 }
 

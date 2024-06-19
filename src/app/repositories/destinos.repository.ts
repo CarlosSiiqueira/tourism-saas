@@ -1,124 +1,116 @@
-import { dateValidate } from "../../shared/helper/date";
 import prismaManager from "../database/database";
+import { Warning } from "../errors";
 import { IDestinos, IDestinosDTO, IDestinosResponse } from "../interfaces/Destinos";
 
 class DestinosRepository implements IDestinos {
 
-    private prisma = prismaManager.getPrisma()
+  private prisma = prismaManager.getPrisma()
 
-    create = async ({
+  create = async ({
+    nome,
+    codigoEndereco,
+    usuarioCadastro,
+  }: IDestinosDTO): Promise<string[]> => {
+
+    try {
+
+      const id = crypto.randomUUID()
+
+      const destino = await this.prisma.destinos.create({
+        data: {
+          id,
+          nome,
+          codigoEndereco,
+          usuarioCadastro
+        }
+      })
+
+      return ['Destino criado com sucesso']
+
+    } catch (error) {
+      throw new Warning('Erro ao criar destino', 400)
+    }
+
+  }
+
+  find = async (id: string): Promise<IDestinosResponse | null> => {
+
+    const destino = await this.prisma.destinos.findUnique({
+      where: {
+        id
+      }
+    })
+
+    if (!destino) {
+      throw new Warning("Destino não encontrado", 400)
+    }
+
+    return destino
+
+  }
+
+  findAll = async (): Promise<IDestinosResponse[]> => {
+
+    const destinos = await this.prisma.destinos.findMany({
+      where: {
+        ativo: true
+      }
+    })
+
+    if (!destinos) {
+      throw new Warning("Sem destinos cadastrados na base", 400)
+    }
+
+    return destinos
+
+  }
+
+  update = async ({
+    nome,
+    ativo = true,
+    codigoEndereco,
+    usuarioCadastro
+  }: IDestinosDTO, id: string): Promise<string[]> => {
+
+    const destino = await this.prisma.destinos.update({
+      data: {
         nome,
         ativo,
-        dataCadastro,
-        codigoEndereco,
-        usuarioCadastro,
-    }: IDestinosDTO): Promise<string[]> => {
-
-        try {
-
-            const id = crypto.randomUUID()
-            dataCadastro = dateValidate(dataCadastro)
-
-            const destino = await this.prisma.destinos.create({
-                data: {
-                    id,
-                    nome,
-                    ativo,
-                    dataCadastro,
-                    codigoEndereco,
-                    usuarioCadastro
-                }
-            })
-
-            return ['Destino criado com sucesso']
-
-        } catch (error) {
-            return ['Erro ao criar destino']
-        }
-
-    }
-
-    find = async (id: string): Promise<IDestinosResponse | null> => {
-
-        const destino = await this.prisma.destinos.findUnique({
-            where: {
-                id
-            }
-        })
-
-        if (!destino) {
-            throw new Error("Destino não encontrado")
-        }
-
-        return destino
-
-    }
-
-    findAll = async (): Promise<IDestinosResponse[]> => {
-
-        const destinos = await this.prisma.destinos.findMany({
-            where: {
-                ativo: true
-            }
-        })
-
-        if (!destinos) {
-            throw new Error("Sem destinos cadastrados na base")
-        }
-
-        return destinos
-
-    }
-
-    update = async ({
-        nome,
-        ativo,
-        dataCadastro,
+        dataCadastro: new Date(),
         codigoEndereco,
         usuarioCadastro
-    }: IDestinosDTO, id: string): Promise<string[]> => {
+      },
+      where: {
+        id
+      }
+    })
 
-        dataCadastro = dateValidate(dataCadastro)
-
-        const destino = await this.prisma.destinos.update({
-            data: {
-                nome,
-                ativo,
-                dataCadastro,
-                codigoEndereco,
-                usuarioCadastro
-            },
-            where: {
-                id
-            }
-        })
-
-        if (!destino) {
-            return ['Erro ao atualizar destino']
-        }
-
-        return ['Destino atualizado com sucesso']
-
+    if (!destino) {
+      throw new Warning('Erro ao atualizar destino', 400)
     }
 
-    delete = async (id: string): Promise<string[]> => {
+    return ['Destino atualizado com sucesso']
 
-        const destino = await this.prisma.destinos.update({
-            data: {
-                ativo: false
-            },
-            where: {
-                id
-            }
-        })
+  }
 
-        if (!destino) {
-            throw new Error("Não foi possivel excluir Destino")
-        }
+  delete = async (id: string): Promise<string[]> => {
 
-        return ['Destino excluído com sucesso']
+    const destino = await this.prisma.destinos.update({
+      data: {
+        ativo: false
+      },
+      where: {
+        id
+      }
+    })
 
+    if (!destino) {
+      throw new Warning("Não foi possivel excluir Destino", 400)
     }
+
+    return ['Destino excluído com sucesso']
+
+  }
 
 }
 

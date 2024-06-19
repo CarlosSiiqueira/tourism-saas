@@ -4,47 +4,47 @@ import { Request, Response } from "express"
 
 @injectable()
 class ContaBancariaController {
-    constructor(
-        @inject("ContaBancariaRepository")
-        private contaBancariaRepository: ContaBancariaRepository
-    ) { }
+  constructor(
+    @inject("ContaBancariaRepository")
+    private contaBancariaRepository: ContaBancariaRepository
+  ) { }
 
-    create = async (request: Request, response: Response): Promise<void> => {
+  create = async (request: Request, response: Response): Promise<void> => {
 
-        const res = await this.contaBancariaRepository.create(request.body)
+    const res = await this.contaBancariaRepository.create(request.body)
 
-        response.status(200).send(res)
+    response.status(200).send(res)
 
-    }
+  }
 
-    find = async (request: Request, response: Response): Promise<void> => {
+  find = async (request: Request, response: Response): Promise<void> => {
 
-        const res = await this.contaBancariaRepository.find(request.params.id)
+    const res = await this.contaBancariaRepository.find(request.params.id)
 
-        response.status(200).send(res)
+    response.status(200).send(res)
 
-    }
+  }
 
-    findAll = async (request: Request, response: Response): Promise<void> => {
+  findAll = async (request: Request, response: Response): Promise<void> => {
 
-        const res = await this.contaBancariaRepository.findAll();
+    const res = await this.contaBancariaRepository.findAll();
 
-        response.status(200).send(res)
-    }
+    response.status(200).send(res)
+  }
 
-    delete = async (request: Request, response: Response): Promise<void> => {
+  delete = async (request: Request, response: Response): Promise<void> => {
 
-        const res = await this.contaBancariaRepository.delete(request.params.id)
+    const res = await this.contaBancariaRepository.delete(request.params.id)
 
-        response.status(200).send(res)
-    }
+    response.status(200).send(res)
+  }
 
-    update = async (request: Request, response: Response): Promise<void> => {
+  update = async (request: Request, response: Response): Promise<void> => {
 
-        const res = await this.contaBancariaRepository.update(request.body, request.params.id)
+    const res = await this.contaBancariaRepository.update(request.body, request.params.id)
 
-        response.status(200).send(res)
-    }
+    response.status(200).send(res)
+  }
 
 }
 

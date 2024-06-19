@@ -1,100 +1,110 @@
-import { dateValidate } from "../../shared/helper/date";
 import prismaManager from "../database/database";
+import { Warning } from "../errors";
 import { IFornecedor, IFornecedorDTO, IFornecedorResponse } from "../interfaces/Fornecedor";
 
 class FornecedorRepository implements IFornecedor {
 
-    private prisma = prismaManager.getPrisma()
+  private prisma = prismaManager.getPrisma()
 
-    create = async ({
-        nome,
-        fantasia,
-        cnpj,
-        site = '',
-        ativo,
-        dataCadastro,
-        observacoes = '',
-        telefone = '',
-        email,
-        contato = '',
-        telefoneContato = '',
-        codigoEndereco,
-        usuarioCadastro
-    }: IFornecedorDTO): Promise<string[]> => {
+  create = async ({
+    nome,
+    fantasia,
+    cnpj,
+    site = '',
+    observacoes = '',
+    telefone = '',
+    email,
+    contato = '',
+    telefoneContato = '',
+    codigoEndereco,
+    usuarioCadastro
+  }: IFornecedorDTO): Promise<string[]> => {
 
-        try {
+    try {
 
-            const id = crypto.randomUUID()
-            dataCadastro = dateValidate(dataCadastro)
+      const id = crypto.randomUUID()
 
-            const fornecedor = await this.prisma.fornecedor.create({
-                data: {
-                    id,
-                    nome,
-                    fantasia,
-                    cnpj,
-                    site,
-                    ativo,
-                    dataCadastro,
-                    observacoes,
-                    telefone,
-                    email,
-                    contato,
-                    telefoneContato,
-                    codigoEndereco,
-                    usuarioCadastro
-                }
-            })
-
-            return ['Fornecedor incluído com sucesso']
-        } catch (error) {
-            return ['Erro ao incluir fornecedor']
+      const fornecedor = await this.prisma.fornecedor.create({
+        data: {
+          id,
+          nome,
+          fantasia,
+          cnpj,
+          site,
+          observacoes,
+          telefone,
+          email,
+          contato,
+          telefoneContato,
+          codigoEndereco,
+          usuarioCadastro
         }
+      })
+
+      return ['Fornecedor incluído com sucesso']
+
+    } catch (error) {
+      throw new Warning('Erro ao incluir fornecedor', 400)
+    }
+  }
+
+  find = async (id: string): Promise<IFornecedorResponse | null> => {
+
+    const fornecedor = await this.prisma.fornecedor.findUnique({
+      where: {
+        id
+      },
+      include: {
+        Endereco: true,
+      }
+    })
+
+    if (!fornecedor) {
+      throw new Warning("Fornecedor não encontrado", 400)
     }
 
-    find = async (id: string): Promise<IFornecedorResponse | null> => {
+    return fornecedor
+  }
 
-        const fornecedor = await this.prisma.fornecedor.findUnique({
-            where: {
-                id
-            },
-            include: {
-                Endereco: true,
-            }
-        })
+  findAll = async (): Promise<IFornecedorResponse[]> => {
 
-        if (!fornecedor) {
-            throw new Error("Fornecedor não encontrado")
-        }
+    const fornecedores = await this.prisma.fornecedor.findMany({
+      where: {
+        ativo: true
+      },
+      include: {
+        Endereco: true,
+      }
+    })
 
-        return fornecedor
+    if (!fornecedores) {
+      throw new Warning("Sem fornecedores cadastrados na base", 400)
     }
 
-    findAll = async (): Promise<IFornecedorResponse[]> => {
+    return fornecedores
+  }
 
-        const fornecedores = await this.prisma.fornecedor.findMany({
-            where: {
-                ativo: true
-            },
-            include: {
-                Endereco: true,
-            }
-        })
+  update = async ({
+    nome,
+    fantasia,
+    cnpj,
+    site,
+    observacoes,
+    telefone,
+    email,
+    contato,
+    telefoneContato,
+    codigoEndereco,
+    usuarioCadastro
+  }: IFornecedorDTO, id: string): Promise<string[]> => {
 
-        if (!fornecedores) {
-            throw new Error("Sem fornecedores cadastrados na base")
-        }
-
-        return fornecedores
-    }
-
-    update = async ({
+    const fornecedor = await this.prisma.fornecedor.update({
+      data: {
         nome,
         fantasia,
         cnpj,
         site,
-        ativo,
-        dataCadastro,
+        dataCadastro: new Date(),
         observacoes,
         telefone,
         email,
@@ -102,53 +112,36 @@ class FornecedorRepository implements IFornecedor {
         telefoneContato,
         codigoEndereco,
         usuarioCadastro
-    }: IFornecedorDTO, id: string): Promise<string[]> => {
+      },
+      where: {
+        id
+      }
+    })
 
-        const fornecedor = await this.prisma.fornecedor.update({
-            data: {
-                nome,
-                fantasia,
-                cnpj,
-                site,
-                ativo,
-                dataCadastro,
-                observacoes,
-                telefone,
-                email,
-                contato,
-                telefoneContato,
-                codigoEndereco,
-                usuarioCadastro
-            },
-            where: {
-                id
-            }
-        })
-
-        if (!fornecedor) {
-            throw new Error("Fornecedor não encontrado")
-        }
-
-        return ['Fornecedor atualizado com sucesso']
+    if (!fornecedor) {
+      throw new Warning("Fornecedor não encontrado", 400)
     }
 
-    delete = async (id: string): Promise<string[]> => {
+    return ['Fornecedor atualizado com sucesso']
+  }
 
-        const fornecedor = await this.prisma.fornecedor.update({
-            data: {
-                ativo: false
-            },
-            where: {
-                id
-            }
-        })
+  delete = async (id: string): Promise<string[]> => {
 
-        if (!fornecedor) {
-            throw new Error("Fornecedor não encontrado")
-        }
+    const fornecedor = await this.prisma.fornecedor.update({
+      data: {
+        ativo: false
+      },
+      where: {
+        id
+      }
+    })
 
-        return ['Fornecedor excluido com sucesso']
+    if (!fornecedor) {
+      throw new Warning("Fornecedor não encontrado", 400)
     }
+
+    return ['Fornecedor excluido com sucesso']
+  }
 
 }
 

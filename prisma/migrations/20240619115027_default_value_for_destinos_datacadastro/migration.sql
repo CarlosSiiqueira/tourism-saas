@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "Destinos" ALTER COLUMN "dataCadastro" SET DEFAULT CURRENT_TIMESTAMP;

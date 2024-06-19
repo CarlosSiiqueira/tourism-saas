@@ -4,59 +4,59 @@ import { Request, Response } from 'express'
 
 @injectable()
 class ExcursaoController {
-    constructor(
-        @inject("ExcursaoRepository")
-        private excursaoRepository: ExcursaoRepository
-    ) { }
+  constructor(
+    @inject("ExcursaoRepository")
+    private excursaoRepository: ExcursaoRepository
+  ) { }
 
-    create = async (request: Request, response: Response): Promise<void> => {
+  create = async (request: Request, response: Response): Promise<void> => {
 
-        const res = await this.excursaoRepository.create(request.body)
+    const res = await this.excursaoRepository.create(request.body)
 
-        response.status(200).send(res)
-    }
+    response.status(200).send(res)
+  }
 
-    find = async (request: Request, response: Response): Promise<void> => {
+  find = async (request: Request, response: Response): Promise<void> => {
 
-        const res = await this.excursaoRepository.find(request.params.id)
+    const res = await this.excursaoRepository.find(request.params.id)
 
-        response.status(200).send(res)
-    }
+    response.status(200).send(res)
+  }
 
-    findAll = async (request: Request, response: Response): Promise<void> => {
+  findAll = async (request: Request, response: Response): Promise<void> => {
 
-        const res = await this.excursaoRepository.findAll()
+    const res = await this.excursaoRepository.findAll()
 
-        response.status(200).send(res)
+    response.status(200).send(res)
 
-    }
+  }
 
-    delete = async (request: Request, response: Response): Promise<void> => {
+  delete = async (request: Request, response: Response): Promise<void> => {
 
-        const res = await this.excursaoRepository.delete(request.params.id)
+    const res = await this.excursaoRepository.delete(request.params.id)
 
-        response.status(200).send(res)
+    response.status(200).send(res)
 
-    }
+  }
 
-    update = async (request: Request, response: Response): Promise<void> => {
+  update = async (request: Request, response: Response): Promise<void> => {
 
-        const res = await this.excursaoRepository.update(request.body, request.params.id)
+    const res = await this.excursaoRepository.update(request.body, request.params.id)
 
-        response.status(200).send(res)
-    }
+    response.status(200).send(res)
+  }
 
-    createExcursaoQuartos = async (request: Request, response: Response): Promise<void> => {
+  createExcursaoQuartos = async (request: Request, response: Response): Promise<void> => {
 
-    }
+  }
 
-    findExcursaoQuartos = async (request: Request, response: Response): Promise<void> => {
+  findExcursaoQuartos = async (request: Request, response: Response): Promise<void> => {
 
-    }
+  }
 
-    updateExcursaoQuartos = async (request: Request, response: Response): Promise<void> => {
+  updateExcursaoQuartos = async (request: Request, response: Response): Promise<void> => {
 
-    }
+  }
 
 }
 

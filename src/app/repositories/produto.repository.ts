@@ -1,232 +1,227 @@
 import { dateValidate } from "../../shared/helper/date"
 import prismaManager from "../database/database"
+import { Warning } from "../errors"
 import { IIndex } from "../interfaces/Helper"
-import { IProduto, IProdutoDTO, IProdutoIndexResponse, IProdutoResponse } from "../interfaces/Produto"
+import { IProduto, IProdutoDTO, IProdutoResponse } from "../interfaces/Produto"
 
 class ProdutoRepository implements IProduto {
 
-    private prisma = prismaManager.getPrisma()
+  private prisma = prismaManager.getPrisma()
 
-    index = async ({
-        orderBy,
-        order,
+  index = async ({
+    orderBy,
+    order,
+    skip,
+    take,
+    filter }: IIndex): Promise<{ count: number; rows: IProdutoResponse[] }> => {
+
+    const where = {
+      NOT: {
+        id: undefined
+      }
+    }
+
+    Object.entries(filter as { [key: string]: string }).map(([key, value]) => {
+
+      switch (key) {
+        case 'nome':
+          Object.assign(where, {
+            OR: [
+              {
+                nome: {
+                  contains: value,
+                  mode: "insensitive"
+                }
+              },
+              {
+                Fornecedor: {
+                  nome: {
+                    contains: value,
+                    mode: "insensitive"
+                  }
+                }
+              }
+            ]
+          })
+          break;
+
+        case 'estoque':
+          Object.assign(where, {
+            AND: [
+              {
+                estoque: {
+                  equals: parseInt(value),
+                  // mode: "insensitive"
+                }
+              }
+            ]
+          })
+          break;
+      }
+    })
+
+    const [count, rows] = await this.prisma.$transaction([
+      this.prisma.produtos.count({ where }),
+      this.prisma.produtos.findMany({
         skip,
         take,
-        filter }: IIndex): Promise<{ count: number; rows: IProdutoIndexResponse[] }> => {
-
-        const where = {
-            NOT: {
-                id: undefined
+        orderBy: {
+          [orderBy as string]: order
+        },
+        where,
+        select: {
+          id: true,
+          nome: true,
+          estoque: true,
+          dataCompra: true,
+          dataCadastro: true,
+          ativo: true,
+          codigoFornecedor: true,
+          usuarioCadastro: true,
+          Fornecedor: {
+            select: {
+              id: true,
+              nome: true,
+              fantasia: true,
+              cnpj: true,
+              site: true,
+              ativo: true,
+              dataCadastro: true,
+              observacoes: true,
+              telefone: true,
+              email: true,
+              contato: true,
+              telefoneContato: true,
+              codigoEndereco: true,
+              usuarioCadastro: true
             }
+          }
         }
+      })
+    ])
 
-        Object.entries(filter as { [key: string]: string }).map(([key, value]) => {
+    return { count, rows }
+  }
 
-            switch (key) {
-                case 'nome':
-                    Object.assign(where, {
-                        OR: [
-                            {
-                                nome: {
-                                    contains: value,
-                                    mode: "insensitive"
-                                }
-                            },
-                            {
-                                Fornecedor: {
-                                    nome: {
-                                        contains: value,
-                                        mode: "insensitive"
-                                    }
-                                }
-                            }
-                        ]
-                    })
-                    break;
+  create = async ({
+    nome,
+    estoque,
+    dataCompra,
+    ativo,
+    codigoFornecedor,
+    usuarioCadastro }: IProdutoDTO): Promise<string[]> => {
 
-                case 'estoque':
-                    Object.assign(where, {
-                        AND: [
-                            {
-                                estoque: {
-                                    equals: parseInt(value),
-                                    // mode: "insensitive"
-                                }
-                            }
-                        ]
-                    })
-                    break;
-            }
-        })
+    try {
 
-        const [count, rows] = await this.prisma.$transaction([
-            this.prisma.produtos.count({ where }),
-            this.prisma.produtos.findMany({
-                skip,
-                take,
-                orderBy: {
-                    [orderBy as string]: order
-                },
-                where,
-                select: {
-                    id: true,
-                    nome: true,
-                    estoque: true,
-                    dataCompra: true,
-                    dataCadastro: true,
-                    ativo: true,
-                    codigoFornecedor: true,
-                    usuarioCadastro: true,
-                    Fornecedor: {
-                        select: {
-                            id: true,
-                            nome: true,
-                            fantasia: true,
-                            cnpj: true,
-                            site: true,
-                            ativo: true,
-                            dataCadastro: true,
-                            observacoes: true,
-                            telefone: true,
-                            email: true,
-                            contato: true,
-                            telefoneContato: true,
-                            codigoEndereco: true,
-                            usuarioCadastro: true
-                        }
-                    }
-                }
-            })
-        ])
+      const id = crypto.randomUUID()
+      dataCompra = dataCompra && dateValidate(dataCompra)
 
-        return { count, rows }
+      const produto = await this.prisma.produtos.create({
+        data: {
+          id,
+          nome,
+          estoque,
+          dataCompra,
+          ativo,
+          codigoFornecedor,
+          usuarioCadastro,
+          dataCadastro: new Date()
+        }
+      })
+
+      return ['Produto inserido com sucesso']
+
+    } catch (error) {
+      throw new Warning("Erro ao inserir produto", 400)
+    }
+  }
+
+  find = async (id: string): Promise<IProdutoResponse | null> => {
+
+    const produto = await this.prisma.produtos.findUnique({
+      where: {
+        id
+      },
+      include: {
+        Fornecedor: true
+      }
+    })
+
+    if (!produto) {
+      throw new Warning("Produto não encontrada", 400)
     }
 
-    create = async ({
-        nome,
-        estoque,
-        dataCompra,
-        dataCadastro,
-        ativo,
-        codigoFornecedor,
-        usuarioCadastro }: IProdutoDTO): Promise<string[]> => {
+    return produto
 
-        try {
+  }
 
-            const id = crypto.randomUUID()
-            dataCadastro = dateValidate(dataCadastro)
-            dataCompra = dateValidate(dataCompra)
+  findAll = async (): Promise<IProdutoResponse[]> => {
 
-            const produto = await this.prisma.produtos.create({
-                data: {
-                    id,
-                    nome,
-                    estoque,
-                    dataCompra,
-                    dataCadastro,
-                    ativo,
-                    codigoFornecedor,
-                    usuarioCadastro
-                }
-            })
+    const produtos = await this.prisma.produtos.findMany({
+      where: {
+        ativo: true
+      },
+      include: {
+        Fornecedor: true
+      }
+    })
 
-            return ['Produto inserido com sucesso']
-
-        } catch (error) {
-            return ['Erro ao inserir produto']
-        }
+    if (!produtos) {
+      throw new Warning("Sem produtos registradas na base", 400)
     }
 
-    find = async (id: string): Promise<IProdutoResponse | null> => {
+    return produtos
+  }
 
-        const produto = await this.prisma.produtos.findUnique({
-            where: {
-                id
-            },
-            include: {
-                Fornecedor: true
-            }
-        })
+  update = async ({
+    nome,
+    estoque,
+    dataCompra,
+    ativo,
+    codigoFornecedor,
+    usuarioCadastro }: IProdutoDTO, id: string): Promise<string[]> => {
 
-        if (!produto) {
-            throw new Error("Produto não encontrada")
+    try {
+      dataCompra = dataCompra && dateValidate(dataCompra)
+
+      const produto = await this.prisma.produtos.update({
+        data: {
+          nome,
+          estoque,
+          dataCompra,
+          ativo,
+          codigoFornecedor,
+          usuarioCadastro
+        },
+        where: {
+          id
         }
+      })
 
-        return produto
+      return ['Produto atualizado com sucesso']
 
+    } catch (error) {
+      throw new Warning('Erro ao atualizar produto', 400)
+    }
+  }
+
+  delete = async (id: string): Promise<string[]> => {
+
+    const produto = await this.prisma.produtos.update({
+      data: {
+        ativo: false
+      },
+      where: {
+        id
+      }
+    })
+
+    if (!produto) {
+      throw new Warning('Não foi possível excluir o produto', 400)
     }
 
-    findAll = async (): Promise<IProdutoResponse[]> => {
-
-        const produtos = await this.prisma.produtos.findMany({
-            where: {
-                ativo: true
-            },
-            include: {
-                Fornecedor: true
-            }
-        })
-
-        if (!produtos) {
-            throw new Error("Sem produtos registradas na base")
-        }
-
-        return produtos
-    }
-
-    update = async ({
-        nome,
-        estoque,
-        dataCompra,
-        dataCadastro,
-        ativo,
-        codigoFornecedor,
-        usuarioCadastro }: IProdutoDTO, id: string): Promise<string[]> => {
-
-        try {
-
-            dataCadastro = dateValidate(dataCadastro)
-            dataCompra = dateValidate(dataCompra)
-
-            const produto = await this.prisma.produtos.update({
-                data: {
-                    nome,
-                    estoque,
-                    dataCompra,
-                    dataCadastro,
-                    ativo,
-                    codigoFornecedor,
-                    usuarioCadastro
-                },
-                where: {
-                    id
-                }
-            })
-
-            return ['Produto atualizado com sucesso']
-
-        } catch (error) {
-            return ['Erro ao atualizar produto']
-        }
-    }
-
-    delete = async (id: string): Promise<string[]> => {
-
-        const produto = await this.prisma.produtos.update({
-            data: {
-                ativo: false
-            },
-            where: {
-                id
-            }
-        })
-
-        if (!produto) {
-            return ['Não foi possível excluir o produto']
-        }
-
-        return ['Produto excluido com sucesso']
-    }
+    return ['Produto excluido com sucesso']
+  }
 }
 
 export { ProdutoRepository }

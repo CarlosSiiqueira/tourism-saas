@@ -1,93 +1,86 @@
-import { dateValidate } from "../../shared/helper/date"
 import prismaManager from "../database/database"
+import { Warning } from "../errors"
 import { IExcursaoOnibus, IExcursaoOnibusDTO, IExcursaoOnibusResponse } from "../interfaces/ExcursaoOnibus"
 
 class ExcursaoOnibusRepository implements IExcursaoOnibus {
 
-    private prisma = prismaManager.getPrisma()
+  private prisma = prismaManager.getPrisma()
 
-    create = async ({
-        numeroCadeira,
-        dataCadastro,
-        codigoExcursao,
-        codigoPassageiro,
-        usuarioCadastro
-    }: IExcursaoOnibusDTO): Promise<string[]> => {
+  create = async ({
+    numeroCadeira,
+    codigoExcursao,
+    codigoPassageiro,
+    usuarioCadastro
+  }: IExcursaoOnibusDTO): Promise<string[]> => {
 
-        try {
+    try {
 
-            const id = crypto.randomUUID()
-            dataCadastro = dateValidate(dataCadastro)
+      const id = crypto.randomUUID()
 
-            const excursaoOnibus = await this.prisma.excursaoOnibus.create({
-                data: {
-                    id: id,
-                    numeroCadeira: numeroCadeira,
-                    dataCadastro: dataCadastro,
-                    codigoExcursao: codigoExcursao,
-                    usuarioCadastro: usuarioCadastro,
-                    codigoPassageiro: codigoPassageiro
-                }
-            })
-
-            if (!excursaoOnibus) {
-                throw new Error('excursao sem Onibus configurados')
-            }
-
-            return ['Cadeira do onibus definidos com sucesso']
-        } catch (error) {
-            return ['Erro ao definir cadeira']
+      const excursaoOnibus = await this.prisma.excursaoOnibus.create({
+        data: {
+          id: id,
+          numeroCadeira: numeroCadeira,          
+          codigoExcursao: codigoExcursao,
+          usuarioCadastro: usuarioCadastro,
+          codigoPassageiro: codigoPassageiro
         }
+      })
+
+      if (!excursaoOnibus) {
+        throw new Warning('excursao sem Onibus configurados', 400)
+      }
+
+      return ['Cadeira do onibus definidos com sucesso']
+      
+    } catch (error) {
+      return ['Erro ao definir cadeira']
+    }
+  }
+
+  find = async (idExcursao: string, idCadeira: string): Promise<IExcursaoOnibusResponse[]> => {
+
+    const excursaoOnibus = await this.prisma.excursaoOnibus.findMany({
+      where: {
+        codigoExcursao: idExcursao,
+        id: idCadeira
+      },
+      include: {
+        Pessoa: true,
+        Excursao: true
+      }
+    })
+
+    if (!excursaoOnibus) {
+      throw new Warning('não existem cadeiras Onibus definidos para essa excursao', 400)
     }
 
-    find = async (idExcursao: string, idCadeira: string): Promise<IExcursaoOnibusResponse[]> => {
+    return excursaoOnibus
+  }
 
-        const excursaoOnibus = await this.prisma.excursaoOnibus.findMany({
-            where: {
-                codigoExcursao: idExcursao,
-                id: idCadeira
-            },
-            include: {
-                Pessoa: true,
-                Excursao: true
-            }
-        })
+  update = async ({
+    numeroCadeira,
+    codigoPassageiro,
+    usuarioCadastro }: IExcursaoOnibusDTO, id: string): Promise<string[]> => {
 
-        if (!excursaoOnibus) {
-            throw new Error('não existem cadeiras Onibus definidos para essa excursao')
-        }
+    const excursaoOnibus = await this.prisma.excursaoOnibus.update({
+      data: {
+        numeroCadeira: numeroCadeira,
+        dataCadastro: new Date(),
+        codigoPassageiro: codigoPassageiro,
+        usuarioCadastro: usuarioCadastro
+      },
+      where: {
+        id: id
+      }
+    })
 
-        return excursaoOnibus
+    if (!excursaoOnibus) {
+      throw new Warning('registro não encontrado', 400)
     }
 
-    update = async ({
-        numeroCadeira,
-        dataCadastro,
-        codigoExcursao,
-        codigoPassageiro,
-        usuarioCadastro }: IExcursaoOnibusDTO, id: string): Promise<string[]> => {
-
-        dataCadastro = dateValidate(dataCadastro)
-
-        const excursaoOnibus = await this.prisma.excursaoOnibus.update({
-            data: {
-                numeroCadeira: numeroCadeira,
-                dataCadastro: dataCadastro,
-                // codigoExcursao: codigoExcursao,
-                codigoPassageiro: codigoPassageiro,
-                usuarioCadastro: usuarioCadastro
-            },
-            where: {
-                id: id
-            }
-        })
-
-        if (!excursaoOnibus) {
-            throw new Error('registro não encontrado')
-        }
-
-        return ['Registro atualizado com sucesso']
-    }
+    return ['Registro atualizado com sucesso']
+  }
 }
 
 export { ExcursaoOnibusRepository }

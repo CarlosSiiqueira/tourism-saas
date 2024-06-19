@@ -1,151 +1,147 @@
-import { dateValidate } from "../../shared/helper/date"
 import prismaManager from "../database/database"
+import { Warning } from "../errors"
 import { IUsuario, IUsuarioDTO, IUsuarioResponse, IUsuarioLogin } from "../interfaces/Usuario"
 
 class UsuarioRepository implements IUsuario {
 
-    private prisma = prismaManager.getPrisma()
+  private prisma = prismaManager.getPrisma()
 
-    create = async ({
-        nome,
-        username,
-        password,
-        dataCadastro,
-        usuarioCadastro,
-        tipo,
-        email,
-        ativo = true,
-        comissao = null,
-        meta = null }: IUsuarioDTO): Promise<string[]> => {
+  create = async ({
+    nome,
+    username,
+    password,
+    usuarioCadastro,
+    tipo,
+    email,
+    comissao = null,
+    meta = null }: IUsuarioDTO): Promise<string[]> => {
 
-        try {
+    try {
 
-            const id = crypto.randomUUID()
-            dataCadastro = dateValidate(dataCadastro)
+      const id = crypto.randomUUID()
 
-            const usuario = await this.prisma.usuarios.create({
-                data: {
-                    id,
-                    nome,
-                    username,
-                    password,
-                    dataCadastro,
-                    usuarioCadastro,
-                    tipo,
-                    email,
-                    ativo,
-                    comissao,
-                    meta
-                }
-            })
-
-            return ['Usuario inserido com sucesso']
-
-        } catch (error) {
-            return ['Erro ao inserir Usuario']
+      const usuario = await this.prisma.usuarios.create({
+        data: {
+          id,
+          nome,
+          username,
+          password,
+          usuarioCadastro,
+          tipo,
+          email,
+          comissao,
+          meta
         }
+      })
+
+      return ['Usuario inserido com sucesso']
+
+    } catch (error) {
+      throw new Warning('Erro ao inserir Usuario', 400)
+    }
+  }
+
+  find = async (id: string): Promise<IUsuarioResponse | null> => {
+
+    const usuario = await this.prisma.usuarios.findUnique({
+      where: {
+        id: id,
+        ativo: true
+      }
+    })
+
+    if (!usuario) {
+      throw new Warning("Usuario não encontrado", 400)
     }
 
-    find = async (id: string): Promise<IUsuarioResponse | null> => {
+    return usuario
 
-        const usuario = await this.prisma.usuarios.findUnique({
-            where: {
-                id: id,
-                ativo: true
-            }
-        })
+  }
 
-        if (!usuario) {
-            throw new Error("Usuario não encontrado")
+  findAll = async (): Promise<IUsuarioResponse[]> => {
+
+    const usuarios = await this.prisma.usuarios.findMany({
+      where: {
+        ativo: true
+      }
+    })
+
+    if (!usuarios) {
+      throw new Warning("Sem usuários ativos na base", 400)
+    }
+
+    return usuarios
+  }
+
+  update = async ({
+    nome,
+    username,
+    password,
+    usuarioCadastro,
+    tipo,
+    email,
+    comissao,
+    meta }: IUsuarioDTO, id: string): Promise<string[]> => {
+
+    try {
+
+      const usuario = await this.prisma.usuarios.update({
+        data: {
+          nome,
+          username,
+          password,
+          dataCadastro: new Date(),
+          usuarioCadastro,
+          tipo,
+          email,
+          comissao,
+          meta
+        },
+        where: {
+          id
         }
+      })
 
-        return usuario
+      return ['Usuário atualizado com sucesso']
 
+    } catch (error) {
+      throw new Warning('Erro ao atualizar usuário', 400)
+    }
+  }
+
+  delete = async (id: string): Promise<string[]> => {
+
+    const usuario = await this.prisma.usuarios.update({
+      data: {
+        ativo: false
+      },
+      where: {
+        id
+      }
+    })
+
+    if (!usuario) {
+      throw new Warning('Não foi possível excluir o usuário', 400)
     }
 
-    findAll = async (): Promise<IUsuarioResponse[]> => {
+    return ['Usuário excluido com sucesso']
+  }
 
-        const usuarios = await this.prisma.usuarios.findMany({
-            where: {
-                ativo: true
-            }
-        })
+  login = async (username: string, password: string): Promise<IUsuarioResponse | null> => {
 
-        if (!usuarios) {
-            throw new Error("Sem usuários ativos na base")
-        }
+    const usuario = await this.prisma.usuarios.findFirst({
+      where: {
+        username: username,
+        password: password
+      }
+    })
 
-        return usuarios
+    if (!usuario) {
+      throw new Warning("Login ou senha incorretos", 400)
     }
 
-    update = async ({
-        nome,
-        username,
-        password,
-        dataCadastro,
-        usuarioCadastro,
-        tipo,
-        email,
-        ativo,
-        comissao,
-        meta }: IUsuarioDTO, id: string): Promise<string[]> => {
-
-        try {
-
-            const usuario = await this.prisma.usuarios.update({
-                data: {
-                    nome,
-                    username,
-                    password,
-                    dataCadastro,
-                    usuarioCadastro,
-                    tipo,
-                    email,
-                    ativo,
-                    comissao,
-                    meta
-                },
-                where: {
-                    id
-                }
-            })
-
-            return ['Usuário atualizado com sucesso']
-
-        } catch (error) {
-            return ['Erro ao atualizar usuário']
-        }
-    }
-
-    delete = async (id: string): Promise<string[]> => {
-
-        const usuario = await this.prisma.usuarios.update({
-            data: {
-                ativo: false
-            },
-            where: {
-                id
-            }
-        })
-
-        if (!usuario) {
-            return ['Não foi possível excluir o usuário']
-        }
-
-        return ['Usuário excluido com sucesso']
-    }
-
-    login = async (username: string, password: string): Promise<IUsuarioResponse | null> => {
-
-        const usuario = await this.prisma.usuarios.findFirst({
-            where: {
-                username: username,
-                password: password
-            }
-        })
-
-        return usuario
-    }
+    return usuario
+  }
 }
 
 export { UsuarioRepository }

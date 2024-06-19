@@ -7,42 +7,42 @@ const authService = new AuthService(usuarioRepository)
 
 const authenticateToken = async (request: Request, response: Response, next: NextFunction) => {
 
-    const noAuthRoutes = [
-        "/usuarios/login",
-        "/usuarios/auth"
-    ]
+  const noAuthRoutes = [
+    "/usuarios/login",
+    "/usuarios/auth"
+  ]
 
-    const authHeader = request.headers['authorization'];
+  const authHeader = request.headers['authorization'];
 
-    if (!authHeader) {
-        let access = false
-        noAuthRoutes.map(path => {
+  if (!authHeader) {
+    let access = false
+    noAuthRoutes.map(path => {
 
-            if (request.path == path) {
-                access = true
-            }
+      if (request.path == path) {
+        access = true
+      }
 
-        })
+    })
 
-        if (!access) {
-            return response.sendStatus(401)
-        }
-        return next()
+    if (!access) {
+      return response.sendStatus(401)
     }
+    return next()
+  }
 
-    const user = await authService.verifyToken(authHeader);
+  const user = await authService.verifyToken(authHeader);
 
-    if (!user) {
-        response.sendStatus(403)
-        return null
-    }
+  if (!user) {
+    response.sendStatus(401)
+    return null
+  }
 
-    request.headers = {
-        ...request.headers,
-        user: JSON.stringify(user)
-    }
+  request.headers = {
+    ...request.headers,
+    user: JSON.stringify(user)
+  }
 
-    next()
+  next()
 }
 
 export { authenticateToken }
