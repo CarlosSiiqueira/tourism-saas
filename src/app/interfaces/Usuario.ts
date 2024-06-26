@@ -4,7 +4,7 @@ export interface IUsuario {
   findAll(): Promise<IUsuarioResponse[]>
   delete(id: string): Promise<string[]>
   update(data: IUsuarioDTO, id: string): Promise<string[]>
-  login(username: string, password: string): Promise<IUsuarioResponse | null>
+  login(username: string, password: string): Promise<IUsuarioResponse>
 }
 
 

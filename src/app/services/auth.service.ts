@@ -18,14 +18,18 @@ export class AuthService {
     this.secretKey = process.env.JWT_SECRET_KEY || ''
   }
 
-  async authenticate(username: string, password: string): Promise<string | null> {
+  async authenticate(username: string, password: string): Promise<{
+    userId: string,
+    token: string
+  } | null> {
     const user = await this.usuarioRepository.login(username, password)
 
-    if (!user) {
-      return null
-    }
+    const token = jwt.sign({ id: user.id, username: user.username }, this.secretKey, { expiresIn: '1d' });
 
-    return jwt.sign({ id: user.id, username: user.username }, this.secretKey, { expiresIn: '1d' });
+    return {
+      userId: user.id,
+      token
+    }
   }
 
   verifyToken = async (token: string): Promise<User | null> => {

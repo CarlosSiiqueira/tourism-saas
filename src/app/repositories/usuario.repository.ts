@@ -127,7 +127,7 @@ class UsuarioRepository implements IUsuario {
     return ['Usuário excluido com sucesso']
   }
 
-  login = async (username: string, password: string): Promise<IUsuarioResponse | null> => {
+  login = async (username: string, password: string): Promise<IUsuarioResponse> => {
 
     const usuario = await this.prisma.usuarios.findFirst({
       where: {
@@ -137,7 +137,7 @@ class UsuarioRepository implements IUsuario {
     })
 
     if (!usuario) {
-      throw new Warning("Login ou senha incorretos", 400)
+      throw new Warning("Login ou senha incorretos", 401)
     }
 
     return usuario
