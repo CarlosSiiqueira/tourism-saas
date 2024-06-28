@@ -16,6 +16,7 @@ class FinanceiroRepository implements IFinanceiro {
     observacao = "",
     ativo,
     numeroComprovanteBancario = "",
+    dataPrevistaRecebimento,
     codigoPessoa,
     codigoFornecedor,
     codigoExcursao = "",
@@ -41,6 +42,7 @@ class FinanceiroRepository implements IFinanceiro {
           observacao,
           ativo,
           numeroComprovanteBancario,
+          dataPrevistaRecebimento,
           codigoPessoa,
           codigoFornecedor,
           codigoExcursao,
@@ -129,6 +131,7 @@ class FinanceiroRepository implements IFinanceiro {
     try {
 
       data = dateValidate(data)
+      let dataPrevistaRecebimento = new Date();
 
       const financeiro = await this.prisma.transacoes.update({
         data: {
@@ -140,6 +143,7 @@ class FinanceiroRepository implements IFinanceiro {
           observacao,
           ativo,
           numeroComprovanteBancario,
+          dataPrevistaRecebimento,
           codigoPessoa,
           codigoFornecedor,
           codigoExcursao,

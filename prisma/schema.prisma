@@ -38,15 +38,15 @@ model Pessoas {
   ativo           Boolean   @default(true)
   dataNascimento  DateTime?
 
-  Usuarios         Usuarios           @relation(fields: [usuarioCadastro], references: [id])
-  usuarioCadastro  String
-  Endereco         Endereco[]
-  ExcursaoQuartos  ExcursaoQuartos[]
-  ExcursaoOnibus   ExcursaoOnibus[]
-  ExcursaoEmbarque ExcursaoEmbarque[]
-  Excursao         Excursao[]
-  Vendas           Vendas[]
-  Transacoes       Transacoes[]
+  Usuarios           Usuarios             @relation(fields: [usuarioCadastro], references: [id])
+  usuarioCadastro    String
+  Endereco           Endereco[]
+  ExcursaoQuartos    ExcursaoQuartos[]
+  ExcursaoOnibus     ExcursaoOnibus[]
+  PassageiroEmbarque PassageiroEmbarque[]
+  Excursao           Excursao[]
+  Vendas             Vendas[]
+  Transacoes         Transacoes[]
 }
 
 model Usuarios {
@@ -62,20 +62,20 @@ model Usuarios {
   comissao        Float?
   meta            Float?
 
-  Pessoas          Pessoas[]
-  Pacotes          Pacotes[]
-  FormaPagamento   FormaPagamento[]
-  ContaBancaria    ContaBancaria[]
-  Produtos         Produtos[]
-  ExcursaoQuartos  ExcursaoQuartos[]
-  ExcursaoOnibus   ExcursaoOnibus[]
-  LocalEmbarque    LocalEmbarque[]
-  ExcursaoEmbarque ExcursaoEmbarque[]
-  Excursao         Excursao[]
-  Vendas           Vendas[]
-  Destinos         Destinos[]
-  Transacoes       Transacoes[]
-  Fornecedor       Fornecedor[]
+  Pessoas            Pessoas[]
+  Pacotes            Pacotes[]
+  FormaPagamento     FormaPagamento[]
+  ContaBancaria      ContaBancaria[]
+  Produtos           Produtos[]
+  ExcursaoQuartos    ExcursaoQuartos[]
+  ExcursaoOnibus     ExcursaoOnibus[]
+  LocalEmbarque      LocalEmbarque[]
+  PassageiroEmbarque PassageiroEmbarque[]
+  Excursao           Excursao[]
+  Vendas             Vendas[]
+  Destinos           Destinos[]
+  Transacoes         Transacoes[]
+  Fornecedor         Fornecedor[]
 }
 
 model Pacotes {
@@ -177,15 +177,15 @@ model LocalEmbarque {
   dataCadastro DateTime @default(now())
   ativo        Boolean  @default(true)
 
-  Endereco         Endereco           @relation(fields: [codigoEndereco], references: [id])
-  codigoEndereco   String
-  Usuarios         Usuarios           @relation(fields: [usuarioCadastro], references: [id])
-  usuarioCadastro  String
-  ExcursaoEmbarque ExcursaoEmbarque[]
-  Pacotes          Pacotes[]
+  Endereco           Endereco             @relation(fields: [codigoEndereco], references: [id])
+  codigoEndereco     String
+  Usuarios           Usuarios             @relation(fields: [usuarioCadastro], references: [id])
+  usuarioCadastro    String
+  PassageiroEmbarque PassageiroEmbarque[]
+  Pacotes            Pacotes[]
 }
 
-model ExcursaoEmbarque {
+model PassageiroEmbarque {
   id           String   @id @default(uuid())
   embarcou     Boolean  @default(false)
   horaEmbarque String
@@ -210,16 +210,16 @@ model Excursao {
   gerouFinanceiro Boolean  @default(false)
   vagas           Int
 
-  Pessoas          Pessoas            @relation(fields: [codigoPassageiro], references: [id])
-  codigoPassageiro String
-  Pacotes          Pacotes            @relation(fields: [codigoPacote], references: [id])
-  codigoPacote     String
-  Usuarios         Usuarios           @relation(fields: [usuarioCadastro], references: [id])
-  usuarioCadastro  String
-  ExcursaoQuartos  ExcursaoQuartos[]
-  ExcursaoOnibus   ExcursaoOnibus[]
-  ExcursaoEmbarque ExcursaoEmbarque[]
-  Transacoes       Transacoes[]
+  Pessoas            Pessoas              @relation(fields: [codigoPassageiro], references: [id])
+  codigoPassageiro   String
+  Pacotes            Pacotes              @relation(fields: [codigoPacote], references: [id])
+  codigoPacote       String
+  Usuarios           Usuarios             @relation(fields: [usuarioCadastro], references: [id])
+  usuarioCadastro    String
+  ExcursaoQuartos    ExcursaoQuartos[]
+  ExcursaoOnibus     ExcursaoOnibus[]
+  PassageiroEmbarque PassageiroEmbarque[]
+  Transacoes         Transacoes[]
 }
 
 model Vendas {
@@ -265,6 +265,7 @@ model Transacoes {
   observacao                String?
   ativo                     Boolean
   numeroComprovanteBancario String?
+  dataPrevistaRecebimento   DateTime
 
   Pessoas              Pessoas        @relation(fields: [codigoPessoa], references: [id])
   codigoPessoa         String

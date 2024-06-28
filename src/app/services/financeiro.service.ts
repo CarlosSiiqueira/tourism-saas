@@ -59,6 +59,7 @@ export class FinanceiroService {
     observacao,
     ativo,
     numeroComprovanteBancario,
+    dataPrevistaRecebimento,
     codigoPessoa,
     codigoFornecedor,
     codigoExcursao,
@@ -79,6 +80,7 @@ export class FinanceiroService {
         observacao,
         ativo,
         numeroComprovanteBancario,
+        dataPrevistaRecebimento,
         codigoPessoa,
         codigoFornecedor,
         codigoExcursao,
@@ -114,6 +116,13 @@ export class FinanceiroService {
     }
 
     return ['Financeiro liberado para alteração']
+  }
+
+  setDataPrevistaPagamento = async (qtdDiasRecebimento: number, data: Date): Promise<Date> => {
+
+    data.setDate(data.getDate() + qtdDiasRecebimento)
+
+    return data
   }
 
 }

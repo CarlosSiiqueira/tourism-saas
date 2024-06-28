@@ -54,6 +54,13 @@ class EnderecoController {
     response.status(200).send(res)
   }
 
+  buscaCidade = async (request: Request, response: Response): Promise<void> => {
+
+    const res = await this.apiService.buscaCidade(request.params.search)
+
+    response.status(200).send(res)
+  }
+
 }
 
 export { EnderecoController }

@@ -36,7 +36,7 @@ class FormaPagamentoRepository implements IFormaPagamento {
     }
   }
 
-  find = async (id: string): Promise<IFormaPagamentoResponse | null> => {
+  find = async (id: string): Promise<IFormaPagamentoResponse> => {
 
     const formaPagamento = await this.prisma.formaPagamento.findUnique({
       where: {
