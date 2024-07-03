@@ -21,7 +21,7 @@ export interface IPacoteDTO {
   dataCadastro: Date
   origem: number
   codigoLocalEmbarque: string
-  codigoDestino: string
+  codigoDestino: string | null
   usuarioCadastro: string
 }
 

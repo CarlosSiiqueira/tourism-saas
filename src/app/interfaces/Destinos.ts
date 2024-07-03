@@ -1,7 +1,8 @@
 export interface IDestinos {
-  create(data: IDestinosDTO): Promise<string[]>
+  create(nome: string): Promise<string[]>
   find(id: string): Promise<IDestinosResponse | null>
   findAll(): Promise<IDestinosResponse[]>
+  findByName(name: string): Promise<IDestinosDTO | null>
   delete(id: string): Promise<string[]>
   update(data: IDestinosDTO, id: string): Promise<string[]>
 }
@@ -9,9 +10,6 @@ export interface IDestinos {
 export interface IDestinosDTO {
   nome: string
   ativo: boolean
-  dataCadastro: Date
-  codigoEndereco: string
-  usuarioCadastro: string
 }
 
 export interface IDestinosResponse extends IDestinosDTO {

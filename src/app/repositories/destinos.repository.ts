@@ -6,11 +6,7 @@ class DestinosRepository implements IDestinos {
 
   private prisma = prismaManager.getPrisma()
 
-  create = async ({
-    nome,
-    codigoEndereco,
-    usuarioCadastro,
-  }: IDestinosDTO): Promise<string[]> => {
+  create = async (nome: string): Promise<string[]> => {
 
     try {
 
@@ -19,9 +15,7 @@ class DestinosRepository implements IDestinos {
       const destino = await this.prisma.destinos.create({
         data: {
           id,
-          nome,
-          codigoEndereco,
-          usuarioCadastro
+          nome
         }
       })
 
@@ -65,20 +59,29 @@ class DestinosRepository implements IDestinos {
 
   }
 
+  findByName = async (name: string): Promise<IDestinosDTO | null> => {
+
+    const destino = await this.prisma.destinos.findFirst({
+      where: {
+        nome: {
+          equals: name,
+          mode: "insensitive"
+        }
+      }
+    })
+
+    return destino
+  }
+
   update = async ({
     nome,
     ativo = true,
-    codigoEndereco,
-    usuarioCadastro
   }: IDestinosDTO, id: string): Promise<string[]> => {
 
     const destino = await this.prisma.destinos.update({
       data: {
         nome,
-        ativo,
-        dataCadastro: new Date(),
-        codigoEndereco,
-        usuarioCadastro
+        ativo
       },
       where: {
         id

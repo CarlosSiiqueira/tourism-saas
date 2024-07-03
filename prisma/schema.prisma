@@ -19,7 +19,6 @@ model Endereco {
   uf            String
   Pessoas       Pessoas[]
   LocalEmbarque LocalEmbarque[]
-  Destinos      Destinos[]
   Fornecedor    Fornecedor[]
 }
 
@@ -73,7 +72,6 @@ model Usuarios {
   PassageiroEmbarque PassageiroEmbarque[]
   Excursao           Excursao[]
   Vendas             Vendas[]
-  Destinos           Destinos[]
   Transacoes         Transacoes[]
   Fornecedor         Fornecedor[]
 }
@@ -90,8 +88,8 @@ model Pacotes {
 
   LocalEmbarque       LocalEmbarque @relation(fields: [codigoLocalEmbarque], references: [id])
   codigoLocalEmbarque String
-  Destinos            Destinos      @relation(fields: [codigoDestino], references: [id])
-  codigoDestino       String
+  Destinos            Destinos?      @relation(fields: [codigoDestino], references: [id])
+  codigoDestino       String?
   Usuarios            Usuarios      @relation(fields: [usuarioCadastro], references: [id])
   usuarioCadastro     String
   Excursao            Excursao[]
@@ -210,8 +208,7 @@ model Excursao {
   gerouFinanceiro Boolean  @default(false)
   vagas           Int
 
-  Pessoas            Pessoas              @relation(fields: [codigoPassageiro], references: [id])
-  codigoPassageiro   String
+  Pessoas            Pessoas[]
   Pacotes            Pacotes              @relation(fields: [codigoPacote], references: [id])
   codigoPacote       String
   Usuarios           Usuarios             @relation(fields: [usuarioCadastro], references: [id])
@@ -229,6 +226,7 @@ model Vendas {
   qtd       Int
   efetivada Boolean  @default(false)
   data      DateTime @default(now())
+  origem    Int      @default(1)
 
   Pessoas              Pessoas        @relation(fields: [codigoCliente], references: [id])
   codigoCliente        String
@@ -248,10 +246,6 @@ model Destinos {
   ativo        Boolean  @default(true)
   dataCadastro DateTime @default(now())
 
-  Endereco        Endereco  @relation(fields: [codigoEndereco], references: [id])
-  codigoEndereco  String
-  Usuarios        Usuarios  @relation(fields: [usuarioCadastro], references: [id])
-  usuarioCadastro String
   Pacotes         Pacotes[]
 }
 

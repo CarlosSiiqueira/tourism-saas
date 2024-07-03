@@ -15,7 +15,7 @@ class ExcursaoRepository implements IExcursao {
     ativo = true,
     gerouFinanceiro = false,
     vagas,
-    codigoPassageiro,
+    // codigoPassageiro,
     codigoPacote,
     usuarioCadastro,
   }: IExcursaoDTO): Promise<string[]> => {
@@ -36,7 +36,7 @@ class ExcursaoRepository implements IExcursao {
           ativo: ativo,
           gerouFinanceiro: gerouFinanceiro,
           vagas: vagas,
-          codigoPassageiro: codigoPassageiro,
+          // codigoPassageiro: codigoPassageiro,
           codigoPacote: codigoPacote,
           usuarioCadastro: usuarioCadastro,
         }
@@ -115,7 +115,7 @@ class ExcursaoRepository implements IExcursao {
     observacoes = '',
     gerouFinanceiro = false,
     vagas,
-    codigoPassageiro,
+    // codigoPassageiro,
     codigoPacote,
     usuarioCadastro,
   }: IExcursaoDTO, id: string): Promise<string[]> => {

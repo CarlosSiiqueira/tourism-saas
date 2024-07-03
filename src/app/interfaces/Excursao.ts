@@ -15,7 +15,6 @@ export interface IExcursaoDTO {
   ativo: boolean
   gerouFinanceiro: boolean
   vagas: number
-  codigoPassageiro: string
   codigoPacote: string
   usuarioCadastro: string
 }
