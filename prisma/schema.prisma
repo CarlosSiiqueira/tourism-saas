@@ -37,15 +37,15 @@ model Pessoas {
   ativo           Boolean   @default(true)
   dataNascimento  DateTime?
 
-  Usuarios           Usuarios             @relation(fields: [usuarioCadastro], references: [id])
-  usuarioCadastro    String
-  Endereco           Endereco[]
-  ExcursaoQuartos    ExcursaoQuartos[]
-  ExcursaoOnibus     ExcursaoOnibus[]
-  PassageiroEmbarque PassageiroEmbarque[]
-  Excursao           Excursao[]
-  Vendas             Vendas[]
-  Transacoes         Transacoes[]
+  Usuarios            Usuarios              @relation(fields: [usuarioCadastro], references: [id])
+  usuarioCadastro     String
+  Endereco            Endereco[]
+  ExcursaoQuartos     ExcursaoQuartos[]
+  ExcursaoOnibus      ExcursaoOnibus[]
+  PassageiroEmbarque  PassageiroEmbarque[]
+  Vendas              Vendas[]
+  Transacoes          Transacoes[]
+  ExcursaoPassageiros ExcursaoPassageiros[]
 }
 
 model Usuarios {
@@ -86,9 +86,9 @@ model Pacotes {
   origem         Int      @default(1)
   tipoTransporte Int      @default(1)
   urlImagem      String?
+  idWP           Int?
+  destino        String
 
-  LocalEmbarque       LocalEmbarque @relation(fields: [codigoLocalEmbarque], references: [id])
-  codigoLocalEmbarque String
   Destinos            Destinos?     @relation(fields: [codigoDestino], references: [id])
   codigoDestino       String?
   Usuarios            Usuarios      @relation(fields: [usuarioCadastro], references: [id])
@@ -176,12 +176,12 @@ model LocalEmbarque {
   dataCadastro DateTime @default(now())
   ativo        Boolean  @default(true)
 
-  Endereco           Endereco             @relation(fields: [codigoEndereco], references: [id])
-  codigoEndereco     String
-  Usuarios           Usuarios             @relation(fields: [usuarioCadastro], references: [id])
-  usuarioCadastro    String
-  PassageiroEmbarque PassageiroEmbarque[]
-  Pacotes            Pacotes[]
+  Endereco            Endereco              @relation(fields: [codigoEndereco], references: [id])
+  codigoEndereco      String
+  Usuarios            Usuarios              @relation(fields: [usuarioCadastro], references: [id])
+  usuarioCadastro     String
+  PassageiroEmbarque  PassageiroEmbarque[]
+  ExcursaoPassageiros ExcursaoPassageiros[]
 }
 
 model PassageiroEmbarque {
@@ -209,15 +209,15 @@ model Excursao {
   gerouFinanceiro Boolean  @default(false)
   vagas           Int
 
-  Pessoas            Pessoas[]
-  Pacotes            Pacotes              @relation(fields: [codigoPacote], references: [id])
-  codigoPacote       String
-  Usuarios           Usuarios             @relation(fields: [usuarioCadastro], references: [id])
-  usuarioCadastro    String
-  ExcursaoQuartos    ExcursaoQuartos[]
-  ExcursaoOnibus     ExcursaoOnibus[]
-  PassageiroEmbarque PassageiroEmbarque[]
-  Transacoes         Transacoes[]
+  Pacotes             Pacotes               @relation(fields: [codigoPacote], references: [id])
+  codigoPacote        String
+  Usuarios            Usuarios              @relation(fields: [usuarioCadastro], references: [id])
+  usuarioCadastro     String
+  ExcursaoQuartos     ExcursaoQuartos[]
+  ExcursaoOnibus      ExcursaoOnibus[]
+  PassageiroEmbarque  PassageiroEmbarque[]
+  Transacoes          Transacoes[]
+  ExcursaoPassageiros ExcursaoPassageiros[]
 }
 
 model Vendas {
@@ -298,4 +298,16 @@ model Fornecedor {
   Usuarios        Usuarios     @relation(fields: [usuarioCadastro], references: [id])
   usuarioCadastro String
   Produtos        Produtos[]
+}
+
+model ExcursaoPassageiros {
+  id           String   @id @default(uuid())
+  dataCadastro DateTime @default(now())
+
+  Excursao      Excursao      @relation(fields: [idExcursao], references: [id])
+  idExcursao    String
+  Pessoa        Pessoas       @relation(fields: [idPassageiro], references: [id])
+  idPassageiro  String
+  LocalEmbarque LocalEmbarque @relation(fields: [localEmbarque], references: [id])
+  localEmbarque String
 }

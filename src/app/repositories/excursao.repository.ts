@@ -36,7 +36,6 @@ class ExcursaoRepository implements IExcursao {
           ativo: ativo,
           gerouFinanceiro: gerouFinanceiro,
           vagas: vagas,
-          // codigoPassageiro: codigoPassageiro,
           codigoPacote: codigoPacote,
           usuarioCadastro: usuarioCadastro,
         }
@@ -51,13 +50,29 @@ class ExcursaoRepository implements IExcursao {
 
   find = async (id: string): Promise<IExcursaoResponse> => {
 
-    const excursao = await this.prisma.excursao.findUnique({
+    const excursao = await this.prisma.excursao.findFirst({
       where: {
         id
       },
-      include: {
-        Pessoas: true,
-        Pacotes: true
+      select: {
+        id: true,
+        nome: true,
+        dataInicio: true,
+        dataFim: true,
+        observacoes: true,
+        dataCadastro: true,
+        ativo: true,
+        gerouFinanceiro: true,
+        vagas: true,
+        codigoPacote: true,
+        usuarioCadastro: true,
+        ExcursaoPassageiros: {
+          include: {
+            Pessoa: true,
+            LocalEmbarque: true
+          }
+        },
+        Pacotes: {}
       }
     })
 
@@ -65,8 +80,9 @@ class ExcursaoRepository implements IExcursao {
       throw new Warning('Excursão não encontrada', 400)
     }
 
-    return excursao
+    excursao.vagas -= excursao.ExcursaoPassageiros.length
 
+    return excursao
   }
 
   findAll = async (): Promise<IExcursaoResponse[]> => {
@@ -74,10 +90,25 @@ class ExcursaoRepository implements IExcursao {
     const excursoes = await this.prisma.excursao.findMany({
       where: {
         ativo: true
-      },
-      include: {
-        Pessoas: true,
-        Pacotes: true
+      }, select: {
+        id: true,
+        nome: true,
+        dataInicio: true,
+        dataFim: true,
+        observacoes: true,
+        dataCadastro: true,
+        ativo: true,
+        gerouFinanceiro: true,
+        vagas: true,
+        codigoPacote: true,
+        usuarioCadastro: true,
+        ExcursaoPassageiros: {
+          include: {
+            Pessoa: true,
+            LocalEmbarque: true
+          }
+        },
+        Pacotes: {},
       }
     })
 
@@ -85,8 +116,11 @@ class ExcursaoRepository implements IExcursao {
       throw new Warning("Sem excursões cadastradas na base", 400)
     }
 
-    return excursoes
+    for (const excursao of excursoes) {
+      excursao.vagas -= excursao.ExcursaoPassageiros.length
+    }
 
+    return excursoes
   }
 
   delete = async (id: string): Promise<string> => {
@@ -115,7 +149,6 @@ class ExcursaoRepository implements IExcursao {
     observacoes = '',
     gerouFinanceiro = false,
     vagas,
-    // codigoPassageiro,
     codigoPacote,
     usuarioCadastro,
   }: IExcursaoDTO, id: string): Promise<string[]> => {

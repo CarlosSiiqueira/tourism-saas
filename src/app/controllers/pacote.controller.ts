@@ -24,13 +24,14 @@ class PacoteController {
 
   create = async (request: Request, response: Response): Promise<void> => {
 
-    let res = await this.pacoteRepository.create(request.body)
+    const res = await this.pacoteRepository.create(request.body)
 
-    if (res.message === 'Pacote criado com sucesso') {
-      res = await this.apiService.createProductWp(request.body)
+    if (res.success) {
+      const pacoteWP = await this.apiService.createProductWp(request.body)
+      await this.pacoteRepository.setIdWP(res.pacote.id, pacoteWP.id)
     }
 
-    response.status(res.status).send(res)
+    response.status(200).send(res)
   }
 
   find = async (request: Request, response: Response): Promise<void> => {
@@ -50,6 +51,10 @@ class PacoteController {
   update = async (request: Request, response: Response): Promise<void> => {
 
     const res = await this.pacoteRepository.update(request.body, request.params.id)
+
+    if (res.success) {
+      await this.apiService.updatePacoteWP(res.pacote)
+    }
 
     response.status(200).send(res)
   }

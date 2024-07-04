@@ -14,6 +14,7 @@ import { localEmbarque } from "../routes/local.embarque.routes"
 import { vendas } from "../routes/vendas.routes"
 import { destinos } from "../routes/destinos.routes"
 import { fornecedor } from "../routes/fornecedor.routes"
+import { excursaoPassageiros } from "./excursao.passageiros.routes"
 
 const router = Router()
 
@@ -32,5 +33,6 @@ router.use('/local-embarque', localEmbarque)
 router.use('/vendas', vendas)
 router.use('/destinos', destinos)
 router.use('/fornecedor', fornecedor)
+router.use('/excursao-passageiros', excursaoPassageiros)
 
 export { router }

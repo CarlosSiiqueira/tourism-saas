@@ -1,9 +1,10 @@
 import axios from "axios"
 import { injectable, inject } from "tsyringe";
 import { DestinosRepository } from '../repositories/destinos.repository'
-import { IPacoteDTO } from "../interfaces/Pacote";
+import { IPacoteDTO, IPacoteResponse } from "../interfaces/Pacote";
 import { wooCommerce } from "../api/woocommerce";
 import { wordPress } from "../api/wordpress.rest";
+import { Warning } from "../errors";
 
 interface Cep {
   uf: string
@@ -79,13 +80,18 @@ export class ApiService {
       filter = `&search=${search}`
     }
 
-    const response = await wordPress.get<any>(`wp-json/wp/v2/media?per_page=100&page=1${filter}`)
+    try {
 
-    const images = response.data.map(function (img: any) {
-      return img.link
-    })
+      const response = await wordPress.get<any>(`wp-json/wp/v2/media?per_page=100${filter}`)
 
-    return images
+      const images = response.data.map(function (img: any) {
+        return img.link
+      })
+
+      return images
+    } catch (error: any) {
+      throw new Warning(error.response.data.message, 400)
+    }
   }
 
   createProductWp = async (dados: IPacoteDTO): Promise<any> => {
@@ -111,10 +117,29 @@ export class ApiService {
     try {
       const response = await wooCommerce.post('products', data)
 
-      return response
+      return response.data
     } catch (error: any) {
-      return { 'message': error.response.data.message, 'status': 500 }
+      throw new Warning(error.response.data.message, 400)
     }
   }
 
+  updatePacoteWP = async (dados: IPacoteResponse): Promise<any> => {
+
+    const data = {
+      name: dados.nome,
+      regular_price: `${dados.valor}`,
+      description: dados.descricao,
+      short_description: dados.descricao,
+      catalog_visibility: dados.ativo ? 'visible' : 'hidden',
+      images: [
+        {
+          src: dados.urlImagem
+        }
+      ]
+    }
+
+    const pacoteWP = await wooCommerce.put(`products/${dados.idWP}`, data)
+
+    return pacoteWP.data
+  }
 }

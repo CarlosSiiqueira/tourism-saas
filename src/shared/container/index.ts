@@ -34,6 +34,8 @@ import { IDestinos } from "../../app/interfaces/Destinos"
 import { DestinosRepository } from "../../app/repositories/destinos.repository"
 import { IFornecedor } from "../../app/interfaces/Fornecedor"
 import { FornecedorRepository } from "../../app/repositories/fornecedor.repository"
+import { IExcursaoPassageiros } from "../../app/interfaces/ExcursaoPassageiros"
+import { ExcursaoPassageirosRepository } from "../../app/repositories/excursao.passageiros.repository"
 
 
 container.registerSingleton<IContaBancaria>(
@@ -109,4 +111,9 @@ container.registerSingleton<IDestinos>(
 container.registerSingleton<IFornecedor>(
   "FornecedorRepository",
   FornecedorRepository
+)
+
+container.registerSingleton<IExcursaoPassageiros>(
+  "ExcursaoPassageirosRepository",
+  ExcursaoPassageirosRepository
 )

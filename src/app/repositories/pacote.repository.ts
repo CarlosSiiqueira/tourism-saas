@@ -1,4 +1,3 @@
-import { dateValidate } from "../../shared/helper/date"
 import prismaManager from "../database/database"
 import { Warning } from "../errors"
 import { IPacote, IPacoteDTO, IPacoteResponse } from "../interfaces/Pacote"
@@ -56,7 +55,7 @@ class PacoteRepository implements IPacote {
         },
         where,
         include: {
-          LocalEmbarque: true,
+          Excursao: true,
           Destinos: true,
 
         }
@@ -71,9 +70,11 @@ class PacoteRepository implements IPacote {
     valor,
     descricao,
     origem,
-    codigoLocalEmbarque,
+    tipoTransporte,
+    urlImagem,
+    destino,
     codigoDestino,
-    usuarioCadastro }: IPacoteDTO): Promise<{ 'message': string, 'status': number }> => {
+    usuarioCadastro }: IPacoteDTO): Promise<{ 'pacote': IPacoteResponse, 'success': boolean }> => {
 
     try {
 
@@ -85,14 +86,16 @@ class PacoteRepository implements IPacote {
           nome,
           valor,
           descricao,
+          urlImagem,
           origem,
-          codigoLocalEmbarque,
+          tipoTransporte,
+          destino,
           codigoDestino,
           usuarioCadastro
         }
       })
 
-      return { 'message': 'Pacote criado com sucesso', 'status': 200 }
+      return { 'pacote': pacote, 'success': true }
 
     } catch (error) {
       throw new Warning('Não foi possivel inserir o pacote', 400)
@@ -116,11 +119,7 @@ class PacoteRepository implements IPacote {
 
   findAll = async (): Promise<IPacoteResponse[]> => {
 
-    const pacotes = await this.prisma.pacotes.findMany({
-      where: {
-        ativo: true
-      }
-    })
+    const pacotes = await this.prisma.pacotes.findMany()
 
     if (!pacotes) {
       throw new Warning("Sem pacotes encontrados na base", 400)
@@ -134,10 +133,13 @@ class PacoteRepository implements IPacote {
     valor,
     descricao,
     ativo,
+    urlImagem,
+    idWP,
+    destino,
     origem,
-    codigoLocalEmbarque,
+    tipoTransporte,
     codigoDestino,
-    usuarioCadastro }: IPacoteDTO, id: string): Promise<string[]> => {
+    usuarioCadastro }: IPacoteDTO, id: string): Promise<{ 'pacote': IPacoteResponse, 'success': boolean }> => {
 
     try {
 
@@ -147,8 +149,11 @@ class PacoteRepository implements IPacote {
           valor,
           descricao,
           ativo,
+          urlImagem,
+          idWP,
+          destino,
           origem,
-          codigoLocalEmbarque,
+          tipoTransporte,
           codigoDestino,
           usuarioCadastro
         },
@@ -157,7 +162,7 @@ class PacoteRepository implements IPacote {
         }
       })
 
-      return ['Pacote atualizado com sucesso']
+      return { 'pacote': pacote, 'success': true }
 
     } catch (error) {
       throw new Warning('Erro ao atualizar pacote', 400)
@@ -180,6 +185,25 @@ class PacoteRepository implements IPacote {
       return ['Pacote excluido com sucesso']
     } catch (error) {
       throw new Warning('Ocorreu um erro ao excluir pacote', 400)
+    }
+  }
+
+  setIdWP = async (id: string, idWP: number): Promise<string[]> => {
+
+    try {
+
+      const pacote = await this.prisma.pacotes.update({
+        data: {
+          idWP: idWP
+        },
+        where: {
+          id
+        }
+      })
+
+      return ['Pacote atualizado com sucesso']
+    } catch (error) {
+      throw new Warning('Ocorreu um erro ao atualizar pacote', 400)
     }
   }
 

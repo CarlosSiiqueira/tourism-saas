@@ -18,6 +18,7 @@ import { LocalEmbarqueController } from "./local.embarque.controller"
 import { VendasController } from "./vendas.controller"
 import { DestinosController } from "./destinos.controller"
 import { FornecedorController } from "./fornecedor.controller"
+import { ExcursaoPassageirosController } from "./excursao.passageiros.controller"
 
 export const contaBancariaController = container.resolve(ContaBancariaController)
 export const excursaoController = container.resolve(ExcursaoController)
@@ -34,3 +35,4 @@ export const localEmbarqueController = container.resolve(LocalEmbarqueController
 export const vendasController = container.resolve(VendasController)
 export const destinosController = container.resolve(DestinosController)
 export const fornecedorController = container.resolve(FornecedorController)
+export const excursaoPassageirosController = container.resolve(ExcursaoPassageirosController)
