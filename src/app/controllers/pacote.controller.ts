@@ -2,13 +2,15 @@ import { PacoteRepository } from '../repositories/pacote.repository'
 import { inject, injectable } from "tsyringe"
 import { Request, Response } from 'express'
 import { formatIndexFilters } from '../../shared/utils/filters'
+import { ApiService } from '../services/api.service'
 
 @injectable()
 class PacoteController {
 
   constructor(
     @inject("PacoteRepository")
-    private pacoteRepository: PacoteRepository
+    private pacoteRepository: PacoteRepository,
+    private apiService: ApiService
   ) { }
 
   index = async (request: Request, response: Response): Promise<void> => {
@@ -22,9 +24,13 @@ class PacoteController {
 
   create = async (request: Request, response: Response): Promise<void> => {
 
-    const res = await this.pacoteRepository.create(request.body)
+    let res = await this.pacoteRepository.create(request.body)
 
-    response.status(200).send(res)
+    if (res.message === 'Pacote criado com sucesso') {
+      res = await this.apiService.createProductWp(request.body)
+    }
+
+    response.status(res.status).send(res)
   }
 
   find = async (request: Request, response: Response): Promise<void> => {
@@ -51,6 +57,13 @@ class PacoteController {
   delete = async (request: Request, response: Response): Promise<void> => {
 
     const res = await this.pacoteRepository.delete(request.params.id)
+
+    response.status(200).send(res)
+  }
+
+  listImagesPacote = async (request: Request, response: Response): Promise<void> => {
+
+    const res = await this.apiService.listImagesPacote(request.params.search)
 
     response.status(200).send(res)
   }

@@ -85,10 +85,11 @@ model Pacotes {
   dataCadastro   DateTime @default(now())
   origem         Int      @default(1)
   tipoTransporte Int      @default(1)
+  urlImagem      String?
 
   LocalEmbarque       LocalEmbarque @relation(fields: [codigoLocalEmbarque], references: [id])
   codigoLocalEmbarque String
-  Destinos            Destinos?      @relation(fields: [codigoDestino], references: [id])
+  Destinos            Destinos?     @relation(fields: [codigoDestino], references: [id])
   codigoDestino       String?
   Usuarios            Usuarios      @relation(fields: [usuarioCadastro], references: [id])
   usuarioCadastro     String
@@ -246,7 +247,7 @@ model Destinos {
   ativo        Boolean  @default(true)
   dataCadastro DateTime @default(now())
 
-  Pacotes         Pacotes[]
+  Pacotes Pacotes[]
 }
 
 model Transacoes {

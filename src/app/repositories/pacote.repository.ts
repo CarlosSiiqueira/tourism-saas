@@ -73,7 +73,7 @@ class PacoteRepository implements IPacote {
     origem,
     codigoLocalEmbarque,
     codigoDestino,
-    usuarioCadastro }: IPacoteDTO): Promise<string[]> => {
+    usuarioCadastro }: IPacoteDTO): Promise<{ 'message': string, 'status': number }> => {
 
     try {
 
@@ -92,7 +92,7 @@ class PacoteRepository implements IPacote {
         }
       })
 
-      return ['Pacote criado com sucesso']
+      return { 'message': 'Pacote criado com sucesso', 'status': 200 }
 
     } catch (error) {
       throw new Warning('Não foi possivel inserir o pacote', 400)
@@ -134,7 +134,6 @@ class PacoteRepository implements IPacote {
     valor,
     descricao,
     ativo,
-    dataCadastro,
     origem,
     codigoLocalEmbarque,
     codigoDestino,
@@ -142,15 +141,12 @@ class PacoteRepository implements IPacote {
 
     try {
 
-      dataCadastro = dateValidate(dataCadastro)
-
       const pacote = await this.prisma.pacotes.update({
         data: {
           nome,
           valor,
           descricao,
           ativo,
-          dataCadastro,
           origem,
           codigoLocalEmbarque,
           codigoDestino,
