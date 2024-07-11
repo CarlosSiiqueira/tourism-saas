@@ -22,6 +22,7 @@ export interface IPacoteDTO {
   origem: number
   tipoTransporte: number
   urlImagem: string | null
+  urlImgEsgotado: string | null
   idWP: number | null
   destino: string
   codigoDestino: string | null

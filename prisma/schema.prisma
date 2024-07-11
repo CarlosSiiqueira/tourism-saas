@@ -86,16 +86,17 @@ model Pacotes {
   origem         Int      @default(1)
   tipoTransporte Int      @default(1)
   urlImagem      String?
+  urlImgEsgotado String?
   idWP           Int?
   destino        String
 
-  Destinos            Destinos?     @relation(fields: [codigoDestino], references: [id])
-  codigoDestino       String?
-  Usuarios            Usuarios      @relation(fields: [usuarioCadastro], references: [id])
-  usuarioCadastro     String
-  Excursao            Excursao[]
-  Vendas              Vendas[]
-  Transacoes          Transacoes[]
+  Destinos        Destinos?    @relation(fields: [codigoDestino], references: [id])
+  codigoDestino   String?
+  Usuarios        Usuarios     @relation(fields: [usuarioCadastro], references: [id])
+  usuarioCadastro String
+  Excursao        Excursao[]
+  Vendas          Vendas[]
+  Transacoes      Transacoes[]
 }
 
 model FormaPagamento {
@@ -147,12 +148,11 @@ model ExcursaoQuartos {
   numeroQuarto String
   dataCadastro DateTime @default(now())
 
-  Excursao         Excursao @relation(fields: [codigoExcursao], references: [id])
-  codigoExcursao   String
-  Passageiro       Pessoas  @relation(fields: [codigoPassageiro], references: [id])
-  codigoPassageiro String
-  Usuarios         Usuarios @relation(fields: [usuarioCadastro], references: [id])
-  usuarioCadastro  String
+  Excursao        Excursao  @relation(fields: [codigoExcursao], references: [id])
+  codigoExcursao  String
+  Passageiros     Pessoas[]
+  Usuarios        Usuarios  @relation(fields: [usuarioCadastro], references: [id])
+  usuarioCadastro String
 }
 
 model ExcursaoOnibus {

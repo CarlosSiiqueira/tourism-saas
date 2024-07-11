@@ -8,10 +8,19 @@ export interface IExcursaoQuartosDTO {
   numeroQuarto: string
   dataCadastro: Date
   codigoExcursao: string
-  codigoPassageiro: string
+  passageiros: [string]
   usuarioCadastro: string
+
 }
 
-export interface IExcursaoQuartosResponse extends IExcursaoQuartosDTO {
+export interface IExcursaoQuartosResponse {
   id: string
+  numeroQuarto: string
+  dataCadastro: Date
+  codigoExcursao: string
+  usuarioCadastro: string
+  Passageiros: Array<{
+    id: string,
+    nome: string
+  }>
 }

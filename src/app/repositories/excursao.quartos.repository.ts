@@ -9,7 +9,7 @@ class ExcursaoQuartosRepository implements IExcursaoQuartos {
   create = async ({
     numeroQuarto,
     codigoExcursao,
-    codigoPassageiro,
+    passageiros,
     usuarioCadastro
   }: IExcursaoQuartosDTO): Promise<string[]> => {
 
@@ -20,10 +20,12 @@ class ExcursaoQuartosRepository implements IExcursaoQuartos {
       const excursaoQuartos = await this.prisma.excursaoQuartos.create({
         data: {
           id: id,
-          numeroQuarto: numeroQuarto,          
+          numeroQuarto: numeroQuarto,
           codigoExcursao: codigoExcursao,
           usuarioCadastro: usuarioCadastro,
-          codigoPassageiro: codigoPassageiro
+          Passageiros: {
+            connect: passageiros.map(codigoPassageiro => ({ id: codigoPassageiro }))
+          }
         }
       })
 
@@ -32,7 +34,7 @@ class ExcursaoQuartosRepository implements IExcursaoQuartos {
       }
 
       return ['Quartos definidos com sucesso']
-      
+
     } catch (error) {
       return ['Erro ao registrar quarto']
     }
@@ -44,8 +46,18 @@ class ExcursaoQuartosRepository implements IExcursaoQuartos {
       where: {
         codigoExcursao: idExcursao
       },
-      include: {
-        Passageiro: true,
+      select: {
+        id: true,
+        numeroQuarto: true,
+        dataCadastro: true,
+        codigoExcursao: true,
+        Passageiros: {
+          select: {
+            id: true,
+            nome: true
+          }
+        },
+        usuarioCadastro: true,
         Excursao: true
       }
     })
@@ -60,16 +72,28 @@ class ExcursaoQuartosRepository implements IExcursaoQuartos {
   update = async ({
     numeroQuarto,
     codigoExcursao,
-    codigoPassageiro,
+    passageiros,
     usuarioCadastro }: IExcursaoQuartosDTO, id: string): Promise<string[]> => {
+
+    await this.prisma.excursaoQuartos.update({
+      where: {
+        id
+      },
+      data: {
+        Passageiros: {
+          set: []
+        }
+      }
+    })
 
     const excursaoQuartos = await this.prisma.excursaoQuartos.update({
       data: {
         numeroQuarto: numeroQuarto,
         dataCadastro: new Date(),
-        // codigoExcursao: codigoExcursao,
-        codigoPassageiro: codigoPassageiro,
-        usuarioCadastro: usuarioCadastro
+        usuarioCadastro: usuarioCadastro,
+        Passageiros: {
+          connect: passageiros.map(codigoPassageiro => ({ id: codigoPassageiro }))
+        }
       },
       where: {
         id: id
