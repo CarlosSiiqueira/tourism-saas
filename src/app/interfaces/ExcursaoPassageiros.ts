@@ -23,3 +23,8 @@ export interface IExcursaoPassageirosResponse extends IExcursaoPassageirosDTO {
   id: string
 }
 
+export interface IExcursaoPassageirosListResponse {
+  id: string
+  nome: string
+}
+

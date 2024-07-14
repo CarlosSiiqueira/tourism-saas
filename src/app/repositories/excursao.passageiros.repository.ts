@@ -1,6 +1,11 @@
 import prismaManager from "../database/database"
 import { Warning } from "../errors"
-import { IExcursaoPassageiros, IExcursaoPassageirosDTO, IExcursaoPassageirosResponse } from "../interfaces/ExcursaoPassageiros"
+import {
+  IExcursaoPassageiros,
+  IExcursaoPassageirosDTO,
+  IExcursaoPassageirosResponse,
+  IExcursaoPassageirosListResponse
+} from "../interfaces/ExcursaoPassageiros"
 import { IIndex } from "../interfaces/Helper"
 
 class ExcursaoPassageirosRepository implements IExcursaoPassageiros {
@@ -109,7 +114,7 @@ class ExcursaoPassageirosRepository implements IExcursaoPassageiros {
     return excursaoPassageiros;
   }
 
-  listPassageiros = async (idExcursao: string): Promise<any> => {
+  listPassageiros = async (idExcursao: string): Promise<IExcursaoPassageirosListResponse[]> => {
 
     const excursaoPassageiros = await this.prisma.excursaoPassageiros.findMany({
       where: {
@@ -129,7 +134,7 @@ class ExcursaoPassageirosRepository implements IExcursaoPassageiros {
       throw new Warning("Excursao vazia", 400)
     }
 
-    let response = excursaoPassageiros.map((passageiro) => {
+    const response = excursaoPassageiros.map((passageiro) => {
       return passageiro.Pessoa
     })
 

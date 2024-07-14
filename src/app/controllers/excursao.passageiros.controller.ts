@@ -2,13 +2,18 @@ import { ExcursaoPassageirosRepository } from '../repositories/excursao.passagei
 import { inject, injectable } from "tsyringe"
 import { Request, Response } from 'express'
 import { formatIndexFilters } from '../../shared/utils/filters'
+import { ExcursaoService } from '../services/excursao.service'
+import { ExcursaoQuartosRepository } from '../repositories/excursao.quartos.repository'
 
 @injectable()
 class ExcursaoPassageirosController {
 
   constructor(
     @inject("ExcursaoPassageirosRepository")
-    private excursaoPassageirosRepository: ExcursaoPassageirosRepository
+    private excursaoPassageirosRepository: ExcursaoPassageirosRepository,
+    private excursaoService: ExcursaoService,
+    @inject("ExcursaoQuartosRepository")
+    private excursaoQuartoRepository: ExcursaoQuartosRepository
   ) { }
 
   index = async (request: Request, response: Response): Promise<void> => {
@@ -44,6 +49,15 @@ class ExcursaoPassageirosController {
   listPassageiros = async (request: Request, response: Response): Promise<void> => {
 
     const res = await this.excursaoPassageirosRepository.listPassageiros(request.params.idExcursao)
+
+    response.status(200).send(res)
+  }
+
+  listPassageirosFiltered = async (request: Request, response: Response): Promise<void> => {
+
+    const passageiros = await this.excursaoPassageirosRepository.listPassageiros(request.params.idExcursao)
+    const quartos = await this.excursaoQuartoRepository.findPassageirosWithRoom(request.params.idExcursao)
+    const res = await this.excursaoService.filterPassageirosWithoutRoom(passageiros, quartos);
 
     response.status(200).send(res)
   }

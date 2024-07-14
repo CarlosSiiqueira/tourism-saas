@@ -1,7 +1,8 @@
 import prismaManager from "../database/database"
-import { IExcursaoQuartos, IExcursaoQuartosDTO, IExcursaoQuartosResponse } from "../interfaces/ExcursaoQuartos"
+import { IExcursaoQuartos, IExcursaoQuartosDTO, IExcursaoQuartosListRresponse, IExcursaoQuartosResponse } from "../interfaces/ExcursaoQuartos"
 import { Warning } from "../errors"
 import { IIndex } from "../interfaces/Helper"
+import { warning } from "../middlewares/error.middleware"
 
 class ExcursaoQuartosRepository implements IExcursaoQuartos {
 
@@ -116,6 +117,33 @@ class ExcursaoQuartosRepository implements IExcursaoQuartos {
     return excursaoQuartos
   }
 
+  findPassageirosWithRoom = async (idExcursao: string): Promise<IExcursaoQuartosListRresponse[]> => {
+
+    const passageiros = await this.prisma.excursaoQuartos.findMany({
+      where: {
+        codigoExcursao: idExcursao
+      },
+      select: {
+        Passageiros: {
+          select: {
+            id: true,
+            nome: true
+          }
+        }
+      }
+    })
+
+    if (!passageiros) {
+      throw new Warning('Passageiro não encontrado', 400)
+    }
+
+    const response = passageiros.map((p, index) => {
+      return p
+    })
+
+    return response;
+  }
+
   update = async ({
     numeroQuarto,
     codigoExcursao,
@@ -152,6 +180,21 @@ class ExcursaoQuartosRepository implements IExcursaoQuartos {
     }
 
     return ['Registro atualizado com sucesso']
+  }
+
+  delete = async (id: string): Promise<string[]> => {
+
+    const excursaoQuartos = await this.prisma.excursaoQuartos.delete({
+      where: {
+        id
+      }
+    })
+
+    if (!excursaoQuartos) {
+      throw new Warning('Não foi possível excluir', 400)
+    }
+
+    return ['Quarto excluído com sucesso']
   }
 }
 
