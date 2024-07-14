@@ -14,6 +14,7 @@ import { ExcursaoQuartosRepository } from '../../app/repositories/excursao.quart
 import { ExcursaoOnibusRepository } from '../../app/repositories/excursao.onibus.repository'
 import { EnderecoRepository } from "../../app/repositories/endereco.repository"
 import { LocalEmbarqueRepository } from "../../app/repositories/local.embarque.repository"
+import { PassageiroEmbarqueRepository } from "../../app/repositories/passageiro.embarque.repository"
 
 //interfaces
 import { IContaBancaria } from "../../app/interfaces/ContaBancaria"
@@ -36,6 +37,7 @@ import { IFornecedor } from "../../app/interfaces/Fornecedor"
 import { FornecedorRepository } from "../../app/repositories/fornecedor.repository"
 import { IExcursaoPassageiros } from "../../app/interfaces/ExcursaoPassageiros"
 import { ExcursaoPassageirosRepository } from "../../app/repositories/excursao.passageiros.repository"
+import { IPassageiroEmbarque } from "../../app/interfaces/PassageiroEmbarque"
 
 
 container.registerSingleton<IContaBancaria>(
@@ -116,4 +118,9 @@ container.registerSingleton<IFornecedor>(
 container.registerSingleton<IExcursaoPassageiros>(
   "ExcursaoPassageirosRepository",
   ExcursaoPassageirosRepository
+)
+
+container.registerSingleton<IPassageiroEmbarque>(
+  "PassageiroEmbarqueRepository",
+  PassageiroEmbarqueRepository
 )

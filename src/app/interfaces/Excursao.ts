@@ -1,4 +1,10 @@
+import { IIndex } from "./Helper"
+
 export interface IExcursao {
+  index(data: IIndex): Promise<{
+    count: number
+    rows: IExcursaoResponse[]
+  }>
   create(data: IExcursaoDTO): Promise<string[]>
   find(id: string): Promise<IExcursaoResponse>
   findAll(): Promise<IExcursaoResponse[]>

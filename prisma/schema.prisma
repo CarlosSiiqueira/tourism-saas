@@ -191,11 +191,12 @@ model PassageiroEmbarque {
   horaEmbarque String
   dataCadastro DateTime @default(now())
 
-  LocalEmbarque       LocalEmbarque? @relation(fields: [codigoLocalEmbarque], references: [id])
-  codigoLocalEmbarque String?
+  LocalEmbarque       LocalEmbarque @relation(fields: [codigoLocalEmbarque], references: [id])
+  codigoLocalEmbarque String
   Excursao            Excursao       @relation(fields: [codigoExcursao], references: [id])
   codigoExcursao      String
-  codigoPassageiro    Pessoas[]
+  Passageiro          Pessoas        @relation(fields: [codigoPassageiro], references: [id])
+  codigoPassageiro    String
   Usuarios            Usuarios       @relation(fields: [usuarioCadastro], references: [id])
   usuarioCadastro     String
 }

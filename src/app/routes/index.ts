@@ -15,6 +15,7 @@ import { vendas } from "../routes/vendas.routes"
 import { destinos } from "../routes/destinos.routes"
 import { fornecedor } from "../routes/fornecedor.routes"
 import { excursaoPassageiros } from "./excursao.passageiros.routes"
+import { passageiroEmbarque } from "./passageiro.embarque.routes"
 
 const router = Router()
 
@@ -34,5 +35,6 @@ router.use('/vendas', vendas)
 router.use('/destinos', destinos)
 router.use('/fornecedor', fornecedor)
 router.use('/excursao-passageiros', excursaoPassageiros)
+router.use('/passageiro-embarque', passageiroEmbarque)
 
 export { router }
