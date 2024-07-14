@@ -16,9 +16,7 @@ class ProdutoRepository implements IProduto {
     filter }: IIndex): Promise<{ count: number; rows: IProdutoResponse[] }> => {
 
     const where = {
-      NOT: {
-        id: undefined
-      }
+      ativo: true
     }
 
     Object.entries(filter as { [key: string]: string }).map(([key, value]) => {

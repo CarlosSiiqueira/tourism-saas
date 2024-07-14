@@ -29,7 +29,7 @@ class ExcursaoPassageirosController {
 
   find = async (request: Request, response: Response): Promise<void> => {
 
-    const res = await this.excursaoPassageirosRepository.find(request.params.id)
+    const res = await this.excursaoPassageirosRepository.find(request.params.idExcursao)
 
     response.status(200).send(res)
   }
@@ -37,6 +37,13 @@ class ExcursaoPassageirosController {
   findAll = async (request: Request, response: Response): Promise<void> => {
 
     const res = await this.excursaoPassageirosRepository.findAll()
+
+    response.status(200).send(res)
+  }
+
+  listPassageiros = async (request: Request, response: Response): Promise<void> => {
+
+    const res = await this.excursaoPassageirosRepository.listPassageiros(request.params.idExcursao)
 
     response.status(200).send(res)
   }

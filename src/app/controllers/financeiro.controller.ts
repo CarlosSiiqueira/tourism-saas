@@ -64,6 +64,7 @@ class FinanceiroController {
   efetivarTransacao = async (request: Request, response: Response): Promise<void> => {
 
     const res = await this.financeiroService.efetivarTransacao(request.body, request.params.id)
+    await this.financeiroService.confirmaPagamentoWoo(request.params.id)
 
     response.status(200).send(res)
   }

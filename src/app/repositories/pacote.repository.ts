@@ -10,9 +10,7 @@ class PacoteRepository implements IPacote {
   index = async ({ orderBy, order, skip, take, filter }: IIndex): Promise<{ count: number, rows: IPacoteResponse[] }> => {
 
     const where = {
-      NOT: {
-        id: undefined
-      }
+      ativo: true
     }
 
     Object.entries(filter as { [key: string]: string }).map(([key, value]) => {
@@ -74,6 +72,7 @@ class PacoteRepository implements IPacote {
     urlImagem,
     urlImgEsgotado,
     destino,
+    categoria,
     codigoDestino,
     usuarioCadastro }: IPacoteDTO): Promise<{ 'pacote': IPacoteResponse, 'success': boolean }> => {
 
@@ -92,6 +91,7 @@ class PacoteRepository implements IPacote {
           origem,
           tipoTransporte,
           destino,
+          categoria,
           codigoDestino,
           usuarioCadastro
         }
@@ -139,6 +139,7 @@ class PacoteRepository implements IPacote {
     urlImgEsgotado,
     idWP,
     destino,
+    categoria,
     origem,
     tipoTransporte,
     codigoDestino,
@@ -156,6 +157,7 @@ class PacoteRepository implements IPacote {
           urlImgEsgotado,
           idWP,
           destino,
+          categoria,
           origem,
           tipoTransporte,
           codigoDestino,

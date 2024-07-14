@@ -2,7 +2,7 @@ import { PacoteRepository } from '../repositories/pacote.repository'
 import { inject, injectable } from "tsyringe"
 import { Request, Response } from 'express'
 import { formatIndexFilters } from '../../shared/utils/filters'
-import { ApiService } from '../services/api.service'
+import { PacoteService } from '../services/pacote.service'
 
 @injectable()
 class PacoteController {
@@ -10,7 +10,7 @@ class PacoteController {
   constructor(
     @inject("PacoteRepository")
     private pacoteRepository: PacoteRepository,
-    private apiService: ApiService
+    private pacoteService: PacoteService
   ) { }
 
   index = async (request: Request, response: Response): Promise<void> => {
@@ -27,8 +27,8 @@ class PacoteController {
     const res = await this.pacoteRepository.create(request.body)
 
     if (res.success) {
-      const pacoteWP = await this.apiService.createProductWp(request.body)
-      await this.pacoteRepository.setIdWP(res.pacote.id, pacoteWP.id)
+      // const pacoteWP = await this.pacoteService.createProductWp(request.body)
+      // await this.pacoteRepository.setIdWP(res.pacote.id, pacoteWP.id)
     }
 
     response.status(200).send(res)
@@ -53,7 +53,7 @@ class PacoteController {
     const res = await this.pacoteRepository.update(request.body, request.params.id)
 
     if (res.success) {
-      await this.apiService.updatePacoteWP(res.pacote)
+      // await this.pacoteService.updatePacoteWP(res.pacote)
     }
 
     response.status(200).send(res)
@@ -68,12 +68,10 @@ class PacoteController {
 
   listImagesPacote = async (request: Request, response: Response): Promise<void> => {
 
-    const res = await this.apiService.listImagesPacote(request.params.search)
+    const res = await this.pacoteService.listImagesPacote(request.params.search)
 
     response.status(200).send(res)
   }
-
-
 }
 
 export { PacoteController }

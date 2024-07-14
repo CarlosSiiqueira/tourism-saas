@@ -16,6 +16,7 @@ export interface IFinanceiroDTO {
   ativo: boolean
   numeroComprovanteBancario: string | null
   dataPrevistaRecebimento: Date
+  idWP: number | null
   codigoPessoa: string
   codigoFornecedor: string
   codigoExcursao: string | null

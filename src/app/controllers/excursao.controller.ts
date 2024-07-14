@@ -1,13 +1,24 @@
 import { ExcursaoRepository } from '../repositories/excursao.repository'
 import { inject, injectable } from "tsyringe"
 import { Request, Response } from 'express'
+import { formatIndexFilters } from '../../shared/utils/filters'
 
 @injectable()
 class ExcursaoController {
+
   constructor(
     @inject("ExcursaoRepository")
     private excursaoRepository: ExcursaoRepository
   ) { }
+
+  index = async (request: Request, response: Response): Promise<void> => {
+
+    const { orderBy, order, skip, take, filter } = formatIndexFilters(request)
+
+    const res = await this.excursaoRepository.index({ orderBy, order, skip, take, filter })
+
+    response.status(200).send(res)
+  }
 
   create = async (request: Request, response: Response): Promise<void> => {
 

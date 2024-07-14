@@ -89,6 +89,7 @@ model Pacotes {
   urlImgEsgotado String?
   idWP           Int?
   destino        String
+  categoria      Int?
 
   Destinos        Destinos?    @relation(fields: [codigoDestino], references: [id])
   codigoDestino   String?
@@ -261,6 +262,7 @@ model Transacoes {
   ativo                     Boolean
   numeroComprovanteBancario String?
   dataPrevistaRecebimento   DateTime
+  idWP                      Int?
 
   Pessoas              Pessoas        @relation(fields: [codigoPessoa], references: [id])
   codigoPessoa         String
@@ -303,6 +305,7 @@ model Fornecedor {
 model ExcursaoPassageiros {
   id           String   @id @default(uuid())
   dataCadastro DateTime @default(now())
+  reserva      String
 
   Excursao      Excursao      @relation(fields: [idExcursao], references: [id])
   idExcursao    String

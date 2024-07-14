@@ -8,6 +8,6 @@ produto.get('/find/:id', produtoController.find)
 produto.get('/findAll', produtoController.findAll)
 produto.post('/create', produtoController.create)
 produto.put('/update/:id', produtoController.update)
-produto.patch('/delete', produtoController.delete)
+produto.patch('/delete/:id', produtoController.delete)
 
 export { produto }

@@ -1,4 +1,5 @@
 import { IExcursao, IExcursaoDTO, IExcursaoResponse } from "../interfaces/Excursao"
+import { IIndex } from "../interfaces/Helper"
 import prismaManager from "../database/database"
 import { dateValidate } from "../../shared/helper/date"
 import { Warning } from "../errors"
@@ -6,6 +7,76 @@ import { Warning } from "../errors"
 class ExcursaoRepository implements IExcursao {
 
   private prisma = prismaManager.getPrisma()
+
+  index = async ({ orderBy, order, skip, take, filter }: IIndex): Promise<{ count: number, rows: IExcursaoResponse[] }> => {
+
+    const where = {
+      ativo: true
+    }
+
+    Object.entries(filter as { [key: string]: string }).map(([key, value]) => {
+
+      switch (key) {
+        case 'nome':
+          Object.assign(where, {
+            OR: [
+              {
+                Pessoas: {
+                  nome: {
+                    contains: value,
+                    mode: "insensitive"
+                  }
+                }
+              },
+              {
+                LocalEmbarque: {
+                  nome: {
+                    contains: value,
+                    mode: "insensitive"
+                  }
+
+                }
+              }
+            ]
+          })
+          break;
+      }
+    })
+
+    const [count, rows] = await this.prisma.$transaction([
+      this.prisma.excursao.count({ where }),
+      this.prisma.excursao.findMany({
+        skip,
+        take,
+        orderBy: {
+          [orderBy as string]: order
+        },
+        where,
+        select: {
+          id: true,
+          nome: true,
+          dataInicio: true,
+          dataFim: true,
+          observacoes: true,
+          dataCadastro: true,
+          ativo: true,
+          gerouFinanceiro: true,
+          vagas: true,
+          codigoPacote: true,
+          usuarioCadastro: true,
+          ExcursaoPassageiros: {
+            include: {
+              Pessoa: true,
+              LocalEmbarque: true
+            }
+          },
+          Pacotes: {},
+        }
+      })
+    ])
+
+    return { count, rows }
+  }
 
   create = async ({
     nome,

@@ -2,6 +2,7 @@ import { inject, injectable } from "tsyringe";
 import prismaManager from "../database/database"
 import { FinanceiroRepository } from "../repositories/financeiro.repository";
 import { IFinanceiroDTO } from "../interfaces/Financeiro";
+import { wooCommerce } from "../api/woocommerce";
 
 @injectable()
 export class FinanceiroService {
@@ -60,6 +61,7 @@ export class FinanceiroService {
     ativo,
     numeroComprovanteBancario,
     dataPrevistaRecebimento,
+    idWP,
     codigoPessoa,
     codigoFornecedor,
     codigoExcursao,
@@ -81,6 +83,7 @@ export class FinanceiroService {
         ativo,
         numeroComprovanteBancario,
         dataPrevistaRecebimento,
+        idWP,
         codigoPessoa,
         codigoFornecedor,
         codigoExcursao,
@@ -123,6 +126,20 @@ export class FinanceiroService {
     data.setDate(data.getDate() + qtdDiasRecebimento)
 
     return data
+  }
+
+  confirmaPagamentoWoo = async (id: string): Promise<void> => {
+
+    const data = {
+      status: "completed"
+    }
+
+    const financeiro = await this.financeiroRepository.find(id)
+    let idWP = financeiro?.idWP
+
+    if (idWP) {
+      const woo = await wooCommerce.put(`orders/${idWP}`, data)
+    }
   }
 
 }

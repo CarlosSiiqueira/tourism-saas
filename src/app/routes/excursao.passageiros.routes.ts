@@ -5,8 +5,9 @@ const excursaoPassageiros = Router()
 
 excursaoPassageiros.get('/index', excursaoPassageirosController.index)
 excursaoPassageiros.post('/create', excursaoPassageirosController.create)
-excursaoPassageiros.get('/find/:id', excursaoPassageirosController.find)
+excursaoPassageiros.get('/find/:idExcursao', excursaoPassageirosController.find)
 excursaoPassageiros.get('/findAll', excursaoPassageirosController.findAll)
+excursaoPassageiros.get('/list-passageiros/:idExcursao', excursaoPassageirosController.listPassageiros)
 excursaoPassageiros.delete('/delete/:idPassageiro/:idExcursao', excursaoPassageirosController.delete)
 
 export { excursaoPassageiros }

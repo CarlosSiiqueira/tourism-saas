@@ -79,11 +79,14 @@ class ExcursaoPassageirosRepository implements IExcursaoPassageiros {
     }
   }
 
-  find = async (id: string): Promise<IExcursaoPassageirosResponse> => {
+  find = async (idExcursao: string): Promise<IExcursaoPassageirosResponse[]> => {
 
-    const excursaoPassageiros = await this.prisma.excursaoPassageiros.findFirst({
+    const excursaoPassageiros = await this.prisma.excursaoPassageiros.findMany({
       where: {
-        id
+        idExcursao
+      },
+      include: {
+        Pessoa: true
       }
     })
 
@@ -104,6 +107,33 @@ class ExcursaoPassageirosRepository implements IExcursaoPassageiros {
     }
 
     return excursaoPassageiros;
+  }
+
+  listPassageiros = async (idExcursao: string): Promise<any> => {
+
+    const excursaoPassageiros = await this.prisma.excursaoPassageiros.findMany({
+      where: {
+        idExcursao
+      },
+      select: {
+        Pessoa: {
+          select: {
+            id: true,
+            nome: true
+          }
+        }
+      }
+    })
+
+    if (!excursaoPassageiros) {
+      throw new Warning("Excursao vazia", 400)
+    }
+
+    let response = excursaoPassageiros.map((passageiro) => {
+      return passageiro.Pessoa
+    })
+
+    return response;
   }
 
   delete = async (idPassageiro: string, idExcursao: string): Promise<string[]> => {

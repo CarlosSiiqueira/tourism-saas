@@ -1,10 +1,57 @@
 import prismaManager from "../database/database"
 import { IExcursaoQuartos, IExcursaoQuartosDTO, IExcursaoQuartosResponse } from "../interfaces/ExcursaoQuartos"
 import { Warning } from "../errors"
+import { IIndex } from "../interfaces/Helper"
 
 class ExcursaoQuartosRepository implements IExcursaoQuartos {
 
   private prisma = prismaManager.getPrisma()
+
+  index = async ({ orderBy, order, skip, take, filter }: IIndex): Promise<{ count: number, rows: IExcursaoQuartosResponse[] }> => {
+
+    const where = {
+      NOT: {
+        id: undefined
+      }
+    }
+
+    Object.entries(filter as { [key: string]: string }).map(([key, value]) => {
+
+      switch (key) {
+        case 'nome':
+          Object.assign(where, {
+            OR: [
+              {
+                Passageiros: {
+                  nome: {
+                    contains: value,
+                    mode: "insensitive"
+                  }
+                }
+              }
+            ]
+          })
+          break;
+      }
+    })
+
+    const [count, rows] = await this.prisma.$transaction([
+      this.prisma.excursaoQuartos.count({ where }),
+      this.prisma.excursaoQuartos.findMany({
+        skip,
+        take,
+        orderBy: {
+          [orderBy as string]: order
+        },
+        where,
+        include: {
+          Passageiros: true
+        }
+      })
+    ])
+
+    return { count, rows }
+  }
 
   create = async ({
     numeroQuarto,

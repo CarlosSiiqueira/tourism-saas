@@ -6,8 +6,9 @@ export interface IExcursaoPassageiros {
     rows: IExcursaoPassageirosResponse[]
   }>
   create(data: IExcursaoPassageirosDTO): Promise<string[]>
-  find(id: string): Promise<IExcursaoPassageirosResponse>
+  find(idExcursao: string): Promise<IExcursaoPassageirosResponse[]>
   findAll(): Promise<IExcursaoPassageirosResponse[]>
+  listPassageiros(idExcursao: string): Promise<any>
   delete(idPassageiro: string, idExcursao: string): Promise<string[]>
 }
 
@@ -15,6 +16,7 @@ export interface IExcursaoPassageirosDTO {
   idExcursao: string
   idPassageiro: string
   localEmbarque: string
+  reserva: string
 }
 
 export interface IExcursaoPassageirosResponse extends IExcursaoPassageirosDTO {
