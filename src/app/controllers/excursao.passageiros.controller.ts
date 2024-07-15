@@ -20,7 +20,7 @@ class ExcursaoPassageirosController {
 
     const { orderBy, order, skip, take, filter } = formatIndexFilters(request)
 
-    const res = await this.excursaoPassageirosRepository.index({ orderBy, order, skip, take, filter })
+    const res = await this.excursaoPassageirosRepository.index({ orderBy, order, skip, take, filter }, request.params.idExcursao)
 
     response.status(200).send(res)
   }

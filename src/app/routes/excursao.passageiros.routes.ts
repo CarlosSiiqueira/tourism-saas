@@ -3,7 +3,7 @@ import { excursaoPassageirosController } from "../controllers"
 
 const excursaoPassageiros = Router()
 
-excursaoPassageiros.get('/index', excursaoPassageirosController.index)
+excursaoPassageiros.get('/index/:idExcursao', excursaoPassageirosController.index)
 excursaoPassageiros.post('/create', excursaoPassageirosController.create)
 excursaoPassageiros.get('/find/:idExcursao', excursaoPassageirosController.find)
 excursaoPassageiros.get('/findAll', excursaoPassageirosController.findAll)

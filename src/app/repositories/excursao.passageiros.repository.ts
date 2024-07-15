@@ -4,7 +4,8 @@ import {
   IExcursaoPassageiros,
   IExcursaoPassageirosDTO,
   IExcursaoPassageirosResponse,
-  IExcursaoPassageirosListResponse
+  IExcursaoPassageirosListResponse,
+  IExcursaoPassageirosEmbarqueReponse
 } from "../interfaces/ExcursaoPassageiros"
 import { IIndex } from "../interfaces/Helper"
 
@@ -12,12 +13,10 @@ class ExcursaoPassageirosRepository implements IExcursaoPassageiros {
 
   private prisma = prismaManager.getPrisma()
 
-  index = async ({ orderBy, order, skip, take, filter }: IIndex): Promise<{ count: number, rows: IExcursaoPassageirosResponse[] }> => {
+  index = async ({ orderBy, order, skip, take, filter }: IIndex, idExcursao: string): Promise<{ count: number, rows: IExcursaoPassageirosEmbarqueReponse[] }> => {
 
     const where = {
-      NOT: {
-        id: undefined
-      }
+      idExcursao: idExcursao
     }
 
     Object.entries(filter as { [key: string]: string }).map(([key, value]) => {
@@ -65,7 +64,31 @@ class ExcursaoPassageirosRepository implements IExcursaoPassageiros {
       })
     ])
 
-    return { count, rows }
+    const excursaoPassageirosWithEmbarcou = await Promise.all(
+      rows.map(async (ep) => {
+        const passageiroEmbarque = await this.prisma.passageiroEmbarque.findFirst({
+          where: {
+            codigoExcursao: ep.idExcursao,
+            codigoPassageiro: ep.idPassageiro,
+          },
+          select: {
+            id: true,
+            embarcou: true,
+            horaEmbarque: true
+          },
+        });
+
+        return {
+          ...ep,
+          embarcou: passageiroEmbarque?.embarcou || false,
+          hasBoarded: passageiroEmbarque?.id || '',
+          horaEmbarque: passageiroEmbarque?.horaEmbarque || ''
+        };
+      })
+    );
+
+
+    return { count, rows: excursaoPassageirosWithEmbarcou }
   }
 
   create = async (data: IExcursaoPassageirosDTO): Promise<string[]> => {
@@ -91,7 +114,9 @@ class ExcursaoPassageirosRepository implements IExcursaoPassageiros {
         idExcursao
       },
       include: {
-        Pessoa: true
+        Pessoa: true,
+        LocalEmbarque: true,
+        Excursao: true
       }
     })
 
@@ -105,7 +130,13 @@ class ExcursaoPassageirosRepository implements IExcursaoPassageiros {
 
   findAll = async (): Promise<IExcursaoPassageirosResponse[]> => {
 
-    const excursaoPassageiros = await this.prisma.excursaoPassageiros.findMany()
+    const excursaoPassageiros = await this.prisma.excursaoPassageiros.findMany({
+      include: {
+        Pessoa: true,
+        LocalEmbarque: true,
+        Excursao: true
+      }
+    })
 
     if (!excursaoPassageiros) {
       throw new Warning("Excursao vazia", 400)

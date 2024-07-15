@@ -1,9 +1,9 @@
 import { IIndex } from "./Helper"
 
 export interface IExcursaoPassageiros {
-  index(data: IIndex): Promise<{
+  index(data: IIndex, idExcursao: string): Promise<{
     count: number,
-    rows: IExcursaoPassageirosResponse[]
+    rows: IExcursaoPassageirosEmbarqueReponse[]
   }>
   create(data: IExcursaoPassageirosDTO): Promise<string[]>
   find(idExcursao: string): Promise<IExcursaoPassageirosResponse[]>
@@ -21,6 +21,42 @@ export interface IExcursaoPassageirosDTO {
 
 export interface IExcursaoPassageirosResponse extends IExcursaoPassageirosDTO {
   id: string
+  LocalEmbarque: {
+    nome: string
+    observacoes: string
+    horaEmbarque: string
+    dataCadastro: Date
+    codigoEndereco: string
+    usuarioCadastro: string
+    ativo: boolean
+  },
+  Pessoa: {
+    nome: string
+    cpf: string
+    sexo: string
+    dataCadastro: Date
+    observacoes: string | null
+    telefone: string | null
+    telefoneWpp: string | null
+    email: string
+    contato: string | null
+    telefoneContato: string | null
+    ativo: boolean
+    dataNascimento: Date | null
+    usuarioCadastro: string
+  },
+  Excursao: {
+    nome: string
+    dataInicio: Date
+    dataFim: Date
+    observacoes: string | null
+    dataCadastro: Date
+    ativo: boolean
+    gerouFinanceiro: boolean
+    vagas: number
+    codigoPacote: string
+    usuarioCadastro: string
+  }
 }
 
 export interface IExcursaoPassageirosListResponse {
@@ -28,3 +64,17 @@ export interface IExcursaoPassageirosListResponse {
   nome: string
 }
 
+export interface IExcursaoPassageirosEmbarqueReponse extends IExcursaoPassageirosDTO {
+  embarcou: boolean
+  hasBoarded: string
+  horaEmbarque: string
+  LocalEmbarque: {
+    nome: string
+    observacoes: string
+    horaEmbarque: string
+    dataCadastro: Date
+    codigoEndereco: string
+    usuarioCadastro: string
+    ativo: boolean
+  },
+}
