@@ -13,7 +13,14 @@ class ExcursaoPassageirosRepository implements IExcursaoPassageiros {
 
   private prisma = prismaManager.getPrisma()
 
-  index = async ({ orderBy, order, skip, take, filter }: IIndex, idExcursao: string): Promise<{ count: number, rows: IExcursaoPassageirosEmbarqueReponse[] }> => {
+  index = async ({
+    orderBy,
+    order,
+    skip,
+    take,
+    filter }: IIndex,
+    idExcursao: string,
+    localEmbarque?: string): Promise<{ count: number, rows: IExcursaoPassageirosEmbarqueReponse[] }> => {
 
     const where = {
       idExcursao: idExcursao
@@ -44,6 +51,14 @@ class ExcursaoPassageirosRepository implements IExcursaoPassageiros {
               }
             ]
           })
+          break;
+
+        case 'localEmbarque':
+          if (typeof localEmbarque == 'string') {
+            Object.assign(where, {
+              localEmbarque: localEmbarque
+            })
+          }
           break;
       }
     })
