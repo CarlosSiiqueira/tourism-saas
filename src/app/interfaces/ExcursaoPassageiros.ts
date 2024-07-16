@@ -1,7 +1,7 @@
 import { IIndex } from "./Helper"
 
 export interface IExcursaoPassageiros {
-  index(data: IIndex, idExcursao: string, localEmbarque?: string): Promise<{
+  index(data: IIndex, idExcursao: string): Promise<{
     count: number,
     rows: IExcursaoPassageirosEmbarqueReponse[]
   }>

@@ -19,8 +19,7 @@ class ExcursaoPassageirosRepository implements IExcursaoPassageiros {
     skip,
     take,
     filter }: IIndex,
-    idExcursao: string,
-    localEmbarque?: string): Promise<{ count: number, rows: IExcursaoPassageirosEmbarqueReponse[] }> => {
+    idExcursao: string): Promise<{ count: number, rows: IExcursaoPassageirosEmbarqueReponse[] }> => {
 
     const where = {
       idExcursao: idExcursao
@@ -54,11 +53,9 @@ class ExcursaoPassageirosRepository implements IExcursaoPassageiros {
           break;
 
         case 'localEmbarque':
-          if (typeof localEmbarque == 'string') {
-            Object.assign(where, {
-              localEmbarque: localEmbarque
-            })
-          }
+          Object.assign(where, {
+            localEmbarque: value
+          })
           break;
       }
     })
