@@ -63,15 +63,27 @@ class PassageiroEmbarqueRepository implements IPassageiroEmbarque {
     return { rows, count }
   }
 
-  create = async (data: IPassageiroEmbarqueDTO): Promise<string[]> => {
-
-    const id = crypto.randomUUID()
+  create = async ({
+    embarcou,
+    horaEmbarque,
+    codigoLocalEmbarque,
+    codigoExcursao,
+    codigoPassageiro,
+    usuarioCadastro }: IPassageiroEmbarqueDTO): Promise<string[]> => {
 
     try {
 
+      const id = crypto.randomUUID()
+
       const passageiroEmbarque = await this.prisma.passageiroEmbarque.create({
         data: {
-          ...data
+          id,
+          embarcou,
+          horaEmbarque,
+          codigoLocalEmbarque,
+          codigoExcursao,
+          codigoPassageiro,
+          usuarioCadastro
         }
       })
 
@@ -126,7 +138,8 @@ class PassageiroEmbarqueRepository implements IPassageiroEmbarque {
 
     const passageiroEmbarque = await this.prisma.passageiroEmbarque.update({
       data: {
-        embarcou: data.embarcou
+        embarcou: data.embarcou,
+        horaEmbarque: data.horaEmbarque
       },
       where: {
         id: data.id

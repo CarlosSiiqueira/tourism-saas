@@ -91,13 +91,24 @@ class ExcursaoPassageirosRepository implements IExcursaoPassageiros {
     return { count, rows: excursaoPassageirosWithEmbarcou }
   }
 
-  create = async (data: IExcursaoPassageirosDTO): Promise<string[]> => {
+  create = async ({
+    idExcursao,
+    idPassageiro,
+    localEmbarque,
+    reserva
+  }: IExcursaoPassageirosDTO): Promise<string[]> => {
 
     try {
 
+      const id = crypto.randomUUID()
+
       const excursaoPassageiros = await this.prisma.excursaoPassageiros.create({
         data: {
-          ...data
+          id,
+          idExcursao,
+          idPassageiro,
+          localEmbarque,
+          reserva
         }
       })
 
