@@ -3,6 +3,7 @@ import { inject, injectable } from "tsyringe"
 import { Request, Response } from 'express'
 import { FinanceiroService } from '../services/financeiro.service'
 import { FormaPagamentoRepository } from '../repositories/forma.pagamento.repository'
+import { formatIndexFilters } from '../../shared/utils/filters'
 
 @injectable()
 class FinanceiroController {
@@ -14,6 +15,14 @@ class FinanceiroController {
     private formaPagamentoRepository: FormaPagamentoRepository
   ) { }
 
+  index = async (request: Request, response: Response): Promise<void> => {
+
+    const { orderBy, order, skip, take, filter } = formatIndexFilters(request, 'data')
+
+    const res = await this.financeiroRepository.index({ orderBy, order, skip, take, filter })
+
+    response.status(200).send(res)
+  }
 
   create = async (request: Request, response: Response): Promise<void> => {
 

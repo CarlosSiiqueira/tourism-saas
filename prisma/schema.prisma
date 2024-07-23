@@ -193,11 +193,11 @@ model PassageiroEmbarque {
 
   LocalEmbarque       LocalEmbarque @relation(fields: [codigoLocalEmbarque], references: [id])
   codigoLocalEmbarque String
-  Excursao            Excursao       @relation(fields: [codigoExcursao], references: [id])
+  Excursao            Excursao      @relation(fields: [codigoExcursao], references: [id])
   codigoExcursao      String
-  Passageiro          Pessoas        @relation(fields: [codigoPassageiro], references: [id])
+  Passageiro          Pessoas       @relation(fields: [codigoPassageiro], references: [id])
   codigoPassageiro    String
-  Usuarios            Usuarios       @relation(fields: [usuarioCadastro], references: [id])
+  Usuarios            Usuarios      @relation(fields: [usuarioCadastro], references: [id])
   usuarioCadastro     String
 }
 
@@ -266,10 +266,10 @@ model Transacoes {
   dataPrevistaRecebimento   DateTime
   idWP                      Int?
 
-  Pessoas              Pessoas        @relation(fields: [codigoPessoa], references: [id])
-  codigoPessoa         String
-  Fornecedor           Fornecedor     @relation(fields: [codigoFornecedor], references: [id])
-  codigoFornecedor     String
+  Pessoas              Pessoas?       @relation(fields: [codigoPessoa], references: [id])
+  codigoPessoa         String?
+  Fornecedor           Fornecedor?    @relation(fields: [codigoFornecedor], references: [id])
+  codigoFornecedor     String?
   Excursao             Excursao?      @relation(fields: [codigoExcursao], references: [id])
   codigoExcursao       String?
   Produtos             Produtos?      @relation(fields: [codigoProduto], references: [id])

@@ -1,11 +1,124 @@
 import { dateValidate } from "../../shared/helper/date";
 import prismaManager from "../database/database";
 import { Warning } from "../errors";
-import { IFinanceiro, IFinanceiroDTO, IFinanceiroResponse } from "../interfaces/Financeiro";
+import { IFinanceiro, IFinanceiroDTO, IFinanceiroIndexResponse, IFinanceiroResponse } from "../interfaces/Financeiro";
+import { IIndex } from "../interfaces/Helper";
 
 class FinanceiroRepository implements IFinanceiro {
 
   private prisma = prismaManager.getPrisma()
+
+  index = async ({
+    orderBy,
+    order,
+    skip,
+    take,
+    filter }: IIndex): Promise<{ count: number, rows: IFinanceiroIndexResponse[] }> => {
+
+    const where = {
+      ativo: true
+    }
+
+    Object.entries(filter as { [key: string]: string }).map(([key, value]) => {
+
+      switch (key) {
+        case 'nome':
+          Object.assign(where, {
+            OR: [
+              {
+                Pessoas: {
+                  nome: {
+                    contains: value,
+                    mode: "insensitive"
+                  }
+                }
+              },
+              {
+                Fornecedor: {
+                  nome: {
+                    contains: value,
+                    mode: "insensitive"
+                  }
+
+                }
+              },
+              {
+                Excursao: {
+                  nome: {
+                    contains: value,
+                    mode: "insensitive"
+                  }
+                }
+              },
+              {
+                Produtos: {
+                  nome: {
+                    contains: value,
+                    mode: "insensitive"
+                  }
+                }
+              },
+              {
+                FormaPagamento: {
+                  nome: {
+                    contains: value,
+                    mode: "insensitive"
+                  }
+                }
+              },
+              {
+                Usuarios: {
+                  nome: {
+                    contains: value,
+                    mode: "insensitive"
+                  }
+                }
+              },
+              {
+                observacao: {
+                  contains: value,
+                  mode: "insensitive"
+                }
+              }
+            ]
+          })
+          break;
+
+        case 'valor':
+          Object.assign(where, {
+            valor: parseFloat(value)
+          })
+          break;
+      }
+    })
+
+    const [count, rows] = await this.prisma.$transaction([
+      this.prisma.transacoes.count({ where }),
+      this.prisma.transacoes.findMany({
+        skip,
+        take,
+        orderBy: {
+          [orderBy as string]: order
+        },
+        where,
+        include: {
+          Pessoas: true,
+          Fornecedor: true,
+          Excursao: true,
+          Pacotes: true,
+          Usuarios: true,
+          Produtos: true,
+          FormaPagamento: {
+            include: {
+              ContaBancaria: true
+            }
+          }
+        }
+      })
+    ])
+
+    return { count, rows }
+  }
 
   create = async ({
     tipo,
@@ -13,16 +126,16 @@ class FinanceiroRepository implements IFinanceiro {
     vistoAdmin,
     data,
     efetivado,
-    observacao = "",
+    observacao,
     ativo,
-    numeroComprovanteBancario = "",
+    numeroComprovanteBancario,
     dataPrevistaRecebimento,
     idWP,
     codigoPessoa,
     codigoFornecedor,
-    codigoExcursao = "",
-    codigoProduto = "",
-    codigoPacote = "",
+    codigoExcursao,
+    codigoProduto,
+    codigoPacote,
     codigoFormaPagamento,
     usuarioCadastro
   }: IFinanceiroDTO): Promise<string[]> => {
@@ -31,8 +144,9 @@ class FinanceiroRepository implements IFinanceiro {
 
       const id = crypto.randomUUID();
       data = dateValidate(data)
+      dataPrevistaRecebimento = dateValidate(dataPrevistaRecebimento)
 
-      const financeiro = await this.prisma.transacoes.create({
+      await this.prisma.transacoes.create({
         data: {
           id,
           tipo,

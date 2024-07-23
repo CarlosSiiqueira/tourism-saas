@@ -14,6 +14,10 @@ const authenticateToken = async (request: Request, response: Response, next: Nex
 
   const authHeader = request.headers['authorization'];
 
+  if (process.env.WEBHOOK_SECRET == request.headers['x-wc-webhook-signature']) {
+    return next()
+  }
+
   if (!authHeader) {
     let access = false
     noAuthRoutes.map(path => {

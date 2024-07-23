@@ -24,6 +24,10 @@ class PacoteController {
 
   create = async (request: Request, response: Response): Promise<void> => {
 
+    if (request.headers['x-wc-webhook-signature']) {
+      request.body = []
+    }
+
     const res = await this.pacoteRepository.create(request.body)
 
     if (res.success) {
