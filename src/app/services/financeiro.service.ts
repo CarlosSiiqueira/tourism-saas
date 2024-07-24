@@ -3,6 +3,10 @@ import prismaManager from "../database/database"
 import { FinanceiroRepository } from "../repositories/financeiro.repository";
 import { IFinanceiroDTO } from "../interfaces/Financeiro";
 import { wooCommerce } from "../api/woocommerce";
+import { dateValidate } from "../../shared/helper/date";
+import { IFinanceiroHookArgs } from "../interfaces/Helper";
+import { proccessFinanceiroData } from "../../shared/utils/webHookBody";
+import { IPacoteResponse } from "../interfaces/Pacote";
 
 @injectable()
 export class FinanceiroService {
@@ -123,6 +127,7 @@ export class FinanceiroService {
 
   setDataPrevistaPagamento = async (qtdDiasRecebimento: number, data: Date): Promise<Date> => {
 
+    data = dateValidate(data)
     data.setDate(data.getDate() + qtdDiasRecebimento)
 
     return data
@@ -140,6 +145,23 @@ export class FinanceiroService {
     if (idWP) {
       const woo = await wooCommerce.put(`orders/${idWP}`, data)
     }
+  }
+
+  proccessCreateTransaction = async (dados: IFinanceiroHookArgs, pacote: IPacoteResponse[]): Promise<void> => {
+
+    const financeiro = await Promise.all(
+      pacote.map(async (pct) => {
+
+        dados.Pacote.id = pct.id
+        dados.Pacote.idWP = pct.idWP || 0
+
+        let financeiroData = proccessFinanceiroData(dados)
+
+        const id = await this.financeiroRepository.create(financeiroData);
+
+        return id
+      })
+    );
   }
 
 }

@@ -4,6 +4,9 @@ import { Request, Response } from 'express'
 import { FinanceiroService } from '../services/financeiro.service'
 import { FormaPagamentoRepository } from '../repositories/forma.pagamento.repository'
 import { formatIndexFilters } from '../../shared/utils/filters'
+import { PacoteRepository } from '../repositories/pacote.repository'
+import { proccessPacotesId } from '../../shared/utils/webHookBody'
+import { IPacoteResponse } from '../interfaces/Pacote'
 
 @injectable()
 class FinanceiroController {
@@ -12,7 +15,9 @@ class FinanceiroController {
     private financeiroRepository: FinanceiroRepository,
     private financeiroService: FinanceiroService = new FinanceiroService(financeiroRepository),
     @inject("FormaPagamentoRepository")
-    private formaPagamentoRepository: FormaPagamentoRepository
+    private formaPagamentoRepository: FormaPagamentoRepository,
+    @inject("PacoteRepository")
+    private pacoteRepository: PacoteRepository
   ) { }
 
   index = async (request: Request, response: Response): Promise<void> => {
@@ -84,6 +89,24 @@ class FinanceiroController {
 
     response.status(200).send(res)
   }
+
+  createFromHook = async (request: Request, response: Response): Promise<void> => {
+
+    const ids = proccessPacotesId(request.body);
+
+    if (ids.length) {
+      var pacote = await this.pacoteRepository.getAllByIds(ids);
+
+      if (pacote.length) {
+        const res = await this.financeiroService.proccessCreateTransaction(request.body, pacote)
+
+        response.status(200).send(res)
+      }
+    }
+
+    response.status(301).send('Pacotes não encontrados')
+  }
+
 }
 
 export { FinanceiroController }

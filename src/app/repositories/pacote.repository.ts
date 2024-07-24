@@ -213,6 +213,23 @@ class PacoteRepository implements IPacote {
     }
   }
 
+  getAllByIds = async (ids: Array<number>): Promise<IPacoteResponse[]> => {
+
+    const pacotes = await this.prisma.pacotes.findMany({
+      where: {
+        idWP: {
+          in: ids
+        }
+      }
+    })
+
+    if (!pacotes) {
+      throw new Warning("Nenhum Pacote Encontrado", 400)
+    }
+
+    return pacotes
+  }
+
 }
 
 export { PacoteRepository }

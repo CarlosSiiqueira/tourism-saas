@@ -11,6 +11,7 @@ export interface IPacote {
   delete(id: string): Promise<string[]>
   update(data: IPacoteDTO, id: string): Promise<{ 'pacote': IPacoteResponse, 'success': boolean }>
   setIdWP(id: string, idWP: number): Promise<string[]>
+  getAllByIds(id: Array<number>): Promise<IPacoteResponse[]>
 }
 
 
