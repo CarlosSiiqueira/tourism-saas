@@ -17,7 +17,6 @@ export interface IPacote {
 
 export interface IPacoteDTO {
   nome: string
-  valor: number
   descricao: string
   ativo: boolean
   origem: number

@@ -38,6 +38,10 @@ import { FornecedorRepository } from "../../app/repositories/fornecedor.reposito
 import { IExcursaoPassageiros } from "../../app/interfaces/ExcursaoPassageiros"
 import { ExcursaoPassageirosRepository } from "../../app/repositories/excursao.passageiros.repository"
 import { IPassageiroEmbarque } from "../../app/interfaces/PassageiroEmbarque"
+import { ICategoriaTransacao } from "../../app/interfaces/CategoriaTransacao"
+import { CategoriaTransacaoRepository } from "../../app/repositories/categoria.transacao.repository"
+import { ITipoQuarto } from "../../app/interfaces/TipoQuarto"
+import { TipoQuartoRepository } from "../../app/repositories/tipo.quarto.repository"
 
 
 container.registerSingleton<IContaBancaria>(
@@ -123,4 +127,14 @@ container.registerSingleton<IExcursaoPassageiros>(
 container.registerSingleton<IPassageiroEmbarque>(
   "PassageiroEmbarqueRepository",
   PassageiroEmbarqueRepository
+)
+
+container.registerSingleton<ICategoriaTransacao>(
+  "CategoriaTransacaoRepository",
+  CategoriaTransacaoRepository
+)
+
+container.registerSingleton<ITipoQuarto>(
+  "TipoQuartoRepository",
+  TipoQuartoRepository
 )

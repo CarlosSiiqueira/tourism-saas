@@ -101,10 +101,25 @@ class FinanceiroController {
         const res = await this.financeiroService.proccessCreateTransaction(request.body, pacote)
 
         response.status(200).send(res)
+        return;
       }
     }
 
     response.status(301).send('Pacotes não encontrados')
+  }
+
+  clone = async (request: Request, response: Response): Promise<void> => {
+
+    const clonedTransaction = await this.financeiroRepository.find(request.params.id)
+
+    if (clonedTransaction) {
+      const id = await this.financeiroRepository.create(clonedTransaction)
+      response.status(200).send(id)
+      return;
+    }
+
+    response.status(301).send('Não foi possivel realizar procedimento')
+
   }
 
 }

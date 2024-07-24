@@ -12,5 +12,6 @@ financeiro.patch('/delete/:id', financeiroController.delete)
 financeiro.patch('/set-visto-admin/:id', financeiroController.setVistoAdmin)
 financeiro.patch('/efetivar-transacao/:id', financeiroController.efetivarTransacao)
 financeiro.patch('/des-efetivar/:id', financeiroController.desEfetivar)
+financeiro.put('/clone/:id', financeiroController.clone)
 
 export { financeiro }

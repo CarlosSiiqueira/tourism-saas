@@ -20,6 +20,8 @@ import { DestinosController } from "./destinos.controller"
 import { FornecedorController } from "./fornecedor.controller"
 import { ExcursaoPassageirosController } from "./excursao.passageiros.controller"
 import { PassageiroEmbarqueController } from "./passageiro.embarque.controller"
+import { CategoriaTransacaoController } from "./categoria.transacao.controller"
+import { TipoQuartoController } from "./tipo.quarto.controller"
 
 export const contaBancariaController = container.resolve(ContaBancariaController)
 export const excursaoController = container.resolve(ExcursaoController)
@@ -38,3 +40,5 @@ export const destinosController = container.resolve(DestinosController)
 export const fornecedorController = container.resolve(FornecedorController)
 export const excursaoPassageirosController = container.resolve(ExcursaoPassageirosController)
 export const passageiroEmbarqueController = container.resolve(PassageiroEmbarqueController)
+export const categoriaTransacaoController = container.resolve(CategoriaTransacaoController)
+export const tipoQuartoController = container.resolve(TipoQuartoController)

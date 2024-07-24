@@ -65,7 +65,6 @@ class PacoteRepository implements IPacote {
 
   create = async ({
     nome,
-    valor,
     descricao,
     origem,
     tipoTransporte,
@@ -84,7 +83,6 @@ class PacoteRepository implements IPacote {
         data: {
           id,
           nome,
-          valor,
           descricao,
           urlImagem,
           urlImgEsgotado,
@@ -132,7 +130,6 @@ class PacoteRepository implements IPacote {
 
   update = async ({
     nome,
-    valor,
     descricao,
     ativo,
     urlImagem,
@@ -150,7 +147,6 @@ class PacoteRepository implements IPacote {
       const pacote = await this.prisma.pacotes.update({
         data: {
           nome,
-          valor,
           descricao,
           ativo,
           urlImagem,

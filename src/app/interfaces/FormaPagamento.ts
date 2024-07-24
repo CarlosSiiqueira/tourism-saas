@@ -12,7 +12,6 @@ export interface IFormaPagamentoDTO {
   taxa: number
   qtdDiasRecebimento: number
   ativo: boolean
-  codigoContaBancaria: string
   usuarioCadastro: string
 }
 

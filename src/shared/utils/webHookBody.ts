@@ -39,7 +39,6 @@ export const pacotes = (dados: IPacoteHookArgs): Array<IPacoteDTO> => {
   dados.line_items.forEach((produto) => {
     data.push({
       nome: produto.name,
-      valor: produto.subtotal,
       descricao: '',
       ativo: true,
       origem: 1,

@@ -23,6 +23,7 @@ export interface IExcursaoDTO {
   vagas: number
   codigoPacote: string
   usuarioCadastro: string
+  valor: number
 }
 
 export interface IExcursaoResponse extends IExcursaoDTO {

@@ -74,12 +74,13 @@ model Usuarios {
   Vendas             Vendas[]
   Transacoes         Transacoes[]
   Fornecedor         Fornecedor[]
+  CategoriaTransacao CategoriaTransacao[]
+  TipoQuarto         TipoQuarto[]
 }
 
 model Pacotes {
   id             String   @id @default(uuid())
   nome           String
-  valor          Float
   descricao      String
   ativo          Boolean  @default(true)
   dataCadastro   DateTime @default(now())
@@ -108,12 +109,12 @@ model FormaPagamento {
   qtdDiasRecebimento Int
   ativo              Boolean  @default(true)
 
-  ContaBancaria       ContaBancaria @relation(fields: [codigoContaBancaria], references: [id])
-  codigoContaBancaria String
-  Usuarios            Usuarios      @relation(fields: [usuarioCadastro], references: [id])
-  usuarioCadastro     String
-  Vendas              Vendas[]
-  Transacoes          Transacoes[]
+  Usuarios        Usuarios       @relation(fields: [usuarioCadastro], references: [id])
+  usuarioCadastro String
+  Vendas          Vendas[]
+  Transacoes      Transacoes[]
+  ContaBancaria   ContaBancaria? @relation(fields: [contaBancariaId], references: [id])
+  contaBancariaId String?
 }
 
 model ContaBancaria {
@@ -126,6 +127,7 @@ model ContaBancaria {
   Usuarios        Usuarios         @relation(fields: [usuarioCadastro], references: [id])
   usuarioCadastro String
   FormaPagamento  FormaPagamento[]
+  Transacoes      Transacoes[]
 }
 
 model Produtos {
@@ -149,10 +151,12 @@ model ExcursaoQuartos {
   numeroQuarto String
   dataCadastro DateTime @default(now())
 
-  Excursao        Excursao  @relation(fields: [codigoExcursao], references: [id])
+  TipoQuarto      TipoQuarto? @relation(fields: [idTipoQuarto], references: [id])
+  idTipoQuarto    String?
+  Excursao        Excursao    @relation(fields: [codigoExcursao], references: [id])
   codigoExcursao  String
   Passageiros     Pessoas[]
-  Usuarios        Usuarios  @relation(fields: [usuarioCadastro], references: [id])
+  Usuarios        Usuarios    @relation(fields: [usuarioCadastro], references: [id])
   usuarioCadastro String
 }
 
@@ -211,6 +215,7 @@ model Excursao {
   ativo           Boolean  @default(true)
   gerouFinanceiro Boolean  @default(false)
   vagas           Int
+  valor           Float
 
   Pacotes             Pacotes               @relation(fields: [codigoPacote], references: [id])
   codigoPacote        String
@@ -258,7 +263,7 @@ model Transacoes {
   tipo                      Int
   valor                     Float
   vistoAdmin                Boolean  @default(false)
-  data                      DateTime
+  data                      DateTime @default(now())
   efetivado                 Boolean  @default(false)
   observacao                String?
   ativo                     Boolean
@@ -266,19 +271,23 @@ model Transacoes {
   dataPrevistaRecebimento   DateTime
   idWP                      Int?
 
-  Pessoas              Pessoas?       @relation(fields: [codigoPessoa], references: [id])
+  Pessoas              Pessoas?            @relation(fields: [codigoPessoa], references: [id])
   codigoPessoa         String?
-  Fornecedor           Fornecedor?    @relation(fields: [codigoFornecedor], references: [id])
+  Fornecedor           Fornecedor?         @relation(fields: [codigoFornecedor], references: [id])
   codigoFornecedor     String?
-  Excursao             Excursao?      @relation(fields: [codigoExcursao], references: [id])
+  Excursao             Excursao?           @relation(fields: [codigoExcursao], references: [id])
   codigoExcursao       String?
-  Produtos             Produtos?      @relation(fields: [codigoProduto], references: [id])
+  Produtos             Produtos?           @relation(fields: [codigoProduto], references: [id])
   codigoProduto        String?
-  Pacotes              Pacotes?       @relation(fields: [codigoPacote], references: [id])
+  Pacotes              Pacotes?            @relation(fields: [codigoPacote], references: [id])
   codigoPacote         String?
-  FormaPagamento       FormaPagamento @relation(fields: [codigoFormaPagamento], references: [id])
+  FormaPagamento       FormaPagamento      @relation(fields: [codigoFormaPagamento], references: [id])
   codigoFormaPagamento String
-  Usuarios             Usuarios       @relation(fields: [usuarioCadastro], references: [id])
+  CategoriaTransacao   CategoriaTransacao? @relation(fields: [codigoCategoria], references: [id])
+  codigoCategoria      String?
+  ContaBancaria        ContaBancaria?      @relation(fields: [codigoContaBancaria], references: [id])
+  codigoContaBancaria  String?
+  Usuarios             Usuarios            @relation(fields: [usuarioCadastro], references: [id])
   usuarioCadastro      String
 }
 
@@ -315,4 +324,25 @@ model ExcursaoPassageiros {
   idPassageiro  String
   LocalEmbarque LocalEmbarque @relation(fields: [localEmbarque], references: [id])
   localEmbarque String
+}
+
+model CategoriaTransacao {
+  id           String   @id @default(uuid())
+  nome         String
+  tipo         Int
+  dataCadastro DateTime @default(now())
+
+  Usuarios      Usuarios     @relation(fields: [codigoUsuario], references: [id])
+  codigoUsuario String
+  Transacoes    Transacoes[]
+}
+
+model TipoQuarto {
+  id           String   @id @default(uuid())
+  nome         String
+  dataCadastro DateTime @default(now())
+
+  Usuarios        Usuarios          @relation(fields: [codigoUsuario], references: [id])
+  codigoUsuario   String
+  ExcursaoQuartos ExcursaoQuartos[]
 }

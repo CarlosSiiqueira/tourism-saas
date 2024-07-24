@@ -64,6 +64,7 @@ class ExcursaoRepository implements IExcursao {
           vagas: true,
           codigoPacote: true,
           usuarioCadastro: true,
+          valor: true,
           ExcursaoPassageiros: {
             include: {
               Pessoa: true,
@@ -86,7 +87,7 @@ class ExcursaoRepository implements IExcursao {
     ativo = true,
     gerouFinanceiro = false,
     vagas,
-    // codigoPassageiro,
+    valor,
     codigoPacote,
     usuarioCadastro,
   }: IExcursaoDTO): Promise<string[]> => {
@@ -109,6 +110,7 @@ class ExcursaoRepository implements IExcursao {
           vagas: vagas,
           codigoPacote: codigoPacote,
           usuarioCadastro: usuarioCadastro,
+          valor
         }
       })
 
@@ -137,6 +139,7 @@ class ExcursaoRepository implements IExcursao {
         vagas: true,
         codigoPacote: true,
         usuarioCadastro: true,
+        valor: true,
         ExcursaoPassageiros: {
           include: {
             Pessoa: true,
@@ -173,6 +176,7 @@ class ExcursaoRepository implements IExcursao {
         vagas: true,
         codigoPacote: true,
         usuarioCadastro: true,
+        valor: true,
         ExcursaoPassageiros: {
           include: {
             Pessoa: true,
@@ -222,6 +226,7 @@ class ExcursaoRepository implements IExcursao {
     vagas,
     codigoPacote,
     usuarioCadastro,
+    valor
   }: IExcursaoDTO, id: string): Promise<string[]> => {
 
     dataInicio = dateValidate(dataInicio)
@@ -236,9 +241,9 @@ class ExcursaoRepository implements IExcursao {
         dataCadastro: new Date(),
         gerouFinanceiro: gerouFinanceiro,
         vagas: vagas,
-        // codigoPassageiro: codigoPassageiro,
         codigoPacote: codigoPacote,
         usuarioCadastro: usuarioCadastro,
+        valor
       },
       where: {
         id: id

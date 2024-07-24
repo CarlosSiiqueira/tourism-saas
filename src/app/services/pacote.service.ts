@@ -32,7 +32,7 @@ export class PacoteService {
     const data = {
       name: dados.nome,
       type: "booking",
-      regular_price: `${dados.valor}`,
+      // regular_price: `${dados.valor}`,
       description: dados.descricao,
       short_description: dados.descricao,
       categories: [
@@ -60,7 +60,7 @@ export class PacoteService {
 
     const data = {
       name: dados.nome,
-      regular_price: `${dados.valor}`,
+      // regular_price: `${dados.valor}`,
       description: dados.descricao,
       short_description: dados.descricao,
       catalog_visibility: dados.ativo ? 'visible' : 'hidden',

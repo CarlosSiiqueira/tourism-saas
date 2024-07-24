@@ -1,7 +1,7 @@
 import { dateValidate } from "../../shared/helper/date";
 import prismaManager from "../database/database";
 import { Warning } from "../errors";
-import { IFinanceiro, IFinanceiroDTO, IFinanceiroIndexResponse, IFinanceiroResponse } from "../interfaces/Financeiro";
+import { IFinanceiro, IFinanceiroDTO, IFinanceiroResponse } from "../interfaces/Financeiro";
 import { IIndex } from "../interfaces/Helper";
 
 class FinanceiroRepository implements IFinanceiro {
@@ -13,10 +13,18 @@ class FinanceiroRepository implements IFinanceiro {
     order,
     skip,
     take,
-    filter }: IIndex): Promise<{ count: number, rows: IFinanceiroIndexResponse[] }> => {
+    filter }: IIndex): Promise<{ count: number, rows: IFinanceiroResponse[] }> => {
 
     const where = {
-      ativo: true
+      ativo: true,
+      OR: [
+        {
+          dataPrevistaRecebimento: {
+            lt: new Date()
+          }
+        }
+      ]
+
     }
 
     Object.entries(filter as { [key: string]: string }).map(([key, value]) => {
@@ -89,6 +97,12 @@ class FinanceiroRepository implements IFinanceiro {
             valor: parseFloat(value)
           })
           break;
+
+        case 'data':
+          Object.assign(where, {
+            dataPrevistaRecebimento: dateValidate(value)
+          })
+          break;
       }
     })
 
@@ -108,11 +122,8 @@ class FinanceiroRepository implements IFinanceiro {
           Pacotes: true,
           Usuarios: true,
           Produtos: true,
-          FormaPagamento: {
-            include: {
-              ContaBancaria: true
-            }
-          }
+          FormaPagamento: true,
+          ContaBancaria: true
         }
       })
     ])
@@ -137,6 +148,8 @@ class FinanceiroRepository implements IFinanceiro {
     codigoProduto,
     codigoPacote,
     codigoFormaPagamento,
+    codigoContaBancaria,
+    codigoCategoria,
     usuarioCadastro
   }: IFinanceiroDTO): Promise<string[]> => {
 
@@ -165,6 +178,8 @@ class FinanceiroRepository implements IFinanceiro {
           codigoProduto,
           codigoPacote,
           codigoFormaPagamento,
+          codigoContaBancaria,
+          codigoCategoria,
           usuarioCadastro
         }
       })
@@ -190,7 +205,8 @@ class FinanceiroRepository implements IFinanceiro {
         Produtos: true,
         Pacotes: true,
         FormaPagamento: true,
-        Usuarios: true
+        Usuarios: true,
+        ContaBancaria: true
       }
     })
 
@@ -215,7 +231,8 @@ class FinanceiroRepository implements IFinanceiro {
         Produtos: true,
         Pacotes: true,
         FormaPagamento: true,
-        Usuarios: true
+        Usuarios: true,
+        ContaBancaria: true
       }
     })
 
@@ -235,19 +252,23 @@ class FinanceiroRepository implements IFinanceiro {
     observacao,
     ativo,
     numeroComprovanteBancario,
+    dataPrevistaRecebimento,
+    idWP,
     codigoPessoa,
     codigoFornecedor,
     codigoExcursao,
     codigoProduto,
     codigoPacote,
     codigoFormaPagamento,
+    codigoContaBancaria,
+    codigoCategoria,
     usuarioCadastro
   }: IFinanceiroDTO, id: string): Promise<string[]> => {
 
     try {
 
       data = dateValidate(data)
-      let dataPrevistaRecebimento = new Date();
+      dataPrevistaRecebimento = new Date();
 
       const financeiro = await this.prisma.transacoes.update({
         data: {
@@ -266,6 +287,8 @@ class FinanceiroRepository implements IFinanceiro {
           codigoProduto,
           codigoPacote,
           codigoFormaPagamento,
+          codigoContaBancaria,
+          codigoCategoria,
           usuarioCadastro
         },
         where: {

@@ -10,7 +10,6 @@ class FormaPagamentoRepository implements IFormaPagamento {
     nome,
     taxa,
     qtdDiasRecebimento,
-    codigoContaBancaria,
     usuarioCadastro
   }: IFormaPagamentoDTO): Promise<string[]> => {
 
@@ -24,7 +23,6 @@ class FormaPagamentoRepository implements IFormaPagamento {
           nome,
           taxa,
           qtdDiasRecebimento,
-          codigoContaBancaria,
           usuarioCadastro
         }
       })
@@ -71,7 +69,6 @@ class FormaPagamentoRepository implements IFormaPagamento {
     nome,
     taxa,
     qtdDiasRecebimento,
-    codigoContaBancaria,
     usuarioCadastro
   }: IFormaPagamentoDTO, id: string): Promise<string[]> => {
 
@@ -81,7 +78,6 @@ class FormaPagamentoRepository implements IFormaPagamento {
         dataCadastro: new Date(),
         taxa,
         qtdDiasRecebimento,
-        codigoContaBancaria,
         usuarioCadastro
       },
       where: {

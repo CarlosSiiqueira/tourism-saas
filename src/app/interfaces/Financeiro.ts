@@ -1,7 +1,7 @@
 import { IIndex } from "./Helper"
 
 export interface IFinanceiro {
-  index(data: IIndex): Promise<{ count: number, rows: IFinanceiroIndexResponse[] }>
+  index(data: IIndex): Promise<{ count: number, rows: IFinanceiroResponse[] }>
   create(data: IFinanceiroDTO): Promise<string[]>
   find(id: string): Promise<IFinanceiroResponse | null>
   findAll(): Promise<IFinanceiroResponse[]>
@@ -25,15 +25,13 @@ export interface IFinanceiroDTO {
   codigoExcursao?: string | null
   codigoProduto?: string | null
   codigoPacote?: string | null
+  codigoContaBancaria?: string | null
   codigoFormaPagamento: string
+  codigoCategoria?: string | null
   usuarioCadastro: string
 }
 
 export interface IFinanceiroResponse extends IFinanceiroDTO {
-  id: string
-}
-
-export interface IFinanceiroIndexResponse extends IFinanceiroDTO {
   id: string,
   Pessoas?: {
     id: string
@@ -70,6 +68,7 @@ export interface IFinanceiroIndexResponse extends IFinanceiroDTO {
   Excursao?: {
     id: string
     nome: string
+    valor: number
     dataInicio: Date
     dataFim: Date
     observacoes: string | null
@@ -83,7 +82,6 @@ export interface IFinanceiroIndexResponse extends IFinanceiroDTO {
   Pacotes?: {
     id: string
     nome: string
-    valor: number
     descricao: string
     ativo: boolean
     origem: number
@@ -125,16 +123,14 @@ export interface IFinanceiroIndexResponse extends IFinanceiroDTO {
     taxa: number
     qtdDiasRecebimento: number
     ativo: boolean
-    codigoContaBancaria: string
     usuarioCadastro: string
-    ContaBancaria: {
-      id: string
-      nome: string
-      ativo: boolean
-      saldo: number
-      dataCadastro: Date
-      usuarioCadastro: string
-    }
-
   }
+  ContaBancaria: {
+    id: string
+    nome: string
+    ativo: boolean
+    saldo: number
+    dataCadastro: Date
+    usuarioCadastro: string
+  } | null
 }
