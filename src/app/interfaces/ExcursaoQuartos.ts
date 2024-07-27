@@ -32,5 +32,6 @@ export interface IExcursaoQuartosResponse {
   }[]
   TipoQuarto?: {
     id: string
+    nome: string
   } | null
 }

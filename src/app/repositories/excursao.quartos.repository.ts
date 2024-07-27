@@ -64,7 +64,8 @@ class ExcursaoQuartosRepository implements IExcursaoQuartos {
           },
           TipoQuarto: {
             select: {
-              id: true
+              id: true,
+              nome: true
             }
           }
         }
@@ -130,7 +131,13 @@ class ExcursaoQuartosRepository implements IExcursaoQuartos {
           }
         },
         usuarioCadastro: true,
-        Excursao: true
+        Excursao: true,
+        TipoQuarto: {
+          select: {
+            id: true,
+            nome: true
+          }
+        }
       }
     })
 
@@ -167,7 +174,8 @@ class ExcursaoQuartosRepository implements IExcursaoQuartos {
         },
         TipoQuarto: {
           select: {
-            id: true
+            id: true,
+            nome: true
           }
         }
       }
