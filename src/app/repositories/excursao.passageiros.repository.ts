@@ -175,6 +175,7 @@ class ExcursaoPassageirosRepository implements IExcursaoPassageiros {
         idExcursao
       },
       select: {
+        reserva: true,
         Pessoa: {
           select: {
             id: true,
@@ -189,10 +190,28 @@ class ExcursaoPassageirosRepository implements IExcursaoPassageiros {
     }
 
     const response = excursaoPassageiros.map((passageiro) => {
-      return passageiro.Pessoa
+      return { ...passageiro.Pessoa, 'reserva': passageiro.reserva }
     })
 
     return response;
+  }
+
+  findByIdPessoa = async (idsPassageiros: [string]): Promise<IExcursaoPassageirosResponse[]> => {
+
+    const passageiros = await this.prisma.excursaoPassageiros.findMany({
+      where: {
+        idPassageiro: {
+          in: idsPassageiros
+        }
+      },
+      include: {
+        Pessoa: true,
+        LocalEmbarque: true,
+        Excursao: true
+      }
+    })
+
+    return passageiros
   }
 
   delete = async (idPassageiro: string, idExcursao: string): Promise<string[]> => {

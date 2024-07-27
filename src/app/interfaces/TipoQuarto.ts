@@ -1,4 +1,7 @@
+import { IIndex } from "./Helper"
+
 export interface ITipoQuarto {
+  index(data: IIndex): Promise<{ count: number, rows: ITipoQuartoResponse[] }>
   create(data: ITipoQuartoDTO): Promise<string[]>
   find(id: string): Promise<ITipoQuartoResponse | null>
   findAll(): Promise<ITipoQuartoResponse[]>

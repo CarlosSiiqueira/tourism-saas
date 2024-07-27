@@ -53,7 +53,7 @@ class ExcursaoPassageirosController {
     response.status(200).send(res)
   }
 
-  listPassageirosFiltered = async (request: Request, response: Response): Promise<void> => {
+  listPassageirosNoRoom = async (request: Request, response: Response): Promise<void> => {
 
     const passageiros = await this.excursaoPassageirosRepository.listPassageiros(request.params.idExcursao)
     const quartos = await this.excursaoQuartoRepository.findPassageirosWithRoom(request.params.idExcursao)

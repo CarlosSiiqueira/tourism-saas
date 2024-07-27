@@ -1,10 +1,57 @@
 import prismaManager from "../database/database";
 import { Warning } from "../errors";
+import { IIndex } from "../interfaces/Helper";
 import { ITipoQuarto, ITipoQuartoDTO, ITipoQuartoResponse } from "../interfaces/TipoQuarto";
 
 class TipoQuartoRepository implements ITipoQuarto {
 
   private prisma = prismaManager.getPrisma()
+
+  index = async ({
+    orderBy,
+    order,
+    skip,
+    take,
+    filter }: IIndex): Promise<{ count: number; rows: ITipoQuartoResponse[] }> => {
+
+    const where = {
+      NOT: {
+        id: undefined
+      }
+    }
+
+    Object.entries(filter as { [key: string]: string }).map(([key, value]) => {
+
+      switch (key) {
+        case 'nome':
+          Object.assign(where, {
+            OR: [
+              {
+                nome: {
+                  contains: value,
+                  mode: "insensitive"
+                }
+              }
+            ]
+          })
+          break;
+      }
+    })
+
+    const [count, rows] = await this.prisma.$transaction([
+      this.prisma.tipoQuarto.count({ where }),
+      this.prisma.tipoQuarto.findMany({
+        skip,
+        take,
+        orderBy: {
+          [orderBy as string]: order
+        },
+        where
+      })
+    ])
+
+    return { count, rows }
+  }
 
   create = async ({
     nome,
@@ -23,10 +70,10 @@ class TipoQuartoRepository implements ITipoQuarto {
         }
       })
 
-      return ['Venda criada com sucesso']
+      return ['Tipo quarto criado com sucesso']
 
     } catch (error) {
-      throw new Warning('Não foi possível criar venda', 400)
+      throw new Warning('Não foi possível criar tipo quarto', 400)
     }
 
   }
@@ -40,7 +87,7 @@ class TipoQuartoRepository implements ITipoQuarto {
     })
 
     if (!venda) {
-      throw new Warning("Venda não encontrada", 400)
+      throw new Warning("Tipo Quarto não encontrada", 400)
     }
 
     return venda
@@ -51,7 +98,7 @@ class TipoQuartoRepository implements ITipoQuarto {
     const TipoQuarto = await this.prisma.tipoQuarto.findMany()
 
     if (!TipoQuarto) {
-      throw new Warning("Sem TipoQuarto na base", 400)
+      throw new Warning("Sem Tipo Quarto na base", 400)
     }
 
     return TipoQuarto
@@ -77,13 +124,13 @@ class TipoQuartoRepository implements ITipoQuarto {
       })
 
       if (!venda) {
-        throw new Warning("Venda não encontrada", 400)
+        throw new Warning("Tipo quarto não encontrado", 400)
       }
 
-      return ['Venda atualizada com sucesso']
+      return ['Tipo Quarto atualizado com sucesso']
 
     } catch (error) {
-      throw new Warning('Erro ao atualizar venda', 400)
+      throw new Warning('Erro ao atualizar tipo quarto', 400)
     }
 
   }
@@ -97,10 +144,10 @@ class TipoQuartoRepository implements ITipoQuarto {
     })
 
     if (!venda) {
-      throw new Warning("Venda não encontrada", 400)
+      throw new Warning("Tipo Quarto não encontrado", 400)
     }
 
-    return ['Venda excluída com sucesso']
+    return ['Tipo Quarto excluído com sucesso']
   }
 
 }

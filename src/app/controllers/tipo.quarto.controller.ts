@@ -1,6 +1,7 @@
 import { injectable, inject } from "tsyringe";
 import { TipoQuartoRepository } from "../repositories/tipo.quarto.repository";
 import { Request, Response } from "express";
+import { formatIndexFilters } from "../../shared/utils/filters";
 
 @injectable()
 class TipoQuartoController {
@@ -9,6 +10,15 @@ class TipoQuartoController {
     @inject("TipoQuartoRepository")
     private tipoQuartoRepository: TipoQuartoRepository
   ) { }
+
+  index = async (request: Request, response: Response): Promise<void> => {
+
+    const { orderBy, order, skip, take, filter } = formatIndexFilters(request)
+
+    const res = await this.tipoQuartoRepository.index({ orderBy, order, skip, take, filter })
+
+    response.status(200).send(res)
+  }
 
   create = async (request: Request, response: Response): Promise<void> => {
 

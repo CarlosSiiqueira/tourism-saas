@@ -3,13 +3,16 @@ import { inject, injectable } from "tsyringe"
 import { Request, Response } from 'express'
 import { formatIndexFilters } from '../../shared/utils/filters'
 import { ExcursaoService } from '../services/excursao.service'
+import { ExcursaoPassageirosRepository } from '../repositories/excursao.passageiros.repository'
 
 @injectable()
 class ExcursaoQuartosController {
   constructor(
     @inject("ExcursaoQuartosRepository")
     private excursaoQuartosRepository: ExcursaoQuartosRepository,
-    private excursaoService: ExcursaoService
+    private excursaoService: ExcursaoService,
+    @inject("ExcursaoPassageirosRepository")
+    private excursaoPassageirosRepository: ExcursaoPassageirosRepository
   ) { }
 
   index = async (request: Request, response: Response): Promise<void> => {
@@ -22,6 +25,14 @@ class ExcursaoQuartosController {
   }
 
   create = async (request: Request, response: Response): Promise<void> => {
+
+    let passageiros = await this.excursaoPassageirosRepository.findByIdPessoa(request.body.passageiros)
+
+    if (passageiros.length) {
+      request.body.passageiros = passageiros.map((passageiro) => {
+        return passageiro.id
+      })
+    }
 
     const res = await this.excursaoQuartosRepository.create(request.body)
 

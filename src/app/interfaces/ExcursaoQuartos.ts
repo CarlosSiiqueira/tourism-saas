@@ -1,7 +1,7 @@
 export interface IExcursaoQuartos {
   create(data: IExcursaoQuartosDTO): Promise<string[]>
   find(idExcursao: string): Promise<IExcursaoQuartosResponse[]>
-  findPassageirosWithRoom(idExcursao: string): Promise<IExcursaoQuartosListRresponse[]>
+  findPassageirosWithRoom(idExcursao: string): Promise<IExcursaoQuartosResponse[]>
   update(data: IExcursaoQuartosDTO, id: string): Promise<string[]>
   delete(id: string): Promise<string[]>
 }
@@ -10,6 +10,7 @@ export interface IExcursaoQuartosDTO {
   numeroQuarto: string
   dataCadastro: Date
   codigoExcursao: string
+  idTipoQuarto: string,
   passageiros: [string]
   usuarioCadastro: string
 
@@ -20,16 +21,16 @@ export interface IExcursaoQuartosResponse {
   numeroQuarto: string
   dataCadastro: Date
   codigoExcursao: string
-  usuarioCadastro: string
-  Passageiros: Array<{
-    id: string,
-    nome: string
-  }>
-}
-
-export interface IExcursaoQuartosListRresponse {
-  Passageiros: Array<{
+  usuarioCadastro: string,
+  Passageiros: {
     id: string
-    nome: string
-  }>
+    reserva: string
+    Pessoa: {
+      id: string,
+      nome: string
+    }
+  }[]
+  TipoQuarto?: {
+    id: string
+  } | null
 }

@@ -40,7 +40,6 @@ model Pessoas {
   Usuarios            Usuarios              @relation(fields: [usuarioCadastro], references: [id])
   usuarioCadastro     String
   Endereco            Endereco[]
-  ExcursaoQuartos     ExcursaoQuartos[]
   ExcursaoOnibus      ExcursaoOnibus[]
   PassageiroEmbarque  PassageiroEmbarque[]
   Vendas              Vendas[]
@@ -151,12 +150,12 @@ model ExcursaoQuartos {
   numeroQuarto String
   dataCadastro DateTime @default(now())
 
-  TipoQuarto      TipoQuarto? @relation(fields: [idTipoQuarto], references: [id])
-  idTipoQuarto    String?
-  Excursao        Excursao    @relation(fields: [codigoExcursao], references: [id])
+  TipoQuarto      TipoQuarto           @relation(fields: [idTipoQuarto], references: [id])
+  idTipoQuarto    String
+  Excursao        Excursao              @relation(fields: [codigoExcursao], references: [id])
   codigoExcursao  String
-  Passageiros     Pessoas[]
-  Usuarios        Usuarios    @relation(fields: [usuarioCadastro], references: [id])
+  Passageiros     ExcursaoPassageiros[]
+  Usuarios        Usuarios              @relation(fields: [usuarioCadastro], references: [id])
   usuarioCadastro String
 }
 
@@ -318,12 +317,13 @@ model ExcursaoPassageiros {
   dataCadastro DateTime @default(now())
   reserva      String
 
-  Excursao      Excursao      @relation(fields: [idExcursao], references: [id])
+  Excursao      Excursao          @relation(fields: [idExcursao], references: [id])
   idExcursao    String
-  Pessoa        Pessoas       @relation(fields: [idPassageiro], references: [id])
+  Pessoa        Pessoas           @relation(fields: [idPassageiro], references: [id])
   idPassageiro  String
-  LocalEmbarque LocalEmbarque @relation(fields: [localEmbarque], references: [id])
+  LocalEmbarque LocalEmbarque     @relation(fields: [localEmbarque], references: [id])
   localEmbarque String
+  Quartos       ExcursaoQuartos[]
 }
 
 model CategoriaTransacao {

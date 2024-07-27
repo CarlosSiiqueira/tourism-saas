@@ -1,8 +1,7 @@
 import prismaManager from "../database/database"
-import { IExcursaoQuartos, IExcursaoQuartosDTO, IExcursaoQuartosListRresponse, IExcursaoQuartosResponse } from "../interfaces/ExcursaoQuartos"
+import { IExcursaoQuartos, IExcursaoQuartosDTO, IExcursaoQuartosResponse } from "../interfaces/ExcursaoQuartos"
 import { Warning } from "../errors"
 import { IIndex } from "../interfaces/Helper"
-import { warning } from "../middlewares/error.middleware"
 
 class ExcursaoQuartosRepository implements IExcursaoQuartos {
 
@@ -45,8 +44,29 @@ class ExcursaoQuartosRepository implements IExcursaoQuartos {
           [orderBy as string]: order
         },
         where,
-        include: {
-          Passageiros: true
+        select: {
+          id: true,
+          numeroQuarto: true,
+          dataCadastro: true,
+          codigoExcursao: true,
+          usuarioCadastro: true,
+          Passageiros: {
+            select: {
+              id: true,
+              reserva: true,
+              Pessoa: {
+                select: {
+                  id: true,
+                  nome: true
+                }
+              }
+            }
+          },
+          TipoQuarto: {
+            select: {
+              id: true
+            }
+          }
         }
       })
     ])
@@ -58,6 +78,7 @@ class ExcursaoQuartosRepository implements IExcursaoQuartos {
     numeroQuarto,
     codigoExcursao,
     passageiros,
+    idTipoQuarto,
     usuarioCadastro
   }: IExcursaoQuartosDTO): Promise<string[]> => {
 
@@ -71,20 +92,17 @@ class ExcursaoQuartosRepository implements IExcursaoQuartos {
           numeroQuarto: numeroQuarto,
           codigoExcursao: codigoExcursao,
           usuarioCadastro: usuarioCadastro,
+          idTipoQuarto: idTipoQuarto,
           Passageiros: {
             connect: passageiros.map(codigoPassageiro => ({ id: codigoPassageiro }))
           }
         }
       })
 
-      if (!excursaoQuartos) {
-        throw new Warning('excursao sem quartos configurados')
-      }
 
       return ['Quartos definidos com sucesso']
-
     } catch (error) {
-      return ['Erro ao registrar quarto']
+      throw new Warning('Erro ao inserir quarto')
     }
   }
 
@@ -102,7 +120,13 @@ class ExcursaoQuartosRepository implements IExcursaoQuartos {
         Passageiros: {
           select: {
             id: true,
-            nome: true
+            reserva: true,
+            Pessoa: {
+              select: {
+                id: true,
+                nome: true
+              }
+            }
           }
         },
         usuarioCadastro: true,
@@ -117,36 +141,48 @@ class ExcursaoQuartosRepository implements IExcursaoQuartos {
     return excursaoQuartos
   }
 
-  findPassageirosWithRoom = async (idExcursao: string): Promise<IExcursaoQuartosListRresponse[]> => {
+  findPassageirosWithRoom = async (idExcursao: string): Promise<IExcursaoQuartosResponse[]> => {
 
     const passageiros = await this.prisma.excursaoQuartos.findMany({
       where: {
         codigoExcursao: idExcursao
       },
       select: {
+        id: true,
+        numeroQuarto: true,
+        dataCadastro: true,
+        codigoExcursao: true,
+        usuarioCadastro: true,
         Passageiros: {
           select: {
             id: true,
-            nome: true
+            reserva: true,
+            Pessoa: {
+              select: {
+                id: true,
+                nome: true
+              }
+            }
+          }
+        },
+        TipoQuarto: {
+          select: {
+            id: true
           }
         }
       }
     })
 
     if (!passageiros) {
-      throw new Warning('Passageiro não encontrado', 400)
+      throw new Warning('Sem passageiros na excursão não encontrado', 400)
     }
 
-    const response = passageiros.map((p, index) => {
-      return p
-    })
-
-    return response;
+    return passageiros;
   }
 
   update = async ({
     numeroQuarto,
-    codigoExcursao,
+    idTipoQuarto,
     passageiros,
     usuarioCadastro }: IExcursaoQuartosDTO, id: string): Promise<string[]> => {
 
@@ -166,6 +202,7 @@ class ExcursaoQuartosRepository implements IExcursaoQuartos {
         numeroQuarto: numeroQuarto,
         dataCadastro: new Date(),
         usuarioCadastro: usuarioCadastro,
+        idTipoQuarto: idTipoQuarto,
         Passageiros: {
           connect: passageiros.map(codigoPassageiro => ({ id: codigoPassageiro }))
         }
