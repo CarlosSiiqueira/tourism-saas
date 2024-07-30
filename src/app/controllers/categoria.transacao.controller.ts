@@ -1,6 +1,7 @@
 import { injectable, inject } from "tsyringe";
 import { CategoriaTransacaoRepository } from "../repositories/categoria.transacao.repository";
 import { Request, Response } from "express";
+import { formatIndexFilters } from "../../shared/utils/filters";
 
 @injectable()
 class CategoriaTransacaoController {
@@ -9,6 +10,15 @@ class CategoriaTransacaoController {
     @inject("CategoriaTransacaoRepository")
     private categoriaTransacaoRepository: CategoriaTransacaoRepository
   ) { }
+
+  index = async (request: Request, response: Response): Promise<void> => {
+
+    const { orderBy, order, skip, take, filter } = formatIndexFilters(request)
+
+    const res = await this.categoriaTransacaoRepository.index({ orderBy, order, skip, take, filter })
+
+    response.status(200).send(res)
+  }
 
   create = async (request: Request, response: Response): Promise<void> => {
 

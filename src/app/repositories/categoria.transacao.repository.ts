@@ -75,10 +75,10 @@ class CategoriaTransacaoRepository implements ICategoriaTransacao {
         }
       })
 
-      return ['Venda criada com sucesso']
+      return ['Categoria criada com sucesso']
 
     } catch (error) {
-      throw new Warning('Não foi possível criar venda', 400)
+      throw new Warning('Não foi possível criar Categoria', 400)
     }
 
   }
@@ -92,7 +92,7 @@ class CategoriaTransacaoRepository implements ICategoriaTransacao {
     })
 
     if (!venda) {
-      throw new Warning("Venda não encontrada", 400)
+      throw new Warning("Categoria não encontrada", 400)
     }
 
     return venda
@@ -103,7 +103,7 @@ class CategoriaTransacaoRepository implements ICategoriaTransacao {
     const CategoriaTransacao = await this.prisma.categoriaTransacao.findMany()
 
     if (!CategoriaTransacao) {
-      throw new Warning("Sem CategoriaTransacao na base", 400)
+      throw new Warning("Sem Categoria Transacao na base", 400)
     }
 
     return CategoriaTransacao
