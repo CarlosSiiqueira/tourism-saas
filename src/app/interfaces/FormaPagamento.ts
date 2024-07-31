@@ -1,4 +1,7 @@
+import { IIndex } from "./Helper"
+
 export interface IFormaPagamento {
+  index(data: IIndex): Promise<{ count: number, rows: IFormaPagamentoResponse[] }>
   create(data: IFormaPagamentoDTO): Promise<string[]>
   find(id: string): Promise<IFormaPagamentoResponse | null>
   findAll(): Promise<IFormaPagamentoResponse[]>

@@ -112,8 +112,6 @@ model FormaPagamento {
   usuarioCadastro String
   Vendas          Vendas[]
   Transacoes      Transacoes[]
-  ContaBancaria   ContaBancaria? @relation(fields: [contaBancariaId], references: [id])
-  contaBancariaId String?
 }
 
 model ContaBancaria {
@@ -125,7 +123,6 @@ model ContaBancaria {
 
   Usuarios        Usuarios         @relation(fields: [usuarioCadastro], references: [id])
   usuarioCadastro String
-  FormaPagamento  FormaPagamento[]
   Transacoes      Transacoes[]
 }
 

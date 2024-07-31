@@ -148,10 +148,7 @@ class ContaBancariaRepository implements IContaBancaria {
 
   delete = async (id: string): Promise<string> => {
 
-    const contaBancaria = await this.prisma.contaBancaria.update({
-      data: {
-        ativo: false
-      },
+    const contaBancaria = await this.prisma.contaBancaria.delete({
       where: {
         id: id
       }
@@ -162,12 +159,12 @@ class ContaBancariaRepository implements IContaBancaria {
     }
 
     return id
-
   }
 
   update = async ({
     nome,
     saldo,
+    ativo,
     usuarioCadastro
   }: IContaBancariaDTO, id: string): Promise<string[]> => {
 
@@ -175,6 +172,7 @@ class ContaBancariaRepository implements IContaBancaria {
       data: {
         nome: nome,
         saldo: saldo,
+        ativo: ativo,
         dataCadastro: new Date(),
         usuarioCadastro: usuarioCadastro
       },

@@ -1,10 +1,61 @@
 import { IFormaPagamentoDTO, IFormaPagamento, IFormaPagamentoResponse } from "../interfaces/FormaPagamento"
 import prismaManager from "../database/database"
 import { Warning } from "../errors"
+import { IIndex } from "../interfaces/Helper"
 
 class FormaPagamentoRepository implements IFormaPagamento {
 
   private prisma = prismaManager.getPrisma()
+
+  index = async ({ orderBy, order, skip, take, filter }: IIndex): Promise<{ count: number, rows: IFormaPagamentoResponse[] }> => {
+
+    const where = {
+      NOT: {
+        id: undefined
+      }
+    }
+
+    Object.entries(filter as { [key: string]: string }).map(([key, value]) => {
+
+      switch (key) {
+        case 'nome':
+          Object.assign(where, {
+            OR: [
+              {
+                nome: {
+                  contains: value,
+                  mode: "insensitive"
+                }
+              },
+              {
+                Usuarios: {
+                  nome: {
+                    contains: value,
+                    mode: "insensitive"
+                  }
+                }
+              }
+            ]
+          })
+          break;
+      }
+    })
+
+    const [count, rows] = await this.prisma.$transaction([
+      this.prisma.formaPagamento.count({ where }),
+      this.prisma.formaPagamento.findMany({
+        skip,
+        take,
+        orderBy: {
+          [orderBy as string]: order
+        },
+        where
+      })
+    ])
+
+    return { count, rows }
+
+  }
 
   create = async ({
     nome,
@@ -94,10 +145,7 @@ class FormaPagamentoRepository implements IFormaPagamento {
 
   delete = async (id: string): Promise<string[]> => {
 
-    const formaPagamento = await this.prisma.formaPagamento.update({
-      data: {
-        ativo: false
-      },
+    const formaPagamento = await this.prisma.formaPagamento.delete({
       where: {
         id: id
       }
