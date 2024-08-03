@@ -12,6 +12,7 @@ class EnderecoRepository implements IEndereco {
     complemento = '',
     cep,
     cidade,
+    bairro,
     uf }: IEnderecoDTO): Promise<string> => {
 
     try {
@@ -26,6 +27,7 @@ class EnderecoRepository implements IEndereco {
           complemento,
           cep,
           cidade,
+          bairro,
           uf
         }
       })
@@ -82,6 +84,7 @@ class EnderecoRepository implements IEndereco {
     complemento,
     cep,
     cidade,
+    bairro,
     uf }: IEnderecoDTO, id: string): Promise<string[]> => {
 
     try {
@@ -93,7 +96,8 @@ class EnderecoRepository implements IEndereco {
           complemento,
           cep,
           cidade,
-          uf
+          uf,
+          bairro
         },
         where: {
           id

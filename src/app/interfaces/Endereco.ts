@@ -14,6 +14,7 @@ export interface IEnderecoDTO {
   cep: string
   cidade: string
   uf: string
+  bairro: string
 }
 
 export interface IEnderecoResponse extends IEnderecoDTO {

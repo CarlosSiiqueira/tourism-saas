@@ -37,7 +37,8 @@ class FornecedorController {
         complemento: request.body.complemento || '',
         logradouro: request.body.logradouro || '',
         numero: request.body.numero || '',
-        uf: request.body.uf || ''
+        uf: request.body.uf || '',
+        bairro: request.body.bairro || ''
       })
 
       request.body.codigoEndereco = codigoEndereco

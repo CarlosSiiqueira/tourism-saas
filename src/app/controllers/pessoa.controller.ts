@@ -3,6 +3,7 @@ import { inject, injectable } from "tsyringe"
 import { Request, Response } from 'express'
 import { EnderecoRepository } from '../repositories/endereco.repository'
 import { EnderecoService } from '../services/endereco.service'
+import { formatIndexFilters } from '../../shared/utils/filters'
 
 @injectable()
 class PessoaController {
@@ -14,6 +15,14 @@ class PessoaController {
     private enderecoService: EnderecoService = new EnderecoService(enderecoRepository)
   ) { }
 
+  index = async (request: Request, response: Response): Promise<void> => {
+
+    const { orderBy, order, skip, take, filter } = formatIndexFilters(request)
+
+    const res = await this.pessoaRepository.index({ orderBy, order, skip, take, filter })
+
+    response.status(200).send(res)
+  }
 
   create = async (request: Request, response: Response): Promise<void> => {
 
@@ -27,7 +36,8 @@ class PessoaController {
         complemento: request.body.complemento || '',
         logradouro: request.body.logradouro || '',
         numero: request.body.numero || '',
-        uf: request.body.uf || ''
+        uf: request.body.uf || '',
+        bairro: request.body.bairro || ''
       })
 
 

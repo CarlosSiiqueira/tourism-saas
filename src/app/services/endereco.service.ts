@@ -9,6 +9,7 @@ interface Address {
   cep: string
   cidade: string
   uf: string
+  bairro: string
 }
 
 @injectable()
@@ -27,6 +28,7 @@ export class EnderecoService {
     cep,
     cidade,
     uf,
+    bairro
   }: Address): Promise<string> => {
 
     try {
@@ -50,7 +52,8 @@ export class EnderecoService {
             complemento,
             cep,
             cidade,
-            uf
+            uf,
+            bairro
           })
 
           codigoEndereco = endereco

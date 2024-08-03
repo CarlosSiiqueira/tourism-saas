@@ -17,12 +17,13 @@ model Endereco {
   cep           String
   cidade        String
   uf            String
+  bairro        String
   Pessoas       Pessoas[]
   LocalEmbarque LocalEmbarque[]
   Fornecedor    Fornecedor[]
 }
 
-model Pessoas {
+model Pessoas {n
   id              String    @id @default(uuid())
   nome            String
   cpf             String
@@ -108,7 +109,7 @@ model FormaPagamento {
   qtdDiasRecebimento Int
   ativo              Boolean  @default(true)
 
-  Usuarios        Usuarios       @relation(fields: [usuarioCadastro], references: [id])
+  Usuarios        Usuarios     @relation(fields: [usuarioCadastro], references: [id])
   usuarioCadastro String
   Vendas          Vendas[]
   Transacoes      Transacoes[]
@@ -121,7 +122,7 @@ model ContaBancaria {
   saldo        Float    @default(0)
   dataCadastro DateTime @default(now())
 
-  Usuarios        Usuarios         @relation(fields: [usuarioCadastro], references: [id])
+  Usuarios        Usuarios     @relation(fields: [usuarioCadastro], references: [id])
   usuarioCadastro String
   Transacoes      Transacoes[]
 }
@@ -147,7 +148,7 @@ model ExcursaoQuartos {
   numeroQuarto String
   dataCadastro DateTime @default(now())
 
-  TipoQuarto      TipoQuarto           @relation(fields: [idTipoQuarto], references: [id])
+  TipoQuarto      TipoQuarto            @relation(fields: [idTipoQuarto], references: [id])
   idTipoQuarto    String
   Excursao        Excursao              @relation(fields: [codigoExcursao], references: [id])
   codigoExcursao  String
