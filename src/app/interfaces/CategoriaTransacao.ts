@@ -13,6 +13,7 @@ export interface ICategoriaTransacaoDTO {
   nome: string
   tipo: number
   codigoUsuario: string
+  codigoSubCategoria: string
 }
 
 export interface ICategoriaTransacaoResponse extends ICategoriaTransacaoDTO {

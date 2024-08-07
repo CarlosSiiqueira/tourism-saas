@@ -50,6 +50,9 @@ class CategoriaTransacaoRepository implements ICategoriaTransacao {
           [orderBy as string]: order
         },
         where,
+        include: {
+          SubCategoria: true
+        }
       })
     ])
 
@@ -59,7 +62,8 @@ class CategoriaTransacaoRepository implements ICategoriaTransacao {
   create = async ({
     nome,
     tipo,
-    codigoUsuario
+    codigoUsuario,
+    codigoSubCategoria
   }: ICategoriaTransacaoDTO): Promise<string[]> => {
 
     try {
@@ -71,7 +75,8 @@ class CategoriaTransacaoRepository implements ICategoriaTransacao {
           id,
           nome,
           tipo,
-          codigoUsuario
+          codigoUsuario,
+          codigoSubCategoria
         }
       })
 
@@ -112,7 +117,8 @@ class CategoriaTransacaoRepository implements ICategoriaTransacao {
   update = async ({
     nome,
     tipo,
-    codigoUsuario
+    codigoUsuario,
+    codigoSubCategoria
   }: ICategoriaTransacaoDTO, id: string): Promise<string[]> => {
 
     try {
@@ -121,7 +127,8 @@ class CategoriaTransacaoRepository implements ICategoriaTransacao {
         data: {
           nome,
           tipo,
-          codigoUsuario
+          codigoUsuario,
+          codigoSubCategoria
         },
         where: {
           id

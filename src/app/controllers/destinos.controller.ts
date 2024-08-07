@@ -20,7 +20,6 @@ class DestinosController {
 
     try {
       codigoEndereco = await this.enderecoService.findOrCreateAddress({
-        id: request.body.codigoEndereco || null,
         cep: request.body.cep || '',
         cidade: request.body.cidade || '',
         complemento: request.body.complemento || '',

@@ -62,6 +62,9 @@ class PessoaRepository implements IPessoa {
           [orderBy as string]: order
         },
         where,
+        include: {
+          Endereco: true
+        }
       })
     ])
 
@@ -160,19 +163,40 @@ class PessoaRepository implements IPessoa {
     nome,
     cpf,
     sexo,
-    observacoes = '',
-    telefone = '',
-    telefoneWpp = '',
+    observacoes,
+    telefone,
+    telefoneWpp,
     email,
-    contato = '',
-    telefoneContato = '',
-    dataNascimento = new Date(),
-    usuarioCadastro }: IPessoaDTO, id: string): Promise<string[]> => {
+    contato,
+    telefoneContato,
+    dataNascimento,
+    usuarioCadastro }: IPessoaDTO, id: string, codigoEndereco: string): Promise<string[]> => {
 
     try {
+      let endereco = {}
 
       if (dataNascimento) {
         dataNascimento = dateValidate(dataNascimento)
+      }
+
+      if (codigoEndereco) {
+        await this.prisma.pessoas.update({
+          where: {
+            id
+          },
+          data: {
+            Endereco: {
+              set: []
+            }
+          }
+        })
+        endereco = {
+          Endereco: {
+            connect: {
+              id: codigoEndereco
+            }
+          }
+        }
       }
 
       const pessoa = await this.prisma.pessoas.update({
@@ -188,7 +212,8 @@ class PessoaRepository implements IPessoa {
           contato,
           telefoneContato,
           dataNascimento,
-          usuarioCadastro
+          usuarioCadastro,
+          ...endereco
         },
         where: {
           id

@@ -2,7 +2,6 @@ import { injectable, inject } from "tsyringe";
 import { EnderecoRepository } from "../repositories/endereco.repository";
 
 interface Address {
-  id: string | null
   logradouro: string
   numero: string
   complemento: string | null
@@ -21,10 +20,9 @@ export class EnderecoService {
   ) { }
 
   findOrCreateAddress = async ({
-    id = null,
     logradouro,
     numero,
-    complemento = null,
+    complemento,
     cep,
     cidade,
     uf,
@@ -32,40 +30,34 @@ export class EnderecoService {
   }: Address): Promise<string> => {
 
     try {
-      let endereco;
-      let codigoEndereco: string = '';
+      const endereco = await this.enderecoRepository.findExact({
+        logradouro,
+        numero,
+        complemento,
+        cep,
+        cidade,
+        uf,
+        bairro
+      })
 
-      if (id) {
-        codigoEndereco = id
-      } else {
-
-        endereco = await this.enderecoRepository.findByCepAndNumber(cep, numero)
-
-        if (endereco) {
-          codigoEndereco = endereco.id
-        }
-
-        if (!codigoEndereco) {
-          const endereco = await this.enderecoRepository.create({
-            logradouro,
-            numero,
-            complemento,
-            cep,
-            cidade,
-            uf,
-            bairro
-          })
-
-          codigoEndereco = endereco
-        }
+      if (endereco) {
+        return endereco.id
       }
 
-      return codigoEndereco
+      const newEndereco = await this.enderecoRepository.create({
+        logradouro,
+        numero,
+        complemento,
+        cep,
+        cidade,
+        uf,
+        bairro
+      })
+
+      return newEndereco
 
     } catch (error) {
       return 'erro ao gerar endereço'
     }
   }
-
-
 }

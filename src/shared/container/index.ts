@@ -42,6 +42,8 @@ import { ICategoriaTransacao } from "../../app/interfaces/CategoriaTransacao"
 import { CategoriaTransacaoRepository } from "../../app/repositories/categoria.transacao.repository"
 import { ITipoQuarto } from "../../app/interfaces/TipoQuarto"
 import { TipoQuartoRepository } from "../../app/repositories/tipo.quarto.repository"
+import { IReserva } from "../../app/interfaces/Reserva"
+import { ReservaRepository } from "../../app/repositories/reserva.repository"
 
 
 container.registerSingleton<IContaBancaria>(
@@ -137,4 +139,9 @@ container.registerSingleton<ICategoriaTransacao>(
 container.registerSingleton<ITipoQuarto>(
   "TipoQuartoRepository",
   TipoQuartoRepository
+)
+
+container.registerSingleton<IReserva>(
+  "ReservaRepository",
+  ReservaRepository
 )

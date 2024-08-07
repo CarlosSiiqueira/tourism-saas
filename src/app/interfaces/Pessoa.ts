@@ -6,7 +6,7 @@ export interface IPessoa {
   find(id: string): Promise<IPessoaResponse | null>
   findAll(): Promise<IPessoaResponse[]>
   delete(id: string): Promise<string[]>
-  update(data: IPessoaDTO, id: string): Promise<string[]>
+  update(data: IPessoaDTO, id: string, codigoEndereco: string): Promise<string[]>
 }
 
 export interface IPessoaDTO {

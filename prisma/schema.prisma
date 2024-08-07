@@ -23,7 +23,7 @@ model Endereco {
   Fornecedor    Fornecedor[]
 }
 
-model Pessoas {n
+model Pessoas {
   id              String    @id @default(uuid())
   nome            String
   cpf             String
@@ -61,21 +61,23 @@ model Usuarios {
   comissao        Float?
   meta            Float?
 
-  Pessoas            Pessoas[]
-  Pacotes            Pacotes[]
-  FormaPagamento     FormaPagamento[]
-  ContaBancaria      ContaBancaria[]
-  Produtos           Produtos[]
-  ExcursaoQuartos    ExcursaoQuartos[]
-  ExcursaoOnibus     ExcursaoOnibus[]
-  LocalEmbarque      LocalEmbarque[]
-  PassageiroEmbarque PassageiroEmbarque[]
-  Excursao           Excursao[]
-  Vendas             Vendas[]
-  Transacoes         Transacoes[]
-  Fornecedor         Fornecedor[]
-  CategoriaTransacao CategoriaTransacao[]
-  TipoQuarto         TipoQuarto[]
+  Pessoas               Pessoas[]
+  Pacotes               Pacotes[]
+  FormaPagamento        FormaPagamento[]
+  ContaBancaria         ContaBancaria[]
+  Produtos              Produtos[]
+  ExcursaoQuartos       ExcursaoQuartos[]
+  ExcursaoOnibus        ExcursaoOnibus[]
+  LocalEmbarque         LocalEmbarque[]
+  PassageiroEmbarque    PassageiroEmbarque[]
+  Excursao              Excursao[]
+  Vendas                Vendas[]
+  Transacoes            Transacoes[]
+  Fornecedor            Fornecedor[]
+  CategoriaTransacao    CategoriaTransacao[]
+  TipoQuarto            TipoQuarto[]
+  Reservas              Reservas[]
+  SubCategoriaTransacao SubCategoriaTransacao[]
 }
 
 model Pacotes {
@@ -286,6 +288,7 @@ model Transacoes {
   codigoContaBancaria  String?
   Usuarios             Usuarios            @relation(fields: [usuarioCadastro], references: [id])
   usuarioCadastro      String
+  Reservas             Reservas[]
 }
 
 model Fornecedor {
@@ -330,9 +333,21 @@ model CategoriaTransacao {
   tipo         Int
   dataCadastro DateTime @default(now())
 
-  Usuarios      Usuarios     @relation(fields: [codigoUsuario], references: [id])
-  codigoUsuario String
-  Transacoes    Transacoes[]
+  Usuarios           Usuarios              @relation(fields: [codigoUsuario], references: [id])
+  codigoUsuario      String
+  SubCategoria       SubCategoriaTransacao @relation(fields: [codigoSubCategoria], references: [id])
+  codigoSubCategoria String
+  Transacoes         Transacoes[]
+}
+
+model SubCategoriaTransacao {
+  id           String   @id @default(uuid())
+  nome         String
+  dataCadastro DateTime @default(now())
+
+  Usuarios           Usuarios             @relation(fields: [codigoUsuario], references: [id])
+  codigoUsuario      String
+  CategoriaTransacao CategoriaTransacao[]
 }
 
 model TipoQuarto {
@@ -343,4 +358,15 @@ model TipoQuarto {
   Usuarios        Usuarios          @relation(fields: [codigoUsuario], references: [id])
   codigoUsuario   String
   ExcursaoQuartos ExcursaoQuartos[]
+}
+
+model Reservas {
+  id           String   @id @default(uuid())
+  reserva      String
+  dataCadastro DateTime @default(now())
+
+  Usuario          Usuarios?  @relation(fields: [codigoUsuario], references: [id])
+  codigoUsuario    String?
+  Transacao        Transacoes @relation(fields: [codigoFinanceiro], references: [id])
+  codigoFinanceiro String
 }
