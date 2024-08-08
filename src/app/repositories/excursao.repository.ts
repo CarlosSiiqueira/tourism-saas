@@ -65,6 +65,7 @@ class ExcursaoRepository implements IExcursao {
           codigoPacote: true,
           usuarioCadastro: true,
           valor: true,
+          publicadoSite: true,
           ExcursaoPassageiros: {
             include: {
               Pessoa: true,
@@ -243,7 +244,7 @@ class ExcursaoRepository implements IExcursao {
         vagas: vagas,
         codigoPacote: codigoPacote,
         usuarioCadastro: usuarioCadastro,
-        valor
+        valor: valor
       },
       where: {
         id: id
@@ -255,6 +256,24 @@ class ExcursaoRepository implements IExcursao {
     }
 
     return ['Registro atualizado com sucesso']
+  }
+
+  publish = async (id: string): Promise<IExcursaoResponse> => {
+
+    const excursao = await this.prisma.excursao.update({
+      data: {
+        publicadoSite: true
+      },
+      where: {
+        id
+      }
+    })
+
+    if (!excursao) {
+      throw new Warning('Registro não encontrado', 400)
+    }
+
+    return excursao
   }
 }
 

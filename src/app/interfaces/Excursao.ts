@@ -10,6 +10,7 @@ export interface IExcursao {
   findAll(): Promise<IExcursaoResponse[]>
   delete(id: string): Promise<string>
   update(data: IExcursaoDTO, id: string): Promise<string[]>
+  publish(id: string): Promise<IExcursaoResponse>
 }
 
 export interface IExcursaoDTO {

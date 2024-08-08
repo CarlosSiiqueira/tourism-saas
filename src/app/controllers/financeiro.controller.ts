@@ -31,9 +31,40 @@ class FinanceiroController {
 
   create = async (request: Request, response: Response): Promise<void> => {
 
-    const formaPagamento = await this.formaPagamentoRepository.find(request.body.codigoFormaPagamento)
+    const formaPagamento = await this.formaPagamentoRepository.find(request.body.formaPagamento)
 
-    request.body.dataPrevistaRecebimento = await this.financeiroService.setDataPrevistaPagamento(formaPagamento.qtdDiasRecebimento, request.body.data)
+    request.body.dataPrevistaRecebimento = await this.financeiroService.setDataPrevistaPagamento(formaPagamento.qtdDiasRecebimento)
+
+    const res = await this.financeiroRepository.create(request.body)
+
+    response.status(200).send(res)
+  }
+
+  createByHook = async (request: Request, response: Response): Promise<void> => {
+
+    const formaPagamento = await this.formaPagamentoRepository.findByName(request.body.payment_method_title)
+
+    request.body.dataPrevistaRecebimento = await this.financeiroService.setDataPrevistaPagamento(formaPagamento.qtdDiasRecebimento)
+
+    request.body.tipo = 2
+    request.body.valor = parseFloat(request.body.total)
+    request.body.vistoAdmin = false
+    request.body.efetivado = false
+    request.body.observacao = 'teste'
+    request.body.ativo = true
+    request.body.numeroComprovanteBancario = null
+    // request.body.idWP = request.body.transaction_id
+    request.body.idWP = 1
+    request.body.codigoPessoa = 'fc60d73e-ee47-47dc-a690-810cc43c26c3'
+    request.body.codigoFornecedor = null
+    request.body.codigoExcursao = '3130555d-17a7-4a29-b7d5-7a33a94bf523'
+    request.body.codigoProduto = null
+    request.body.codigoPacote = 'b474e52d-c20c-4ceb-adc8-cda42b66c1b8'
+    request.body.codigoFormaPagamento = formaPagamento.id
+    request.body.codigoContaBancaria = null
+    request.body.codigoCategoria = '1'
+    request.body.usuarioCadastro = '0692ca23-a6e2-492b-96e8-90dc421ec471'
+    request.body.data = new Date()
 
     const res = await this.financeiroRepository.create(request.body)
 

@@ -125,9 +125,9 @@ export class FinanceiroService {
     return ['Financeiro liberado para alteração']
   }
 
-  setDataPrevistaPagamento = async (qtdDiasRecebimento: number, data: Date): Promise<Date> => {
+  setDataPrevistaPagamento = async (qtdDiasRecebimento: number): Promise<Date> => {
 
-    data = dateValidate(data)
+    let data = new Date()
     data.setDate(data.getDate() + qtdDiasRecebimento)
 
     return data

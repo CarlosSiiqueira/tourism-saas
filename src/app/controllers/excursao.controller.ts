@@ -2,13 +2,18 @@ import { ExcursaoRepository } from '../repositories/excursao.repository'
 import { inject, injectable } from "tsyringe"
 import { Request, Response } from 'express'
 import { formatIndexFilters } from '../../shared/utils/filters'
+import { PacoteService } from '../services/pacote.service'
+import { PacoteRepository } from '../repositories/pacote.repository'
 
 @injectable()
 class ExcursaoController {
 
   constructor(
     @inject("ExcursaoRepository")
-    private excursaoRepository: ExcursaoRepository
+    private excursaoRepository: ExcursaoRepository,
+    @inject("PacoteRepository")
+    private pacoteRepository: PacoteRepository,
+    private pacoteService: PacoteService
   ) { }
 
   index = async (request: Request, response: Response): Promise<void> => {
@@ -57,16 +62,17 @@ class ExcursaoController {
     response.status(200).send(res)
   }
 
-  createExcursaoQuartos = async (request: Request, response: Response): Promise<void> => {
+  publish = async (request: Request, response: Response): Promise<void> => {
 
-  }
+    const excursao = await this.excursaoRepository.publish(request.params.id)
 
-  findExcursaoQuartos = async (request: Request, response: Response): Promise<void> => {
+    if (excursao.id) {
+      const pacote = await this.pacoteRepository.find(excursao.codigoPacote)
+      const pacoteWP = await this.pacoteService.createProductWp(request.body)
+      await this.pacoteRepository.setIdWP(pacote.id, pacoteWP.id)
+    }
 
-  }
-
-  updateExcursaoQuartos = async (request: Request, response: Response): Promise<void> => {
-
+    response.status(200).send('Excursão publicada com sucesso')
   }
 
 }

@@ -108,6 +108,17 @@ model FormaPagamento {
   nome               String
   dataCadastro       DateTime @default(now())
   taxa               Float
+  taxa2x             Float?
+  taxa3x             Float?
+  taxa4x             Float?
+  taxa5x             Float?
+  taxa6x             Float?
+  taxa7x             Float?
+  taxa8x             Float?
+  taxa9x             Float?
+  taxa10x            Float?
+  taxa11x            Float?
+  taxa12x            Float?
   qtdDiasRecebimento Int
   ativo              Boolean  @default(true)
 
@@ -215,6 +226,7 @@ model Excursao {
   gerouFinanceiro Boolean  @default(false)
   vagas           Int
   valor           Float
+  publicadoSite   Boolean  @default(false)
 
   Pacotes             Pacotes               @relation(fields: [codigoPacote], references: [id])
   codigoPacote        String

@@ -13,6 +13,17 @@ export interface IFormaPagamentoDTO {
   nome: string
   dataCadastro: Date
   taxa: number
+  taxa2x: number | null
+  taxa3x: number | null
+  taxa4x: number | null
+  taxa5x: number | null
+  taxa6x: number | null
+  taxa7x: number | null
+  taxa8x: number | null
+  taxa9x: number | null
+  taxa10x: number | null
+  taxa11x: number | null
+  taxa12x: number | null
   qtdDiasRecebimento: number
   ativo: boolean
   usuarioCadastro: string

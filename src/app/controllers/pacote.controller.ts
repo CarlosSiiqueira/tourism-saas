@@ -24,16 +24,7 @@ class PacoteController {
 
   create = async (request: Request, response: Response): Promise<void> => {
 
-    if (request.headers['x-wc-webhook-signature']) {
-      request.body = []
-    }
-
     const res = await this.pacoteRepository.create(request.body)
-
-    if (res.success) {
-      // const pacoteWP = await this.pacoteService.createProductWp(request.body)
-      // await this.pacoteRepository.setIdWP(res.pacote.id, pacoteWP.id)
-    }
 
     response.status(200).send(res)
   }
@@ -55,10 +46,6 @@ class PacoteController {
   update = async (request: Request, response: Response): Promise<void> => {
 
     const res = await this.pacoteRepository.update(request.body, request.params.id)
-
-    if (res.success) {
-      // await this.pacoteService.updatePacoteWP(res.pacote)
-    }
 
     response.status(200).send(res)
   }

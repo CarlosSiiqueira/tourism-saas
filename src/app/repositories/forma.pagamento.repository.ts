@@ -60,6 +60,17 @@ class FormaPagamentoRepository implements IFormaPagamento {
   create = async ({
     nome,
     taxa,
+    taxa2x,
+    taxa3x,
+    taxa4x,
+    taxa5x,
+    taxa6x,
+    taxa7x,
+    taxa8x,
+    taxa9x,
+    taxa10x,
+    taxa11x,
+    taxa12x,
     qtdDiasRecebimento,
     usuarioCadastro
   }: IFormaPagamentoDTO): Promise<string[]> => {
@@ -73,6 +84,17 @@ class FormaPagamentoRepository implements IFormaPagamento {
           id,
           nome,
           taxa,
+          taxa2x,
+          taxa3x,
+          taxa4x,
+          taxa5x,
+          taxa6x,
+          taxa7x,
+          taxa8x,
+          taxa9x,
+          taxa10x,
+          taxa11x,
+          taxa12x,
           qtdDiasRecebimento,
           usuarioCadastro
         }
@@ -101,6 +123,21 @@ class FormaPagamentoRepository implements IFormaPagamento {
 
   }
 
+  findByName = async (nome: string): Promise<IFormaPagamentoResponse> => {
+
+    const formaPagamento = await this.prisma.formaPagamento.findFirst({
+      where: {
+        nome: nome
+      }
+    })
+
+    if (!formaPagamento) {
+      throw new Warning("Forma de pagamento não encontrada", 400)
+    }
+
+    return formaPagamento
+  }
+
   findAll = async (): Promise<IFormaPagamentoResponse[]> => {
 
     const formaPagamento = await this.prisma.formaPagamento.findMany({
@@ -119,6 +156,17 @@ class FormaPagamentoRepository implements IFormaPagamento {
   update = async ({
     nome,
     taxa,
+    taxa2x,
+    taxa3x,
+    taxa4x,
+    taxa5x,
+    taxa6x,
+    taxa7x,
+    taxa8x,
+    taxa9x,
+    taxa10x,
+    taxa11x,
+    taxa12x,
     qtdDiasRecebimento,
     usuarioCadastro
   }: IFormaPagamentoDTO, id: string): Promise<string[]> => {
@@ -128,6 +176,17 @@ class FormaPagamentoRepository implements IFormaPagamento {
         nome,
         dataCadastro: new Date(),
         taxa,
+        taxa2x,
+        taxa3x,
+        taxa4x,
+        taxa5x,
+        taxa6x,
+        taxa7x,
+        taxa8x,
+        taxa9x,
+        taxa10x,
+        taxa11x,
+        taxa12x,
         qtdDiasRecebimento,
         usuarioCadastro
       },

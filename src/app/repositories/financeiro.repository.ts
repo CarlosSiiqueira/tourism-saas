@@ -17,13 +17,13 @@ class FinanceiroRepository implements IFinanceiro {
 
     const where = {
       ativo: true,
-      OR: [
-        {
-          dataPrevistaRecebimento: {
-            lt: new Date()
-          }
-        }
-      ]
+      // OR: [
+      //   {
+      //     dataPrevistaRecebimento: {
+      //       lt: new Date()
+      //     }
+      //   }
+      // ]
 
     }
 
