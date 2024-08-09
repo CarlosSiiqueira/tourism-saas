@@ -186,7 +186,7 @@ model ExcursaoOnibus {
 model LocalEmbarque {
   id           String   @id @default(uuid())
   nome         String
-  observacoes  String
+  observacoes  String?
   horaEmbarque String
   dataCadastro DateTime @default(now())
   ativo        Boolean  @default(true)
@@ -328,8 +328,9 @@ model Fornecedor {
 model ExcursaoPassageiros {
   id           String   @id @default(uuid())
   dataCadastro DateTime @default(now())
-  reserva      String
 
+  Reservas      Reservas          @relation(fields: [reserva], references: [id])
+  reserva       String
   Excursao      Excursao          @relation(fields: [idExcursao], references: [id])
   idExcursao    String
   Pessoa        Pessoas           @relation(fields: [idPassageiro], references: [id])
@@ -377,8 +378,9 @@ model Reservas {
   reserva      String
   dataCadastro DateTime @default(now())
 
-  Usuario          Usuarios?  @relation(fields: [codigoUsuario], references: [id])
-  codigoUsuario    String?
-  Transacao        Transacoes @relation(fields: [codigoFinanceiro], references: [id])
-  codigoFinanceiro String
+  Usuario             Usuarios?             @relation(fields: [codigoUsuario], references: [id])
+  codigoUsuario       String?
+  Transacao           Transacoes            @relation(fields: [codigoFinanceiro], references: [id])
+  codigoFinanceiro    String
+  ExcursaoPassageiros ExcursaoPassageiros[]
 }

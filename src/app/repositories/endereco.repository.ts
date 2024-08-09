@@ -90,6 +90,18 @@ class EnderecoRepository implements IEndereco {
     return endereco
   }
 
+  findByCepAndNumber = async (cep: string, numero: string): Promise<IEnderecoResponse | null> => {
+
+    const endereco = await this.prisma.endereco.findFirst({
+      where: {
+        numero,
+        cep,
+      }
+    })
+
+    return endereco
+  }
+
   update = async ({
     logradouro,
     numero,

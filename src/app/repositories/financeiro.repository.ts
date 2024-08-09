@@ -151,7 +151,7 @@ class FinanceiroRepository implements IFinanceiro {
     codigoContaBancaria,
     codigoCategoria,
     usuarioCadastro
-  }: IFinanceiroDTO): Promise<string[]> => {
+  }: IFinanceiroDTO): Promise<string> => {
 
     try {
 
@@ -184,7 +184,7 @@ class FinanceiroRepository implements IFinanceiro {
         }
       })
 
-      return [id]
+      return id
 
     } catch (error) {
       throw new Warning('Houve um erro ao gerar transação', 400)

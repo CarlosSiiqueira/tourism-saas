@@ -5,7 +5,7 @@ export interface IReserva {
     count: number
     rows: IReservaResponse[]
   }>
-  create(data: IReservaDTO): Promise<string[]>
+  create(data: IReservaDTO): Promise<string>
   find(id: string): Promise<IReservaResponse>
   findAll(): Promise<IReservaResponse[]>
   delete(id: string): Promise<string>

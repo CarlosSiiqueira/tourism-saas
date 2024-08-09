@@ -4,7 +4,7 @@ import { Warning } from "../errors"
 import { IPacoteDTO, IPacoteResponse } from "../interfaces/Pacote"
 
 export class PacoteService {
-  
+
   listImagesPacote = async (search: string): Promise<[string]> => {
 
     let filter: string = ''
@@ -74,5 +74,25 @@ export class PacoteService {
     const pacoteWP = await wooCommerce.put(`products/${dados.idWP}`, data)
 
     return pacoteWP.data
+  }
+
+  createEvent = async (): Promise<any> => {
+
+    const url = 'http://seusite.com/wp-json/wp/v2/posts';
+
+    // Dados do evento
+    const dados = {
+      title: 'titulo',
+      content: 'Descrição do evento',
+      status: 'publish',
+      date: new Date(),
+      acf: {
+        data_fim: new Date()
+      }
+    }
+
+    const d = await wordPress.post('wp-json/wp/v2/posts', dados)
+
+    return d
   }
 }

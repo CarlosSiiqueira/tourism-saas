@@ -5,6 +5,7 @@ export interface IEndereco {
   delete(id: string): Promise<string[]>
   update(data: IEnderecoDTO, id: string): Promise<string[]>
   findExact(dados: IEnderecoDTO): Promise<IEnderecoResponse | null>
+  findByCepAndNumber(cep: string, numero: string): Promise<IEnderecoResponse | null>
 }
 
 export interface IEnderecoDTO {

@@ -18,6 +18,7 @@ import { excursaoPassageiros } from "./excursao.passageiros.routes"
 import { passageiroEmbarque } from "./passageiro.embarque.routes"
 import { categoriaTransacao } from "./categoria.transacao.routes"
 import { tipoQuarto } from "./tipo.quarto.routes"
+import { reserva } from "./reserva.routes"
 
 const router = Router()
 
@@ -40,5 +41,6 @@ router.use('/excursao-passageiros', excursaoPassageiros)
 router.use('/passageiro-embarque', passageiroEmbarque)
 router.use('/categoria-transacao', categoriaTransacao)
 router.use('/tipo-quarto', tipoQuarto)
+router.use('/reserva', reserva)
 
 export { router }

@@ -71,7 +71,8 @@ class ExcursaoPassageirosRepository implements IExcursaoPassageiros {
         where,
         include: {
           Pessoa: true,
-          LocalEmbarque: true
+          LocalEmbarque: true,
+          Reservas: true
         }
       })
     ])

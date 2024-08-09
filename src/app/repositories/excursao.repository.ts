@@ -77,6 +77,10 @@ class ExcursaoRepository implements IExcursao {
       })
     ])
 
+    for (const excursao of rows) {
+      excursao.vagas -= excursao.ExcursaoPassageiros.length
+    }
+
     return { count, rows }
   }
 

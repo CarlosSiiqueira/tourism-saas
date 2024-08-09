@@ -127,7 +127,10 @@ class FormaPagamentoRepository implements IFormaPagamento {
 
     const formaPagamento = await this.prisma.formaPagamento.findFirst({
       where: {
-        nome: nome
+        nome: {
+          contains: nome,
+          mode: "insensitive"
+        }
       }
     })
 

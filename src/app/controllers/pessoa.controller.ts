@@ -65,6 +65,13 @@ class PessoaController {
     response.status(200).send(res)
   }
 
+  findByCpf = async (request: Request, response: Response): Promise<void> => {
+
+    const res = await this.pessoaRepository.findByCpf(request.params.cpf)
+
+    response.status(200).send(res)
+  }
+
   update = async (request: Request, response: Response): Promise<void> => {
 
     let codigoEndereco: string = ''

@@ -87,7 +87,7 @@ class ReservaRepository implements IReserva {
   create = async ({
     reserva,
     codigoUsuario,
-    codigoFinanceiro }: IReservaDTO): Promise<string[]> => {
+    codigoFinanceiro }: IReservaDTO): Promise<string> => {
 
     try {
 
@@ -102,10 +102,9 @@ class ReservaRepository implements IReserva {
         }
       })
 
-      return ['Reserva cadastrada com sucesso!']
+      return id
     } catch (error) {
-      const a = error
-      return ['not found']
+      throw new Warning("Erro ao inserir reserva", 400)
     }
   }
 

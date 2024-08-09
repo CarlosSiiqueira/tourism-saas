@@ -75,14 +75,14 @@ class PessoaRepository implements IPessoa {
     nome,
     cpf,
     sexo,
-    observacoes = '',
-    telefone = '',
-    telefoneWpp = '',
+    observacoes,
+    telefone,
+    telefoneWpp,
     email,
-    contato = '',
-    telefoneContato = '',
-    dataNascimento = new Date(),
-    usuarioCadastro }: IPessoaDTO, codigoEndereco: string): Promise<string[]> => {
+    contato,
+    telefoneContato,
+    dataNascimento,
+    usuarioCadastro }: IPessoaDTO, codigoEndereco: string): Promise<string> => {
 
     try {
 
@@ -106,6 +106,7 @@ class PessoaRepository implements IPessoa {
           telefoneContato,
           dataNascimento,
           usuarioCadastro,
+          ativo: true,
           Endereco: {
             connect: {
               id: codigoEndereco
@@ -114,8 +115,7 @@ class PessoaRepository implements IPessoa {
         }
       })
 
-      return ['Pessoa inserida com sucesso']
-
+      return id
     } catch (error) {
       throw new Warning('Erro ao inserir pessoa', 400)
     }
@@ -157,6 +157,17 @@ class PessoaRepository implements IPessoa {
     }
 
     return pessoas
+  }
+
+  findByCpf = async (cpf: string): Promise<IPessoaResponse | null> => {
+
+    const pessoa = await this.prisma.pessoas.findFirst({
+      where: {
+        cpf
+      }
+    })
+
+    return pessoa
   }
 
   update = async ({

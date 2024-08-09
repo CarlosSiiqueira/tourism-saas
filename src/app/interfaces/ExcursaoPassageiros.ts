@@ -24,7 +24,7 @@ export interface IExcursaoPassageirosResponse extends IExcursaoPassageirosDTO {
   id: string
   LocalEmbarque: {
     nome: string
-    observacoes: string
+    observacoes: string | null
     horaEmbarque: string
     dataCadastro: Date
     codigoEndereco: string
@@ -72,7 +72,7 @@ export interface IExcursaoPassageirosEmbarqueReponse extends IExcursaoPassageiro
   horaEmbarque: string
   LocalEmbarque: {
     nome: string
-    observacoes: string
+    observacoes: string | null
     horaEmbarque: string
     dataCadastro: Date
     codigoEndereco: string

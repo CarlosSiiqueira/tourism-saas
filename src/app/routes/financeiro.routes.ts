@@ -5,6 +5,7 @@ const financeiro = Router()
 
 financeiro.get('/index', financeiroController.index)
 financeiro.post('/create', financeiroController.create)
+financeiro.post('/createByHook', financeiroController.createByHook)
 financeiro.get('/find/:id', financeiroController.find)
 financeiro.get('/findAll', financeiroController.findAll)
 financeiro.put('/update/:id', financeiroController.update)

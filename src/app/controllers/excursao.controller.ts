@@ -68,7 +68,7 @@ class ExcursaoController {
 
     if (excursao.id) {
       const pacote = await this.pacoteRepository.find(excursao.codigoPacote)
-      const pacoteWP = await this.pacoteService.createProductWp(request.body)
+      const pacoteWP = await this.pacoteService.createEvent()
       await this.pacoteRepository.setIdWP(pacote.id, pacoteWP.id)
     }
 

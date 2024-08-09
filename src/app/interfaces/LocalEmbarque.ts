@@ -9,7 +9,7 @@ export interface ILocalEmbarque {
 
 export interface ILocalEmbarqueDTO {
   nome: string
-  observacoes: string
+  observacoes: string | null
   horaEmbarque: string
   dataCadastro: Date
   codigoEndereco: string

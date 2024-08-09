@@ -22,7 +22,7 @@ class LocalEmbarqueRepository implements ILocalEmbarque {
         data: {
           id,
           nome,
-          observacoes,
+          observacoes: observacoes || '',
           horaEmbarque,
           codigoEndereco,
           usuarioCadastro
@@ -79,7 +79,7 @@ class LocalEmbarqueRepository implements ILocalEmbarque {
       const localEmbarque = await this.prisma.localEmbarque.update({
         data: {
           nome,
-          observacoes,
+          observacoes: observacoes || '',
           horaEmbarque,
           dataCadastro: new Date(),
           codigoEndereco,

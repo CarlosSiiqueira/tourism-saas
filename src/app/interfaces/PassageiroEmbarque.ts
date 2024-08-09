@@ -29,7 +29,7 @@ export interface IPassageiroEmbarqueIndexResponse extends IPassageiroEmbarqueRes
   LocalEmbarque: {
     id: string
     nome: string
-    observacoes: string
+    observacoes: string | null
     horaEmbarque: string
     ativo: boolean
     codigoEndereco: string

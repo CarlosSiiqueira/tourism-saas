@@ -2,7 +2,7 @@ import { IIndex } from "./Helper"
 
 export interface IFinanceiro {
   index(data: IIndex): Promise<{ count: number, rows: IFinanceiroResponse[] }>
-  create(data: IFinanceiroDTO): Promise<string[]>
+  create(data: IFinanceiroDTO): Promise<string>
   find(id: string): Promise<IFinanceiroResponse | null>
   findAll(): Promise<IFinanceiroResponse[]>
   delete(id: string): Promise<string[]>
