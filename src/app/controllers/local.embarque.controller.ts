@@ -1,7 +1,6 @@
 import { LocalEmbarqueRepository } from '../repositories/local.embarque.repository'
 import { inject, injectable } from "tsyringe"
 import { Request, Response } from 'express'
-import { EnderecoRepository } from '../repositories/endereco.repository'
 import { EnderecoService } from '../services/endereco.service'
 
 @injectable()
@@ -9,9 +8,7 @@ class LocalEmbarqueController {
   constructor(
     @inject("LocalEmbarqueRepository")
     private localEmbarqueRepository: LocalEmbarqueRepository,
-    @inject("EnderecoRepository")
-    private enderecoRepository: EnderecoRepository,
-    private enderecoService: EnderecoService = new EnderecoService(enderecoRepository)
+    private enderecoService: EnderecoService
   ) { }
 
 

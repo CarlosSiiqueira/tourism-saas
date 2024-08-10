@@ -10,9 +10,7 @@ class PessoaController {
   constructor(
     @inject("PessoaRepository")
     private pessoaRepository: PessoaRepository,
-    @inject("EnderecoRepository")
-    private enderecoRepository: EnderecoRepository,
-    private enderecoService: EnderecoService = new EnderecoService(enderecoRepository)
+    private enderecoService: EnderecoService
   ) { }
 
   index = async (request: Request, response: Response): Promise<void> => {

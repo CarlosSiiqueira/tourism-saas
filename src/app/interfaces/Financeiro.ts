@@ -7,6 +7,9 @@ export interface IFinanceiro {
   findAll(): Promise<IFinanceiroResponse[]>
   delete(id: string): Promise<string[]>
   update(data: IFinanceiroDTO, id: string): Promise<string[]>
+  setVistoAdmin(visto: boolean, id: string): Promise<string[]>
+  checkVistoAdmin(id: string): Promise<boolean>
+  efetivaDesfetiva(id: string, acao: boolean): Promise<string[]>
 }
 
 export interface IFinanceiroDTO {
@@ -132,5 +135,17 @@ export interface IFinanceiroResponse extends IFinanceiroDTO {
     saldo: number
     dataCadastro: Date
     usuarioCadastro: string
+  } | null
+  CategoriaTransacao: {
+    id: string
+    nome: string
+    tipo: number
+    codigoUsuario: string
+    codigoSubCategoria: string
+    SubCategoria: {
+      id: string
+      nome: string
+      codigoUsuario: string
+    }
   } | null
 }

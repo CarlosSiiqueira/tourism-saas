@@ -187,6 +187,21 @@ class ContaBancariaRepository implements IContaBancaria {
 
     return ['Registro Atualizado com sucesso'];
   }
+
+  setSaldo = async (id: string, saldo: number): Promise<IContaBancariaResponse> => {
+
+    const conta = await this.prisma.contaBancaria.update({
+      where: {
+        id
+      },
+      data: {
+        saldo
+      }
+    })
+
+    return conta
+  }
+
 }
 
 export { ContaBancariaRepository }

@@ -70,7 +70,7 @@ class CategoriaTransacaoRepository implements ICategoriaTransacao {
 
       const id = crypto.randomUUID()
 
-      const venda = await this.prisma.categoriaTransacao.create({
+      const categoria = await this.prisma.categoriaTransacao.create({
         data: {
           id,
           nome,
@@ -90,28 +90,35 @@ class CategoriaTransacaoRepository implements ICategoriaTransacao {
 
   find = async (id: string): Promise<ICategoriaTransacaoResponse | null> => {
 
-    const venda = await this.prisma.categoriaTransacao.findUnique({
+    const categoria = await this.prisma.categoriaTransacao.findUnique({
       where: {
         id
+      },
+      include: {
+        SubCategoria: true
       }
     })
 
-    if (!venda) {
+    if (!categoria) {
       throw new Warning("Categoria não encontrada", 400)
     }
 
-    return venda
+    return categoria
   }
 
   findAll = async (): Promise<ICategoriaTransacaoResponse[]> => {
 
-    const CategoriaTransacao = await this.prisma.categoriaTransacao.findMany()
+    const categoriaTransacao = await this.prisma.categoriaTransacao.findMany({
+      include: {
+        SubCategoria: true
+      }
+    })
 
-    if (!CategoriaTransacao) {
+    if (!categoriaTransacao) {
       throw new Warning("Sem Categoria Transacao na base", 400)
     }
 
-    return CategoriaTransacao
+    return categoriaTransacao
   }
 
   update = async ({

@@ -2,34 +2,29 @@ import { FinanceiroRepository } from '../repositories/financeiro.repository'
 import { inject, injectable } from "tsyringe"
 import { Request, Response } from 'express'
 import { FinanceiroService } from '../services/financeiro.service'
-import { FormaPagamentoRepository } from '../repositories/forma.pagamento.repository'
 import { formatIndexFilters } from '../../shared/utils/filters'
-import { PacoteRepository } from '../repositories/pacote.repository'
 import { proccessPacotesId } from '../../shared/utils/webHookBody'
-import { IPacoteResponse } from '../interfaces/Pacote'
-import { ReservaRepository } from '../repositories/reserva.repository'
-import { PessoaRepository } from '../repositories/pessoa.repository'
-import { EnderecoRepository } from '../repositories/endereco.repository'
-import { ExcursaoPassageirosRepository } from '../repositories/excursao.passageiros.repository'
+import { FormaPagamentoService } from '../services/forma.pagamento.service'
+import { PacoteService } from '../services/pacote.service'
+import { ReservaService } from '../services/reserva.service'
+import { EnderecoService } from '../services/endereco.service'
+import { PessoaService } from '../services/pessoa.service'
+import { ExcursaoPassageiroService } from '../services/excursao.passageiro.service'
+import { ContaBancariaService } from '../services/conta.bancaria.service'
 
 @injectable()
 class FinanceiroController {
   constructor(
     @inject("FinanceiroRepository")
     private financeiroRepository: FinanceiroRepository,
-    private financeiroService: FinanceiroService = new FinanceiroService(financeiroRepository),
-    @inject("FormaPagamentoRepository")
-    private formaPagamentoRepository: FormaPagamentoRepository,
-    @inject("PacoteRepository")
-    private pacoteRepository: PacoteRepository,
-    @inject("ReservaRepository")
-    private reservaRepository: ReservaRepository,
-    @inject("PessoaRepository")
-    private pessoaRepository: PessoaRepository,
-    @inject("EnderecoRepository")
-    private enderecoRepository: EnderecoRepository,
-    @inject("ExcursaoPassageirosRepository")
-    private excursaoPassageiro: ExcursaoPassageirosRepository
+    private financeiroService: FinanceiroService,
+    private formaPagamentoService: FormaPagamentoService,
+    private pacoteService: PacoteService,
+    private reservaService: ReservaService,
+    private pessoaService: PessoaService,
+    private enderecoService: EnderecoService,
+    private excursaoPassageiroService: ExcursaoPassageiroService,
+    private contaBancariaService: ContaBancariaService
   ) { }
 
   index = async (request: Request, response: Response): Promise<void> => {
@@ -43,31 +38,38 @@ class FinanceiroController {
 
   create = async (request: Request, response: Response): Promise<void> => {
 
-    const formaPagamento = await this.formaPagamentoRepository.find(request.body.formaPagamento)
+    const formaPagamento = await this.formaPagamentoService.find(request.body.codigoFormaPagamento)
 
     request.body.dataPrevistaRecebimento = await this.financeiroService.setDataPrevistaPagamento(formaPagamento.qtdDiasRecebimento)
 
+    request.body.valor = request.body.tipo == 2 ? await this.formaPagamentoService.calculateTaxes(request.body.valor, formaPagamento.id, 1) : request.body.valor
+
     const res = await this.financeiroRepository.create(request.body)
+
+    if (res && request.body.efetivado) {
+      let tipoMovimentacao = request.body.tipo == 2 ? "C" : "D"
+      await this.contaBancariaService.movimentar(request.body.codigoContaBancaria, request.body.valor, tipoMovimentacao)
+    }
 
     response.status(200).send(res)
   }
 
   createByHook = async (request: Request, response: Response): Promise<void> => {
 
-    const formaPagamento = await this.formaPagamentoRepository.findByName(request.body.payment_method_title)
+    const formaPagamento = await this.formaPagamentoService.findByName(request.body.payment_method_title)
     let dataCliente = request.body.billing
 
     request.body.dataPrevistaRecebimento = await this.financeiroService.setDataPrevistaPagamento(formaPagamento.qtdDiasRecebimento)
 
-    const pessoa = await this.pessoaRepository.findByCpf(request.body.billing.cpf)
+    const pessoa = await this.pessoaService.findByCpf(request.body.billing.cpf)
     let codigoCliente = pessoa?.id || ''
 
     if (!pessoa) {
-      const endereco = await this.enderecoRepository.findByCepAndNumber(dataCliente.postcode, dataCliente.number);
+      const endereco = await this.enderecoService.findByCepAndNumber(dataCliente.postcode, dataCliente.number);
       let codigoEndereco = endereco?.id || ''
 
       if (!endereco) {
-        const newEndereco = await this.enderecoRepository.create({
+        const newEndereco = await this.enderecoService.create({
           logradouro: `${dataCliente.address_1} ${dataCliente.address_2}` || '',
           numero: dataCliente.number || '',
           complemento: '',
@@ -79,7 +81,7 @@ class FinanceiroController {
         codigoEndereco = newEndereco
       }
 
-      const cliente = await this.pessoaRepository.create({
+      const cliente = await this.pessoaService.create({
         nome: `${dataCliente.first_name} ${dataCliente.last_name}`,
         cpf: dataCliente.cpf,
         sexo: dataCliente.gender ? dataCliente.gender : 'M',
@@ -117,8 +119,8 @@ class FinanceiroController {
     request.body.data = new Date()
 
     const financeiro = await this.financeiroRepository.create(request.body)
-    const reserva = await this.reservaRepository.create({ reserva: `#${request.body.number}`, codigoFinanceiro: financeiro, codigoUsuario: '1' })
-    const passageiro = await this.excursaoPassageiro.create({
+    const reserva = await this.reservaService.create({ reserva: `#${request.body.number}`, codigoFinanceiro: financeiro, codigoUsuario: '1' })
+    const passageiro = await this.excursaoPassageiroService.create({
       idExcursao: '608b47ea-b5d4-484e-ab20-802db35d699f',
       idPassageiro: codigoCliente,
       localEmbarque: '1',
@@ -144,12 +146,30 @@ class FinanceiroController {
 
   update = async (request: Request, response: Response): Promise<void> => {
 
+    const formaPagamento = await this.formaPagamentoService.find(request.body.codigoFormaPagamento)
+
+    request.body.dataPrevistaRecebimento = await this.financeiroService.setDataPrevistaPagamento(formaPagamento.qtdDiasRecebimento)
+
+    request.body.valor = request.body.tipo == 2 ? await this.formaPagamentoService.calculateTaxes(request.body.valor, formaPagamento.id, 1) : request.body.valor
+
     const res = await this.financeiroRepository.update(request.body, request.params.id)
+
+    if (res && request.body.efetivado) {
+      let tipoMovimentacao = request.body.tipo == 2 ? "C" : "D"
+      await this.contaBancariaService.movimentar(request.body.codigoContaBancaria, request.body.valor, tipoMovimentacao)
+    }
 
     response.status(200).send(res)
   }
 
   delete = async (request: Request, response: Response): Promise<void> => {
+
+    const financeiro = await this.financeiroRepository.find(request.params.id)
+
+    if (financeiro && financeiro.efetivado) {
+      let tipoMovimentacao = financeiro.tipo == 2 ? "D" : "C"
+      await this.contaBancariaService.movimentar(financeiro.codigoContaBancaria || '', financeiro.valor, tipoMovimentacao)
+    }
 
     const res = await this.financeiroRepository.delete(request.params.id)
 
@@ -165,35 +185,32 @@ class FinanceiroController {
 
   efetivarTransacao = async (request: Request, response: Response): Promise<void> => {
 
-    const res = await this.financeiroService.efetivarTransacao(request.body, request.params.id)
-    await this.financeiroService.confirmaPagamentoWoo(request.params.id)
+    let res: string = ''
+    const efetivar = await this.financeiroService.efetivarTransacao(request.params.id)
+    const financeiro = await this.financeiroRepository.find(request.params.id)
+
+    // await this.financeiroService.confirmaPagamentoWoo(request.params.id)
+
+    if (financeiro && efetivar) {
+      let tipoMovimentacao: string = financeiro.tipo == 2 ? "C" : "D"
+      res = await this.contaBancariaService.movimentar(financeiro.codigoContaBancaria || '', financeiro.valor, tipoMovimentacao)
+    }
 
     response.status(200).send(res)
   }
 
   desEfetivar = async (request: Request, response: Response): Promise<void> => {
 
-    const res = await this.financeiroService.desEfetivar(request.params.id)
+    let res: string = ''
+    const desefetivar = await this.financeiroService.desEfetivar(request.params.id)
+    const financeiro = await this.financeiroRepository.find(request.params.id)
 
-    response.status(200).send(res)
-  }
-
-  createFromHook = async (request: Request, response: Response): Promise<void> => {
-
-    const ids = proccessPacotesId(request.body);
-
-    if (ids.length) {
-      var pacote = await this.pacoteRepository.getAllByIds(ids);
-
-      if (pacote.length) {
-        const res = await this.financeiroService.proccessCreateTransaction(request.body, pacote)
-
-        response.status(200).send(res)
-        return;
-      }
+    if (financeiro && desefetivar) {
+      let tipoMovimentacao: string = financeiro.tipo == 2 ? "D" : "C"
+      res = await this.contaBancariaService.movimentar(financeiro.codigoContaBancaria || '', financeiro.valor, tipoMovimentacao)
     }
 
-    response.status(301).send('Pacotes não encontrados')
+    response.status(200).send(res)
   }
 
   clone = async (request: Request, response: Response): Promise<void> => {
@@ -207,9 +224,7 @@ class FinanceiroController {
     }
 
     response.status(301).send('Não foi possivel realizar procedimento')
-
   }
-
 }
 
 export { FinanceiroController }

@@ -1,9 +1,18 @@
+import { inject, injectable } from "tsyringe"
 import { wooCommerce } from "../api/woocommerce"
 import { wordPress } from "../api/wordpress.rest"
 import { Warning } from "../errors"
 import { IPacoteDTO, IPacoteResponse } from "../interfaces/Pacote"
+import { PacoteRepository } from "../repositories/pacote.repository"
+import { wordPressEvents } from "../api/wordpressEvents"
 
+@injectable()
 export class PacoteService {
+
+  constructor(
+    @inject("PacoteRepository")
+    private pacoteRepository: PacoteRepository
+  ) { }
 
   listImagesPacote = async (search: string): Promise<[string]> => {
 
@@ -76,23 +85,42 @@ export class PacoteService {
     return pacoteWP.data
   }
 
-  createEvent = async (): Promise<any> => {
+  createEvent = async (tittle: string, dataInicio: string, dataFim: string, decricao: string): Promise<any> => {
 
-    const url = 'http://seusite.com/wp-json/wp/v2/posts';
-
-    // Dados do evento
     const dados = {
-      title: 'titulo',
-      content: 'Descrição do evento',
-      status: 'publish',
-      date: new Date(),
-      acf: {
-        data_fim: new Date()
-      }
+      author: 1,
+      title: tittle,
+      date: dataInicio,
+      description: decricao,
+      status: "publish",
+      start_date: dataInicio,
+      end_date: dataFim,
+      imagem: "https://wess.blog/logo-64d273967e6ff868052792198aabe5f9c0c94135-1-webp/"
     }
 
-    const d = await wordPress.post('wp-json/wp/v2/posts', dados)
+    const d = await wordPressEvents.post('wp-json/tribe/events/v1/events', dados)
 
     return d
+  }
+
+  getAllByIds = async (ids: Array<number>): Promise<IPacoteResponse[]> => {
+
+    const pacotes = await this.pacoteRepository.getAllByIds(ids)
+
+    return pacotes
+  }
+
+  find = async (id: string): Promise<IPacoteResponse> => {
+
+    const pacote = await this.pacoteRepository.find(id)
+
+    return pacote
+  }
+
+  setIdWP = async (id: string, idWP: number): Promise<string[]> => {
+
+    const pacote = await this.pacoteRepository.setIdWP(id, idWP)
+
+    return pacote
   }
 }

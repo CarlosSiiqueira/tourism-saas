@@ -1,10 +1,6 @@
 import axios from "axios"
 import { injectable, inject } from "tsyringe";
 import { DestinosRepository } from '../repositories/destinos.repository'
-import { IPacoteDTO, IPacoteResponse } from "../interfaces/Pacote";
-import { wooCommerce } from "../api/woocommerce";
-import { wordPress } from "../api/wordpress.rest";
-import { Warning } from "../errors";
 
 interface Cep {
   uf: string

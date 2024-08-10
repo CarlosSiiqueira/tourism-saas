@@ -11,8 +11,6 @@ class ExcursaoController {
   constructor(
     @inject("ExcursaoRepository")
     private excursaoRepository: ExcursaoRepository,
-    @inject("PacoteRepository")
-    private pacoteRepository: PacoteRepository,
     private pacoteService: PacoteService
   ) { }
 
@@ -67,9 +65,9 @@ class ExcursaoController {
     const excursao = await this.excursaoRepository.publish(request.params.id)
 
     if (excursao.id) {
-      const pacote = await this.pacoteRepository.find(excursao.codigoPacote)
-      const pacoteWP = await this.pacoteService.createEvent()
-      await this.pacoteRepository.setIdWP(pacote.id, pacoteWP.id)
+      const pacote = await this.pacoteService.find(excursao.codigoPacote)
+      const pacoteWP = await this.pacoteService.createEvent(excursao.nome, excursao.dataInicio.toISOString().split('T')[0], excursao.dataFim.toISOString().split('T')[0], excursao.observacoes || '')
+      await this.pacoteService.setIdWP(pacote.id, pacoteWP.id)
     }
 
     response.status(200).send('Excursão publicada com sucesso')

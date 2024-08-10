@@ -11,9 +11,7 @@ class FornecedorController {
   constructor(
     @inject("FornecedorRepository")
     private fornecedorRepository: FornecedorRepository,
-    @inject("EnderecoRepository")
-    private enderecoRepository: EnderecoRepository,
-    private enderecoService: EnderecoService = new EnderecoService(enderecoRepository)
+    private enderecoService: EnderecoService
   ) { }
 
   index = async (request: Request, response: Response): Promise<void> => {

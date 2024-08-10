@@ -1,5 +1,7 @@
 import { injectable, inject } from "tsyringe";
 import { EnderecoRepository } from "../repositories/endereco.repository";
+import { Warning } from "../errors";
+import { IEnderecoDTO, IEnderecoResponse } from "../interfaces/Endereco";
 
 interface Address {
   logradouro: string
@@ -57,7 +59,36 @@ export class EnderecoService {
       return newEndereco
 
     } catch (error) {
-      return 'erro ao gerar endereço'
+      throw new Warning("Erro ao gerar endereço", 400)
     }
+  }
+
+  findByCepAndNumber = async (cep: string, numero: string): Promise<IEnderecoResponse | null> => {
+
+    const endereco = await this.enderecoRepository.findByCepAndNumber(cep, numero)
+
+    return endereco
+  }
+
+  create = async ({
+    logradouro,
+    numero,
+    complemento,
+    cep,
+    cidade,
+    bairro,
+    uf }: IEnderecoDTO): Promise<string> => {
+
+    const endereco = await this.enderecoRepository.create({
+      logradouro,
+      numero,
+      complemento,
+      cep,
+      cidade,
+      bairro,
+      uf
+    })
+
+    return endereco
   }
 }

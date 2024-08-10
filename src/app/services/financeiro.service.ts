@@ -1,9 +1,7 @@
 import { inject, injectable } from "tsyringe";
-import prismaManager from "../database/database"
 import { FinanceiroRepository } from "../repositories/financeiro.repository";
 import { IFinanceiroDTO } from "../interfaces/Financeiro";
 import { wooCommerce } from "../api/woocommerce";
-import { dateValidate } from "../../shared/helper/date";
 import { IFinanceiroHookArgs } from "../interfaces/Helper";
 import { proccessFinanceiroData } from "../../shared/utils/webHookBody";
 import { IPacoteResponse } from "../interfaces/Pacote";
@@ -16,113 +14,39 @@ export class FinanceiroService {
     private financeiroRepository: FinanceiroRepository
   ) { }
 
-  private prisma = prismaManager.getPrisma();
-
   setVistoAdmin = async (visto: boolean, id: string): Promise<string[]> => {
 
-    const financeiro = await this.prisma.transacoes.update({
-      data: {
-        vistoAdmin: visto
-      },
-      where: {
-        id: id
-      }
-    })
+    const financeiro = await this.financeiroRepository.setVistoAdmin(visto, id)
 
-    if (!financeiro) {
-      return ['Financeiro não encotrado']
-    }
-
-    return visto ? ['Financeiro liberado para efetivação'] : ['Financeiro bloqueado para efetivação']
-
+    return financeiro
   }
 
-  checkVistoAdmin = async (id: string): Promise<boolean> => {
+  efetivarTransacao = async (id: string): Promise<boolean> => {
 
-    const visto = await this.prisma.transacoes.findUnique({
-      select: {
-        vistoAdmin: true
-      },
-      where: {
-        id
+    const visto = await this.financeiroRepository.checkVistoAdmin(id)
+
+    if (visto) {
+      const financeiro = await this.financeiroRepository.efetivaDesfetiva(id, true)
+
+      if (financeiro) {
+        return true
       }
-    })
 
-    if (!visto) {
       return false
     }
 
-    return visto.vistoAdmin
+    return false
   }
 
-  efetivarTransacao = async ({
-    tipo,
-    valor,
-    vistoAdmin,
-    data,
-    efetivado,
-    observacao,
-    ativo,
-    numeroComprovanteBancario,
-    dataPrevistaRecebimento,
-    idWP,
-    codigoPessoa,
-    codigoFornecedor,
-    codigoExcursao,
-    codigoProduto,
-    codigoPacote,
-    codigoFormaPagamento,
-    usuarioCadastro }: IFinanceiroDTO, id: string): Promise<string[]> => {
+  desEfetivar = async (id: string): Promise<boolean> => {
 
-    const visto = await this.checkVistoAdmin(id)
-
-    if (visto) {
-      const financeiro = await this.financeiroRepository.update({
-        tipo,
-        valor,
-        vistoAdmin,
-        data,
-        efetivado,
-        observacao,
-        ativo,
-        numeroComprovanteBancario,
-        dataPrevistaRecebimento,
-        idWP,
-        codigoPessoa,
-        codigoFornecedor,
-        codigoExcursao,
-        codigoProduto,
-        codigoPacote,
-        codigoFormaPagamento,
-        usuarioCadastro
-      }, id)
-
-      if (financeiro) {
-        return ['Financeiro efetivado com sucesso']
-      }
-
-      return ["Não foi possível efetivar financeiro"]
-    }
-
-    return ['Financeiro não verificado pelo usuário admin, favor solicitar verificação']
-  }
-
-  desEfetivar = async (id: string): Promise<string[]> => {
-
-    const financeiro = await this.prisma.transacoes.update({
-      data: {
-        efetivado: false
-      },
-      where: {
-        id
-      }
-    })
+    const financeiro = await this.financeiroRepository.efetivaDesfetiva(id, false)
 
     if (!financeiro) {
-      return ['Não foi possível realizar operação']
+      return false
     }
 
-    return ['Financeiro liberado para alteração']
+    return true
   }
 
   setDataPrevistaPagamento = async (qtdDiasRecebimento: number): Promise<Date> => {

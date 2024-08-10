@@ -10,9 +10,7 @@ class DestinosController {
   constructor(
     @inject("DestinosRepository")
     private destinosRepository: DestinosRepository,
-    @inject("EnderecoRepository")
-    private enderecoRepository: EnderecoRepository,
-    private enderecoService: EnderecoService = new EnderecoService(enderecoRepository)
+    private enderecoService: EnderecoService
   ) { }
 
   create = async (request: Request, response: Response): Promise<void> => {
@@ -37,7 +35,7 @@ class DestinosController {
       return;
     }
 
-    const res = await this.destinosRepository.create(request.body)
+    const res = await this.destinosRepository.create(request.body.nome)
 
     response.status(200).send(res)
   }

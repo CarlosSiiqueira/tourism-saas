@@ -123,7 +123,12 @@ class FinanceiroRepository implements IFinanceiro {
           Usuarios: true,
           Produtos: true,
           FormaPagamento: true,
-          ContaBancaria: true
+          ContaBancaria: true,
+          CategoriaTransacao: {
+            include: {
+              SubCategoria: true
+            }
+          }
         }
       })
     ])
@@ -206,7 +211,12 @@ class FinanceiroRepository implements IFinanceiro {
         Pacotes: true,
         FormaPagamento: true,
         Usuarios: true,
-        ContaBancaria: true
+        ContaBancaria: true,
+        CategoriaTransacao: {
+          include: {
+            SubCategoria: true
+          }
+        }
       }
     })
 
@@ -232,7 +242,12 @@ class FinanceiroRepository implements IFinanceiro {
         Pacotes: true,
         FormaPagamento: true,
         Usuarios: true,
-        ContaBancaria: true
+        ContaBancaria: true,
+        CategoriaTransacao: {
+          include: {
+            SubCategoria: true
+          }
+        }
       }
     })
 
@@ -318,6 +333,59 @@ class FinanceiroRepository implements IFinanceiro {
     return [id]
   }
 
+  setVistoAdmin = async (visto: boolean, id: string): Promise<string[]> => {
+
+    const financeiro = await this.prisma.transacoes.update({
+      data: {
+        vistoAdmin: visto
+      },
+      where: {
+        id: id
+      }
+    })
+
+    if (!financeiro) {
+      return ['Financeiro não encotrado']
+    }
+
+    return visto ? ['Financeiro liberado para efetivação'] : ['Financeiro bloqueado para efetivação']
+  }
+
+  checkVistoAdmin = async (id: string): Promise<boolean> => {
+
+    const visto = await this.prisma.transacoes.findUnique({
+      select: {
+        vistoAdmin: true
+      },
+      where: {
+        id
+      }
+    })
+
+    if (!visto) {
+      return false
+    }
+
+    return visto.vistoAdmin
+  }
+
+  efetivaDesfetiva = async (id: string, acao: boolean): Promise<string[]> => {
+
+    const financeiro = await this.prisma.transacoes.update({
+      data: {
+        efetivado: acao
+      },
+      where: {
+        id
+      }
+    })
+
+    if (!financeiro) {
+      return ['Não foi possível realizar operação']
+    }
+
+    return ['Financeiro liberado para alteração']
+  }
 }
 
 export { FinanceiroRepository }
