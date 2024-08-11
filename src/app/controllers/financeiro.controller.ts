@@ -92,7 +92,8 @@ class FinanceiroController {
         telefoneWpp: null,
         contato: null,
         telefoneContato: null,
-        usuarioCadastro: '1'
+        usuarioCadastro: '1',
+        rg: dataCliente.rg
       }, codigoEndereco)
 
       codigoCliente = cliente

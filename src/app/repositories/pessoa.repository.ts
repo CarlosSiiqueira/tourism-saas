@@ -82,7 +82,8 @@ class PessoaRepository implements IPessoa {
     contato,
     telefoneContato,
     dataNascimento,
-    usuarioCadastro }: IPessoaDTO, codigoEndereco: string): Promise<string> => {
+    usuarioCadastro,
+    rg }: IPessoaDTO, codigoEndereco: string): Promise<string> => {
 
     try {
 
@@ -107,6 +108,7 @@ class PessoaRepository implements IPessoa {
           dataNascimento,
           usuarioCadastro,
           ativo: true,
+          rg,
           Endereco: {
             connect: {
               id: codigoEndereco
@@ -181,7 +183,8 @@ class PessoaRepository implements IPessoa {
     contato,
     telefoneContato,
     dataNascimento,
-    usuarioCadastro }: IPessoaDTO, id: string, codigoEndereco: string): Promise<string[]> => {
+    usuarioCadastro,
+    rg }: IPessoaDTO, id: string, codigoEndereco: string): Promise<string[]> => {
 
     try {
       let endereco = {}
@@ -224,6 +227,7 @@ class PessoaRepository implements IPessoa {
           telefoneContato,
           dataNascimento,
           usuarioCadastro,
+          rg,
           ...endereco
         },
         where: {

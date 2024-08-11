@@ -22,6 +22,7 @@ export interface IPessoaDTO {
   telefoneContato: string | null
   dataNascimento: Date | null
   usuarioCadastro: string
+  rg: string | null
 }
 
 export interface IPessoaResponse extends IPessoaDTO {

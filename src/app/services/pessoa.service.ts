@@ -29,7 +29,8 @@ export class PessoaService {
     contato,
     telefoneContato,
     dataNascimento,
-    usuarioCadastro }: IPessoaDTO, codigoEndereco: string): Promise<string> => {
+    usuarioCadastro,
+    rg }: IPessoaDTO, codigoEndereco: string): Promise<string> => {
 
     const pessoa = await this.pessoaRepository.create({
       nome,
@@ -42,7 +43,8 @@ export class PessoaService {
       contato,
       telefoneContato,
       dataNascimento,
-      usuarioCadastro
+      usuarioCadastro,
+      rg
     }, codigoEndereco)
 
 

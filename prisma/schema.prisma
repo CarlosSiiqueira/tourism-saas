@@ -37,6 +37,7 @@ model Pessoas {
   telefoneContato String?
   ativo           Boolean   @default(true)
   dataNascimento  DateTime?
+  rg              String?
 
   Usuarios            Usuarios              @relation(fields: [usuarioCadastro], references: [id])
   usuarioCadastro     String
