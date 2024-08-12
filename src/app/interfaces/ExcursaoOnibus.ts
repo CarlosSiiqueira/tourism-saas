@@ -1,6 +1,10 @@
+import { IIndex } from "./Helper"
+
 export interface IExcursaoOnibus {
+  index(idExcursao: string, data: IIndex): Promise<{ count: number, rows: IExcursaoOnibusResponse[] }>
   create(data: IExcursaoOnibusDTO): Promise<string[]>
-  find(idExcursao: string, idCadeira: string): Promise<IExcursaoOnibusResponse[]>
+  find(idExcursao: string, idCadeira: string): Promise<IExcursaoOnibusResponse>
+  findAll(idExcursao: string): Promise<IExcursaoOnibusResponse[]>
   update(data: IExcursaoOnibusDTO, id: string): Promise<string[]>
 }
 
