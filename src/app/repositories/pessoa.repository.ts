@@ -1,6 +1,6 @@
 import crypto from 'crypto';
 import prismaManager from "../database/database";
-import { IPessoa, IPessoaDTO, IPessoaResponse } from "../interfaces/Pessoa";
+import { IPessoa, IPessoaDTO, IPessoaReportResponse, IPessoaResponse } from "../interfaces/Pessoa";
 import { dateValidate } from "../../shared/helper/date";
 import { Warning } from "../errors";
 import { IIndex } from "../interfaces/Helper";
@@ -259,6 +259,99 @@ class PessoaRepository implements IPessoa {
     }
 
     return ['Pessoa excluida com sucesso']
+  }
+
+  relatorioClientes = async ({ orderBy, order, skip, take, filter }: IIndex): Promise<IPessoaReportResponse[]> => {
+
+    const where = {
+      ativo: true
+    }
+
+    Object.entries(filter as { [key: string]: string }).map(([key, value]) => {
+
+      switch (key) {
+        case 'nome':
+          Object.assign(where, {
+            OR: [
+              {
+                nome: {
+                  contains: value,
+                  mode: "insensitive"
+                }
+              },
+              {
+                Usuarios: {
+                  nome: {
+                    contains: value,
+                    mode: "insensitive"
+                  }
+                }
+              }
+            ]
+          })
+          break;
+
+        case 'email':
+          Object.assign(where, {
+            OR: [
+              {
+                email: {
+                  contains: value,
+                  mode: "insensitive"
+                }
+              }
+            ]
+          })
+          break;
+      }
+    })
+
+    const clientes = await this.prisma.pessoas.findMany({
+      skip,
+      take,
+      orderBy: {
+        [orderBy as string]: order
+      },
+      where,
+      include: {
+        Transacoes: {
+          include: {
+            Excursao: true,
+            Pacotes: true,
+          }
+        }
+      }
+    })
+
+    const response = await Promise.all(
+      clientes.map(async (cliente) => {
+
+        let aggregrationsTransacoes = await this.prisma.transacoes.aggregate({
+          _sum: {
+            valor: true
+          },
+          _count: {
+            id: true
+          },
+          where: {
+            codigoPessoa: cliente.id,
+            AND: {
+              NOT: {
+                codigoExcursao: null,
+                codigoPacote: null,
+                efetivado: false
+              }
+            }
+          }
+        })
+
+        Object.assign(cliente, { valorTotal: aggregrationsTransacoes._sum.valor, count: aggregrationsTransacoes._count.id })
+
+        return cliente
+      })
+    )
+
+    return response
   }
 }
 

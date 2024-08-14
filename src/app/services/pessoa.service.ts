@@ -1,6 +1,7 @@
 import { inject, injectable } from "tsyringe";
 import { PessoaRepository } from "../repositories/pessoa.repository";
-import { IPessoaDTO, IPessoaResponse } from "../interfaces/Pessoa";
+import { IPessoaDTO, IPessoaReportResponse, IPessoaResponse } from "../interfaces/Pessoa";
+import { IIndex } from "../interfaces/Helper";
 
 @injectable()
 export class PessoaService {
@@ -49,5 +50,20 @@ export class PessoaService {
 
 
     return pessoa
+  }
+
+  index = async (data: IIndex): Promise<{ rows: IPessoaResponse[], count: number }> => {
+
+    const pessoas = await this.pessoaRepository.index(data)
+
+
+    return pessoas
+  }
+
+  relatorioClientes = async (data: IIndex): Promise<IPessoaReportResponse[]> => {
+
+    const report = await this.pessoaRepository.relatorioClientes(data)
+
+    return report
   }
 }
