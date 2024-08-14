@@ -3,6 +3,7 @@ import { IIndex } from "../interfaces/Helper"
 import prismaManager from "../database/database"
 import { dateValidate } from "../../shared/helper/date"
 import { Warning } from "../errors"
+import crypto from 'crypto'
 
 class ExcursaoRepository implements IExcursao {
 

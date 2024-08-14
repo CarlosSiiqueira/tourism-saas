@@ -2,6 +2,7 @@ import prismaManager from "../database/database"
 import { Warning } from "../errors"
 import { IPacote, IPacoteDTO, IPacoteResponse } from "../interfaces/Pacote"
 import { IIndex } from "../interfaces/Helper"
+import crypto from 'crypto'
 
 class PacoteRepository implements IPacote {
 

@@ -1,3 +1,4 @@
+import crypto from 'crypto';
 import prismaManager from "../database/database";
 import { IPessoa, IPessoaDTO, IPessoaResponse } from "../interfaces/Pessoa";
 import { dateValidate } from "../../shared/helper/date";

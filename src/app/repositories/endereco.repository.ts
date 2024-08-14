@@ -1,6 +1,7 @@
 import prismaManager from "../database/database"
 import { Warning } from "../errors"
 import { IEndereco, IEnderecoDTO, IEnderecoResponse } from "../interfaces/Endereco"
+import crypto from 'crypto';
 
 class EnderecoRepository implements IEndereco {
 

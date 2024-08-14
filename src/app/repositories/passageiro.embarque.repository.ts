@@ -2,6 +2,7 @@ import prismaManager from "../database/database";
 import { IPassageiroEmbarque, IPassageiroEmbarqueDTO, IPassageiroEmbarqueIndexResponse, IPassageiroEmbarqueResponse } from "../interfaces/PassageiroEmbarque";
 import { IIndex } from "../interfaces/Helper";
 import { Warning } from "../errors";
+import crypto from 'crypto'
 
 class PassageiroEmbarqueRepository implements IPassageiroEmbarque {
 

@@ -2,6 +2,7 @@ import prismaManager from "../database/database"
 import { Warning } from "../errors"
 import { IReserva, IReservaDTO, IReservaResponse } from "../interfaces/Reserva"
 import { IIndex } from "../interfaces/Helper"
+import crypto from 'crypto'
 
 class ReservaRepository implements IReserva {
 

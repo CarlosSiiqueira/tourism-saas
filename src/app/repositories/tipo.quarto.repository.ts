@@ -2,6 +2,7 @@ import prismaManager from "../database/database";
 import { Warning } from "../errors";
 import { IIndex } from "../interfaces/Helper";
 import { ITipoQuarto, ITipoQuartoDTO, ITipoQuartoResponse } from "../interfaces/TipoQuarto";
+import crypto from 'crypto'
 
 class TipoQuartoRepository implements ITipoQuarto {
 

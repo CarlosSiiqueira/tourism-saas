@@ -1,6 +1,7 @@
 import prismaManager from "../database/database"
 import { Warning } from "../errors"
 import { ILocalEmbarque, ILocalEmbarqueDTO, ILocalEmbarqueResponse } from "../interfaces/LocalEmbarque"
+import crypto from 'crypto'
 
 class LocalEmbarqueRepository implements ILocalEmbarque {
 

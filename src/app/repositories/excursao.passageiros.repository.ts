@@ -8,6 +8,7 @@ import {
   IExcursaoPassageirosEmbarqueReponse
 } from "../interfaces/ExcursaoPassageiros"
 import { IIndex } from "../interfaces/Helper"
+import crypto from 'crypto'
 
 class ExcursaoPassageirosRepository implements IExcursaoPassageiros {
 
@@ -176,7 +177,11 @@ class ExcursaoPassageirosRepository implements IExcursaoPassageiros {
         idExcursao
       },
       select: {
-        reserva: true,
+        Reservas: {
+          select: {
+            reserva: true
+          }
+        },
         Pessoa: {
           select: {
             id: true,
@@ -191,7 +196,7 @@ class ExcursaoPassageirosRepository implements IExcursaoPassageiros {
     }
 
     const response = excursaoPassageiros.map((passageiro) => {
-      return { ...passageiro.Pessoa, 'reserva': passageiro.reserva }
+      return { ...passageiro.Pessoa, 'reserva': passageiro.Reservas.reserva }
     })
 
     return response;

@@ -2,6 +2,7 @@ import prismaManager from "../database/database";
 import { Warning } from "../errors";
 import { IFornecedor, IFornecedorDTO, IFornecedorResponse } from "../interfaces/Fornecedor";
 import { IIndex } from "../interfaces/Helper";
+import crypto from 'crypto'
 
 class FornecedorRepository implements IFornecedor {
 

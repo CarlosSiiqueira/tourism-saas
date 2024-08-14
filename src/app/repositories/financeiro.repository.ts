@@ -3,6 +3,7 @@ import prismaManager from "../database/database";
 import { Warning } from "../errors";
 import { IFinanceiro, IFinanceiroDTO, IFinanceiroResponse } from "../interfaces/Financeiro";
 import { IIndex } from "../interfaces/Helper";
+import crypto from 'crypto'
 
 class FinanceiroRepository implements IFinanceiro {
 

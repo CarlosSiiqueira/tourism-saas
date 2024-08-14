@@ -2,6 +2,7 @@ import prismaManager from "../database/database"
 import { IExcursaoQuartos, IExcursaoQuartosDTO, IExcursaoQuartosResponse } from "../interfaces/ExcursaoQuartos"
 import { Warning } from "../errors"
 import { IIndex } from "../interfaces/Helper"
+import crypto from 'crypto'
 
 class ExcursaoQuartosRepository implements IExcursaoQuartos {
 
@@ -27,6 +28,18 @@ class ExcursaoQuartosRepository implements IExcursaoQuartos {
                     contains: value,
                     mode: "insensitive"
                   }
+                }
+              }
+            ]
+          })
+          break;
+
+        case 'idTipoQuarto':
+          Object.assign(where, {
+            OR: [
+              {
+                TipoQuarto: {
+                  id: value
                 }
               }
             ]

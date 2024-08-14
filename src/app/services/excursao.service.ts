@@ -1,7 +1,15 @@
+import { inject, injectable } from "tsyringe";
 import { IExcursaoPassageirosListResponse } from "../interfaces/ExcursaoPassageiros";
 import { IExcursaoQuartosResponse } from "../interfaces/ExcursaoQuartos";
+import { ExcursaoRepository } from "../repositories/excursao.repository";
 
+@injectable()
 export class ExcursaoService {
+
+  constructor(
+    @inject("ExcursaoRepository")
+    private excursaoRepository: ExcursaoRepository
+  ) { }
 
   filterPassageirosWithoutRoom = async (
     passageiros: IExcursaoPassageirosListResponse[],

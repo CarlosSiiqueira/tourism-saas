@@ -2,6 +2,7 @@ import prismaManager from "../database/database"
 import { Warning } from "../errors"
 import { IContaBancaria, IContaBancariaDTO, IContaBancariaResponse } from "../interfaces/ContaBancaria"
 import { IIndex } from "../interfaces/Helper"
+import crypto from 'crypto';
 
 class ContaBancariaRepository implements IContaBancaria {
 

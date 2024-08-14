@@ -2,6 +2,7 @@ import prismaManager from "../database/database"
 import { Warning } from "../errors"
 import { IExcursaoOnibus, IExcursaoOnibusDTO, IExcursaoOnibusResponse } from "../interfaces/ExcursaoOnibus"
 import { IIndex } from "../interfaces/Helper"
+import crypto from 'crypto';
 
 class ExcursaoOnibusRepository implements IExcursaoOnibus {
 

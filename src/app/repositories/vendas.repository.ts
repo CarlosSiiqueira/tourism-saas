@@ -1,6 +1,7 @@
 import prismaManager from "../database/database";
 import { Warning } from "../errors";
 import { IVendas, IVendasDTO, IVendasResponse } from "../interfaces/Vendas";
+import crypto from 'crypto'
 
 class VendasRepository implements IVendas {
 

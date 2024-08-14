@@ -3,6 +3,7 @@ import prismaManager from "../database/database"
 import { Warning } from "../errors"
 import { IIndex } from "../interfaces/Helper"
 import { IProduto, IProdutoDTO, IProdutoResponse } from "../interfaces/Produto"
+import crypto from 'crypto'
 
 class ProdutoRepository implements IProduto {
 

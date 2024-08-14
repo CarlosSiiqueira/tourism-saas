@@ -1,6 +1,7 @@
 import prismaManager from "../database/database";
 import { Warning } from "../errors";
 import { IDestinos, IDestinosDTO, IDestinosResponse } from "../interfaces/Destinos";
+import crypto from 'crypto';
 
 class DestinosRepository implements IDestinos {
 
