@@ -31,6 +31,7 @@ export interface IFinanceiroDTO {
   codigoContaBancaria?: string | null
   codigoFormaPagamento: string
   codigoCategoria?: string | null
+  idReserva?: string | null
   usuarioCadastro: string
 }
 

@@ -66,7 +66,11 @@ class ExcursaoQuartosRepository implements IExcursaoQuartos {
           Passageiros: {
             select: {
               id: true,
-              reserva: true,
+              Reservas: {
+                select: {
+                  reserva: true
+                }
+              },
               Pessoa: {
                 select: {
                   id: true,
@@ -134,7 +138,11 @@ class ExcursaoQuartosRepository implements IExcursaoQuartos {
         Passageiros: {
           select: {
             id: true,
-            reserva: true,
+            Reservas: {
+              select: {
+                reserva: true
+              }
+            },
             Pessoa: {
               select: {
                 id: true,
@@ -176,7 +184,11 @@ class ExcursaoQuartosRepository implements IExcursaoQuartos {
         Passageiros: {
           select: {
             id: true,
-            reserva: true,
+            Reservas: {
+              select: {
+                reserva: true
+              }
+            },
             Pessoa: {
               select: {
                 id: true,

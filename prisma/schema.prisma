@@ -47,6 +47,7 @@ model Pessoas {
   Vendas              Vendas[]
   Transacoes          Transacoes[]
   ExcursaoPassageiros ExcursaoPassageiros[]
+  Reservas            Reservas[]
 }
 
 model Usuarios {
@@ -238,6 +239,7 @@ model Excursao {
   PassageiroEmbarque  PassageiroEmbarque[]
   Transacoes          Transacoes[]
   ExcursaoPassageiros ExcursaoPassageiros[]
+  Reservas            Reservas[]
 }
 
 model Vendas {
@@ -301,7 +303,8 @@ model Transacoes {
   codigoContaBancaria  String?
   Usuarios             Usuarios            @relation(fields: [usuarioCadastro], references: [id])
   usuarioCadastro      String
-  Reservas             Reservas[]
+  Reservas             Reservas?           @relation(fields: [idReserva], references: [id])
+  idReserva            String?
 }
 
 model Fornecedor {
@@ -376,12 +379,15 @@ model TipoQuarto {
 
 model Reservas {
   id           String   @id @default(uuid())
-  reserva      String
+  reserva      Int      @default(autoincrement())
   dataCadastro DateTime @default(now())
+  status       Boolean  @default(false)
 
   Usuario             Usuarios?             @relation(fields: [codigoUsuario], references: [id])
   codigoUsuario       String?
-  Transacao           Transacoes            @relation(fields: [codigoFinanceiro], references: [id])
-  codigoFinanceiro    String
+  Pessoa              Pessoas[]
+  Excursao            Excursao              @relation(fields: [idExcursao], references: [id])
+  idExcursao          String
   ExcursaoPassageiros ExcursaoPassageiros[]
+  Transacoes          Transacoes[]
 }

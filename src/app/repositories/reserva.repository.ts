@@ -63,17 +63,26 @@ class ReservaRepository implements IReserva {
         orderBy: {
           [orderBy as string]: order
         },
-        include: {
-          Transacao: {
-            include: {
-              Pessoas: true,
-              Fornecedor: true,
-              Excursao: true,
-              Pacotes: true,
-              Usuarios: true,
-              Produtos: true,
-              FormaPagamento: true,
-              ContaBancaria: true
+        select: {
+          id: true,
+          reserva: true,
+          status: true,
+          codigoUsuario: true,
+          idExcursao: true,
+          Pessoa: {
+            select: {
+              id: true,
+              nome: true,
+              cpf: true,
+              rg: true
+            }
+          },
+          Excursao: {
+            select: {
+              id: true,
+              nome: true,
+              dataInicio: true,
+              dataFim: true
             }
           }
         },
@@ -86,9 +95,9 @@ class ReservaRepository implements IReserva {
   }
 
   create = async ({
-    reserva,
     codigoUsuario,
-    codigoFinanceiro }: IReservaDTO): Promise<string> => {
+    passageiros,
+    idExcursao }: IReservaDTO): Promise<string> => {
 
     try {
 
@@ -97,9 +106,11 @@ class ReservaRepository implements IReserva {
       await this.prisma.reservas.create({
         data: {
           id,
-          reserva,
           codigoUsuario,
-          codigoFinanceiro
+          idExcursao,
+          Pessoa: {
+            connect: passageiros.map(codigoPassageiro => ({ id: codigoPassageiro }))
+          }
         }
       })
 
@@ -116,19 +127,9 @@ class ReservaRepository implements IReserva {
         id
       },
       include: {
-        Transacao: {
-          include: {
-            Pessoas: true,
-            Fornecedor: true,
-            Excursao: true,
-            Pacotes: true,
-            Usuarios: true,
-            Produtos: true,
-            FormaPagamento: true,
-            ContaBancaria: true
-          }
-        }
-      },
+        Pessoa: true,
+        Excursao: true
+      }
     })
 
     if (!Reserva) {
@@ -142,19 +143,9 @@ class ReservaRepository implements IReserva {
 
     const contasBancarias = await this.prisma.reservas.findMany({
       include: {
-        Transacao: {
-          include: {
-            Pessoas: true,
-            Fornecedor: true,
-            Excursao: true,
-            Pacotes: true,
-            Usuarios: true,
-            Produtos: true,
-            FormaPagamento: true,
-            ContaBancaria: true
-          }
-        }
-      },
+        Pessoa: true,
+        Excursao: true
+      }
     })
 
     if (!contasBancarias) {
@@ -182,14 +173,29 @@ class ReservaRepository implements IReserva {
   update = async ({
     reserva,
     codigoUsuario,
-    codigoFinanceiro
+    passageiros,
+    idExcursao
   }: IReservaDTO, id: string): Promise<string[]> => {
+
+    await this.prisma.reservas.update({
+      where: {
+        id
+      },
+      data: {
+        Pessoa: {
+          set: []
+        }
+      }
+    })
 
     const Reserva = await this.prisma.reservas.update({
       data: {
         reserva,
         codigoUsuario,
-        codigoFinanceiro
+        idExcursao,
+        Pessoa: {
+          connect: passageiros.map((codigoPassageiro) => { return { id: codigoPassageiro } })
+        }
       },
       where: {
         id: id

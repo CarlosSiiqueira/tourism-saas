@@ -119,8 +119,9 @@ class FinanceiroController {
     request.body.usuarioCadastro = '1'
     request.body.data = new Date()
 
+    const reserva = await this.reservaService.create({ idExcursao: request.body.codigoExcursao, passageiros: [codigoCliente], codigoUsuario: '1' })
+    request.body.reserva = reserva
     const financeiro = await this.financeiroRepository.create(request.body)
-    const reserva = await this.reservaService.create({ reserva: `#${request.body.number}`, codigoFinanceiro: financeiro, codigoUsuario: '1' })
     const passageiro = await this.excursaoPassageiroService.create({
       idExcursao: '608b47ea-b5d4-484e-ab20-802db35d699f',
       idPassageiro: codigoCliente,

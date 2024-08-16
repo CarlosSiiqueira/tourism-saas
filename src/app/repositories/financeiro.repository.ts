@@ -156,6 +156,7 @@ class FinanceiroRepository implements IFinanceiro {
     codigoFormaPagamento,
     codigoContaBancaria,
     codigoCategoria,
+    idReserva,
     usuarioCadastro
   }: IFinanceiroDTO): Promise<string> => {
 
@@ -186,6 +187,7 @@ class FinanceiroRepository implements IFinanceiro {
           codigoFormaPagamento,
           codigoContaBancaria,
           codigoCategoria,
+          idReserva,
           usuarioCadastro
         }
       })
@@ -278,6 +280,7 @@ class FinanceiroRepository implements IFinanceiro {
     codigoFormaPagamento,
     codigoContaBancaria,
     codigoCategoria,
+    idReserva,
     usuarioCadastro
   }: IFinanceiroDTO, id: string): Promise<string[]> => {
 
@@ -305,6 +308,7 @@ class FinanceiroRepository implements IFinanceiro {
           codigoFormaPagamento,
           codigoContaBancaria,
           codigoCategoria,
+          idReserva,
           usuarioCadastro
         },
         where: {

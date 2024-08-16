@@ -12,14 +12,14 @@ export class ReservaService {
 
 
   create = async ({
-    reserva,
     codigoUsuario,
-    codigoFinanceiro }: IReservaDTO): Promise<string> => {
+    passageiros,
+    idExcursao }: IReservaDTO): Promise<string> => {
 
     const newReserva = await this.reservaRepository.create({
-      reserva,
       codigoUsuario,
-      codigoFinanceiro
+      passageiros,
+      idExcursao
     })
 
     return newReserva

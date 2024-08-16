@@ -63,7 +63,7 @@ export interface IExcursaoPassageirosResponse extends IExcursaoPassageirosDTO {
 export interface IExcursaoPassageirosListResponse {
   id: string
   nome: string
-  reserva: string
+  reserva: number
 }
 
 export interface IExcursaoPassageirosEmbarqueReponse extends IExcursaoPassageirosDTO {

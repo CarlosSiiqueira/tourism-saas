@@ -24,7 +24,9 @@ export interface IExcursaoQuartosResponse {
   usuarioCadastro: string,
   Passageiros: {
     id: string
-    reserva: string
+    Reservas: {
+      reserva: number
+    }
     Pessoa: {
       id: string,
       nome: string
