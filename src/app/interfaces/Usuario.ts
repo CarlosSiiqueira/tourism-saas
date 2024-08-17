@@ -1,4 +1,7 @@
+import { IIndex } from "./Helper"
+
 export interface IUsuario {
+  index(data: IIndex): Promise<{ count: number, rows: IUsuarioResponse[] }>
   create(data: IUsuarioDTO): Promise<string[]>
   find(id: string): Promise<IUsuarioResponse | null>
   findAll(): Promise<IUsuarioResponse[]>

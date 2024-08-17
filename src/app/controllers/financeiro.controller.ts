@@ -93,7 +93,8 @@ class FinanceiroController {
         contato: null,
         telefoneContato: null,
         usuarioCadastro: '1',
-        rg: dataCliente.rg
+        rg: dataCliente.rg,
+        emissor: dataCliente.orgaoEmissor || null
       }, codigoEndereco)
 
       codigoCliente = cliente
@@ -119,7 +120,14 @@ class FinanceiroController {
     request.body.usuarioCadastro = '1'
     request.body.data = new Date()
 
-    const reserva = await this.reservaService.create({ idExcursao: request.body.codigoExcursao, passageiros: [codigoCliente], codigoUsuario: '1', desconto: 0 })
+    const reserva = await this.reservaService.create({
+      idExcursao: request.body.codigoExcursao,
+      passageiros: [codigoCliente],
+      codigoUsuario: '1',
+      desconto: 0,
+      localEmbarqueId: '1'
+    })
+    
     request.body.reserva = reserva
     const financeiro = await this.financeiroRepository.create(request.body)
     const passageiro = await this.excursaoPassageiroService.create({

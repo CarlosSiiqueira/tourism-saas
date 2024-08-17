@@ -1,10 +1,50 @@
 import prismaManager from "../database/database"
 import { Warning } from "../errors"
+import { IIndex } from "../interfaces/Helper"
 import { IUsuario, IUsuarioDTO, IUsuarioResponse, IUsuarioLogin } from "../interfaces/Usuario"
 
 class UsuarioRepository implements IUsuario {
 
   private prisma = prismaManager.getPrisma()
+
+  index = async ({ orderBy, order, skip, take, filter }: IIndex): Promise<{ count: number, rows: IUsuarioResponse[] }> => {
+
+    const where = {
+      ativo: true
+    }
+
+    Object.entries(filter as { [key: string]: string }).map(([key, value]) => {
+
+      switch (key) {
+        case 'nome':
+          Object.assign(where, {
+            OR: [
+              {
+                nome: {
+                  contains: value,
+                  mode: "insensitive"
+                }
+              }
+            ]
+          })
+          break;
+      }
+    })
+
+    const [count, rows] = await this.prisma.$transaction([
+      this.prisma.usuarios.count({ where }),
+      this.prisma.usuarios.findMany({
+        skip,
+        take,
+        orderBy: {
+          [orderBy as string]: order
+        },
+        where,
+      })
+    ])
+
+    return { count, rows }
+  }
 
   create = async ({
     nome,

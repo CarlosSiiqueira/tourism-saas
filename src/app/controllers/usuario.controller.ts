@@ -2,6 +2,7 @@ import { UsuarioRepository } from '../repositories/usuario.repository'
 import { inject, injectable } from "tsyringe"
 import { Request, Response } from 'express'
 import { AuthService } from '../services/auth.service'
+import { formatIndexFilters } from '../../shared/utils/filters'
 
 @injectable()
 class UsuarioController {
@@ -10,6 +11,15 @@ class UsuarioController {
     private usuarioRepository: UsuarioRepository,
     private authService: AuthService = new AuthService(usuarioRepository)
   ) { }
+
+  index = async (request: Request, response: Response): Promise<void> => {
+
+    const { orderBy, order, skip, take, filter } = formatIndexFilters(request)
+
+    const usuarios = await this.usuarioRepository.index({ orderBy, order, skip, take, filter })
+
+    response.status(200).send(usuarios)
+  }
 
   create = async (request: Request, response: Response): Promise<void> => {
 

@@ -20,6 +20,7 @@ export interface IReservaDTO {
   idExcursao: string
   desconto: number
   plataforma?: number
+  localEmbarqueId: string
 }
 
 export interface IReservaResponse {
@@ -44,7 +45,8 @@ export interface IReservaResponse {
   Usuario: {
     nome: string
   } | null
-  Transacoes?: {
-    
+  LocalEmbarque: {
+    nome: string
+    horaEmbarque: string
   }
 }

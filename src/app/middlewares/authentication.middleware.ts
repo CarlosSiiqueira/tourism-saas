@@ -9,7 +9,8 @@ const authenticateToken = async (request: Request, response: Response, next: Nex
 
   const noAuthRoutes = [
     "/usuarios/login",
-    "/usuarios/auth"
+    "/usuarios/auth",
+    "/passageiro-embarque/embarque-qrcode"
   ]
 
   const authHeader = request.headers['authorization'];

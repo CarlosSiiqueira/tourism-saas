@@ -154,6 +154,50 @@ class PassageiroEmbarqueRepository implements IPassageiroEmbarque {
     return data.embarcou ? ['Embarque registrado com sucesso'] : ['Desembarque registrado com sucesso']
   }
 
+  embarqueQRCode = async (data: IPassageiroEmbarqueDTO, id: string): Promise<string[]> => {
+
+    const passageiroEmbarque = await this.prisma.passageiroEmbarque.findFirst({
+      where: {
+        Passageiro: {
+          id: id
+        },
+        Excursao: {
+          id: data.codigoExcursao
+        }
+      }
+    })
+
+    if (passageiroEmbarque) {
+
+      const embarque = await this.prisma.passageiroEmbarque.update({
+        where: {
+          id: passageiroEmbarque.id
+        },
+        data: {
+          embarcou: true,
+          horaEmbarque: new Date().toISOString()
+        }
+      })
+
+      return ['Embarque registrado com sucesso']
+    }
+
+    const newId = crypto.randomUUID()
+
+    const newEmbarque = await this.prisma.passageiroEmbarque.create({
+      data: {
+        id: newId,
+        embarcou: true,
+        horaEmbarque: new Date().toISOString(),
+        usuarioCadastro: '1',
+        codigoLocalEmbarque: '1',
+        codigoExcursao: data.codigoExcursao,
+        codigoPassageiro: '1'
+      }
+    })
+
+    return ['Embarque registrado com sucesso']
+  }
 }
 
 export { PassageiroEmbarqueRepository }

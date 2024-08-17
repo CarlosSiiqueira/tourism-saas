@@ -92,6 +92,12 @@ class ReservaRepository implements IReserva {
             select: {
               nome: true
             }
+          },
+          LocalEmbarque: {
+            select: {
+              nome: true,
+              horaEmbarque: true
+            }
           }
         },
         where
@@ -107,7 +113,8 @@ class ReservaRepository implements IReserva {
     passageiros,
     idExcursao,
     desconto,
-    plataforma = 1 }: IReservaDTO): Promise<string> => {
+    plataforma = 1,
+    localEmbarqueId }: IReservaDTO): Promise<string> => {
 
     try {
 
@@ -120,6 +127,7 @@ class ReservaRepository implements IReserva {
           idExcursao,
           desconto,
           plataforma,
+          localEmbarqueId,
           Pessoa: {
             connect: passageiros.map(codigoPassageiro => ({ id: codigoPassageiro }))
           }
@@ -142,6 +150,7 @@ class ReservaRepository implements IReserva {
         Pessoa: true,
         Excursao: true,
         Usuario: true,
+        LocalEmbarque: true,
         Transacoes: {
           include: {
             FormaPagamento: true
@@ -164,7 +173,8 @@ class ReservaRepository implements IReserva {
         Pessoa: true,
         Excursao: true,
         Usuario: true,
-        Transacoes: true
+        Transacoes: true,
+        LocalEmbarque: true
       }
     })
 

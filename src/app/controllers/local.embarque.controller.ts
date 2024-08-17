@@ -2,6 +2,7 @@ import { LocalEmbarqueRepository } from '../repositories/local.embarque.reposito
 import { inject, injectable } from "tsyringe"
 import { Request, Response } from 'express'
 import { EnderecoService } from '../services/endereco.service'
+import { formatIndexFilters } from '../../shared/utils/filters'
 
 @injectable()
 class LocalEmbarqueController {
@@ -11,6 +12,14 @@ class LocalEmbarqueController {
     private enderecoService: EnderecoService
   ) { }
 
+  index = async (request: Request, response: Response): Promise<void> => {
+
+    const { orderBy, order, skip, take, filter } = formatIndexFilters(request)
+
+    const localEmbarque = await this.localEmbarqueRepository.index({ orderBy, order, skip, take, filter })
+
+    response.status(200).send(localEmbarque)
+  }
 
   create = async (request: Request, response: Response): Promise<void> => {
 

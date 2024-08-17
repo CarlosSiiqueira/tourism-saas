@@ -4,6 +4,7 @@ import { Request, Response } from "express"
 import { formatIndexFilters } from '../../shared/utils/filters'
 import { FinanceiroService } from '../services/financeiro.service'
 import { FormaPagamentoService } from '../services/forma.pagamento.service'
+import { ExcursaoPassageiroService } from '../services/excursao.passageiro.service'
 
 @injectable()
 class ReservaController {
@@ -11,7 +12,8 @@ class ReservaController {
     @inject("ReservaRepository")
     private reservaRepository: ReservaRepository,
     private financeiroService: FinanceiroService,
-    private formaPagamentoService: FormaPagamentoService
+    private formaPagamentoService: FormaPagamentoService,
+    private excursaoPassageiroService: ExcursaoPassageiroService
   ) { }
 
   index = async (request: Request, response: Response): Promise<void> => {
@@ -25,12 +27,12 @@ class ReservaController {
 
   create = async (request: Request, response: Response): Promise<void> => {
 
-    const res = await this.reservaRepository.create(request.body)
+    const reserva = await this.reservaRepository.create(request.body)
     const formaPagamento = await this.formaPagamentoService.find(request.body.codigoFormaPagamento)
 
-    request.body.idReserva = res || ''
+    request.body.idReserva = reserva || ''
     request.body.tipo = 2
-    request.body.observacao = `${request.body.criancasColo}x nessa Reserva`
+    request.body.observacao = request.body.criancasColo > 0 ? `${request.body.criancasColo}x nessa Reserva` : ''
     request.body.ativo = true
     request.body.data = new Date()
     request.body.dataPrevistaRecebimento = await this.financeiroService.setDataPrevistaPagamento(formaPagamento.qtdDiasRecebimento)
@@ -39,7 +41,18 @@ class ReservaController {
 
     const financeiro = await this.financeiroService.create(request.body)
 
-    response.status(200).send(res)
+    const newPassageiro = await Promise.all(
+      request.body.passageiros.map(async (passageiro: string) => {
+        return await this.excursaoPassageiroService.create({
+          idExcursao: request.body.idExcursao,
+          idPassageiro: passageiro,
+          localEmbarque: request.body.localEmbarqueId,
+          reserva: reserva
+        })
+      })
+    )
+
+    response.status(200).send(reserva)
   }
 
   find = async (request: Request, response: Response): Promise<void> => {

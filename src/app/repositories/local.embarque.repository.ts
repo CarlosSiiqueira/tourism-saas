@@ -1,11 +1,67 @@
 import prismaManager from "../database/database"
 import { Warning } from "../errors"
+import { IIndex } from "../interfaces/Helper"
 import { ILocalEmbarque, ILocalEmbarqueDTO, ILocalEmbarqueResponse } from "../interfaces/LocalEmbarque"
 import crypto from 'crypto'
 
 class LocalEmbarqueRepository implements ILocalEmbarque {
 
   private prisma = prismaManager.getPrisma()
+
+  index = async ({ orderBy, order, skip, take, filter }: IIndex): Promise<{ count: number, rows: ILocalEmbarqueResponse[] }> => {
+
+    const where = {
+      ativo: true
+    }
+
+    Object.entries(filter as { [key: string]: string }).map(([key, value]) => {
+
+      switch (key) {
+        case 'nome':
+          Object.assign(where, {
+            OR: [
+              {
+                nome: {
+                  contains: value,
+                  mode: "insensitive"
+                }
+              },
+              {
+                Usuarios: {
+                  nome: {
+                    contains: value,
+                    mode: "insensitive"
+                  }
+                }
+              }
+            ]
+          })
+          break;
+      }
+    })
+
+    const [count, rows] = await this.prisma.$transaction([
+      this.prisma.localEmbarque.count({ where }),
+      this.prisma.localEmbarque.findMany({
+        skip,
+        take,
+        orderBy: {
+          [orderBy as string]: order
+        },
+        where,
+        include: {
+          Endereco: true,
+          Usuarios: {
+            select: {
+              nome: true
+            }
+          }
+        }
+      })
+    ])
+
+    return { count, rows }
+  }
 
   create = async ({
     nome,
@@ -23,7 +79,7 @@ class LocalEmbarqueRepository implements ILocalEmbarque {
         data: {
           id,
           nome,
-          observacoes: observacoes || '',
+          observacoes: observacoes,
           horaEmbarque,
           codigoEndereco,
           usuarioCadastro

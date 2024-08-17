@@ -10,6 +10,7 @@ export interface IPassageiroEmbarque {
   findAll(): Promise<IPassageiroEmbarqueResponse[]>
   findByExcursao(idExcursao: string): Promise<IPassageiroEmbarqueResponse[]>
   embarqueDesembarque(data: IPassageiroEmbarqueResponse): Promise<string[]>
+  embarqueQRCode(data: IPassageiroEmbarqueDTO, id: string): Promise<string[]>
 }
 
 export interface IPassageiroEmbarqueDTO {

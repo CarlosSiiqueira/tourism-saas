@@ -24,13 +24,14 @@ export interface IPessoaDTO {
   dataNascimento: Date | null
   usuarioCadastro: string
   rg: string | null
+  emissor: string | null
 }
 
 export interface IPessoaResponse extends IPessoaDTO {
   id: string
 }
 
-export interface IPessoaReportResponse extends IPessoaResponse { 
+export interface IPessoaReportResponse extends IPessoaResponse {
   Transacoes: Array<{
     id: string
     tipo: number

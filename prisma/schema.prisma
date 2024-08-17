@@ -38,6 +38,7 @@ model Pessoas {
   ativo           Boolean   @default(true)
   dataNascimento  DateTime?
   rg              String?
+  emissor         String?
 
   Usuarios            Usuarios              @relation(fields: [usuarioCadastro], references: [id])
   usuarioCadastro     String
@@ -156,6 +157,7 @@ model Produtos {
   usuarioCadastro  String
   Vendas           Vendas[]
   Transacoes       Transacoes[]
+  Reservas         Reservas[]
 }
 
 model ExcursaoQuartos {
@@ -199,6 +201,7 @@ model LocalEmbarque {
   usuarioCadastro     String
   PassageiroEmbarque  PassageiroEmbarque[]
   ExcursaoPassageiros ExcursaoPassageiros[]
+  Reservas            Reservas[]
 }
 
 model PassageiroEmbarque {
@@ -390,6 +393,9 @@ model Reservas {
   Pessoa              Pessoas[]
   Excursao            Excursao              @relation(fields: [idExcursao], references: [id])
   idExcursao          String
+  LocalEmbarque       LocalEmbarque         @relation(fields: [localEmbarqueId], references: [id])
+  localEmbarqueId     String
   ExcursaoPassageiros ExcursaoPassageiros[]
   Transacoes          Transacoes[]
+  Opcionais           Produtos[]
 }
