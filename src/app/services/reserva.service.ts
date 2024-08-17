@@ -14,15 +14,30 @@ export class ReservaService {
   create = async ({
     codigoUsuario,
     passageiros,
-    idExcursao }: IReservaDTO): Promise<string> => {
+    idExcursao,
+    desconto }: IReservaDTO): Promise<string> => {
 
     const newReserva = await this.reservaRepository.create({
       codigoUsuario,
       passageiros,
-      idExcursao
+      idExcursao,
+      desconto
     })
 
     return newReserva
   }
 
+  confirmaReserva = async (id: string): Promise<string> => {
+
+    const reserva = await this.reservaRepository.setConfirm(id, true)
+
+    return reserva;
+  }
+
+  removeConfirmReserva = async (id: string): Promise<string> => {
+
+    const reserva = await this.reservaRepository.setConfirm(id, false)
+
+    return reserva;
+  }
 }

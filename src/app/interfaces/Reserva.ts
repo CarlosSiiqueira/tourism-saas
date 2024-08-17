@@ -10,6 +10,7 @@ export interface IReserva {
   findAll(): Promise<IReservaResponse[]>
   delete(id: string): Promise<string>
   update(data: IReservaDTO, id: string): Promise<string[]>
+  setConfirm(id: string, status: boolean): Promise<string>
 }
 
 export interface IReservaDTO {
@@ -17,6 +18,8 @@ export interface IReservaDTO {
   codigoUsuario: string | null
   passageiros: [string]
   idExcursao: string
+  desconto: number
+  plataforma?: number
 }
 
 export interface IReservaResponse {
@@ -24,6 +27,8 @@ export interface IReservaResponse {
   reserva: number,
   status: boolean,
   codigoUsuario: string | null,
+  desconto: number
+  plataforma: number
   Pessoa?: {
     id: string,
     nome: string,
@@ -35,5 +40,11 @@ export interface IReservaResponse {
     nome: string,
     dataInicio: Date,
     dataFim: Date
+  },
+  Usuario: {
+    nome: string
+  } | null
+  Transacoes?: {
+    
   }
 }

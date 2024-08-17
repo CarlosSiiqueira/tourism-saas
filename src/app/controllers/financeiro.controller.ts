@@ -119,7 +119,7 @@ class FinanceiroController {
     request.body.usuarioCadastro = '1'
     request.body.data = new Date()
 
-    const reserva = await this.reservaService.create({ idExcursao: request.body.codigoExcursao, passageiros: [codigoCliente], codigoUsuario: '1' })
+    const reserva = await this.reservaService.create({ idExcursao: request.body.codigoExcursao, passageiros: [codigoCliente], codigoUsuario: '1', desconto: 0 })
     request.body.reserva = reserva
     const financeiro = await this.financeiroRepository.create(request.body)
     const passageiro = await this.excursaoPassageiroService.create({
@@ -196,6 +196,10 @@ class FinanceiroController {
     if (financeiro && efetivar) {
       let tipoMovimentacao: string = financeiro.tipo == 2 ? "C" : "D"
       res = await this.contaBancariaService.movimentar(financeiro.codigoContaBancaria || '', financeiro.valor, tipoMovimentacao)
+    }
+
+    if (financeiro?.idReserva) {
+      await this.reservaService.confirmaReserva(financeiro.idReserva)
     }
 
     response.status(200).send(res)

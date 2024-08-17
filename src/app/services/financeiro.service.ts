@@ -88,4 +88,11 @@ export class FinanceiroService {
     );
   }
 
+  create = async (data: IFinanceiroDTO): Promise<string> => {
+
+    const financeiro = await this.financeiroRepository.create(data)
+
+    return financeiro
+  }
+
 }

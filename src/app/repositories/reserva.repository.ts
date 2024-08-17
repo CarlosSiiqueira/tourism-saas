@@ -69,6 +69,9 @@ class ReservaRepository implements IReserva {
           status: true,
           codigoUsuario: true,
           idExcursao: true,
+          dataCadastro: true,
+          desconto: true,
+          plataforma: true,
           Pessoa: {
             select: {
               id: true,
@@ -84,6 +87,11 @@ class ReservaRepository implements IReserva {
               dataInicio: true,
               dataFim: true
             }
+          },
+          Usuario: {
+            select: {
+              nome: true
+            }
           }
         },
         where
@@ -97,7 +105,9 @@ class ReservaRepository implements IReserva {
   create = async ({
     codigoUsuario,
     passageiros,
-    idExcursao }: IReservaDTO): Promise<string> => {
+    idExcursao,
+    desconto,
+    plataforma = 1 }: IReservaDTO): Promise<string> => {
 
     try {
 
@@ -108,6 +118,8 @@ class ReservaRepository implements IReserva {
           id,
           codigoUsuario,
           idExcursao,
+          desconto,
+          plataforma,
           Pessoa: {
             connect: passageiros.map(codigoPassageiro => ({ id: codigoPassageiro }))
           }
@@ -128,7 +140,13 @@ class ReservaRepository implements IReserva {
       },
       include: {
         Pessoa: true,
-        Excursao: true
+        Excursao: true,
+        Usuario: true,
+        Transacoes: {
+          include: {
+            FormaPagamento: true
+          }
+        }
       }
     })
 
@@ -144,7 +162,9 @@ class ReservaRepository implements IReserva {
     const contasBancarias = await this.prisma.reservas.findMany({
       include: {
         Pessoa: true,
-        Excursao: true
+        Excursao: true,
+        Usuario: true,
+        Transacoes: true
       }
     })
 
@@ -174,8 +194,9 @@ class ReservaRepository implements IReserva {
     reserva,
     codigoUsuario,
     passageiros,
-    idExcursao
-  }: IReservaDTO, id: string): Promise<string[]> => {
+    idExcursao,
+    desconto,
+    plataforma }: IReservaDTO, id: string): Promise<string[]> => {
 
     await this.prisma.reservas.update({
       where: {
@@ -193,6 +214,8 @@ class ReservaRepository implements IReserva {
         reserva,
         codigoUsuario,
         idExcursao,
+        desconto,
+        plataforma,
         Pessoa: {
           connect: passageiros.map((codigoPassageiro) => { return { id: codigoPassageiro } })
         }
@@ -207,6 +230,20 @@ class ReservaRepository implements IReserva {
     }
 
     return ['Reserva Atualizada com sucesso'];
+  }
+
+  setConfirm = async (id: string, status: boolean): Promise<string> => {
+
+    const reserva = await this.prisma.reservas.update({
+      where: {
+        id,
+      },
+      data: {
+        status
+      }
+    })
+
+    return id
   }
 }
 

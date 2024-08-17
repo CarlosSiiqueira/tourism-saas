@@ -382,6 +382,8 @@ model Reservas {
   reserva      Int      @default(autoincrement())
   dataCadastro DateTime @default(now())
   status       Boolean  @default(false)
+  desconto     Int
+  plataforma   Int      @default(1)
 
   Usuario             Usuarios?             @relation(fields: [codigoUsuario], references: [id])
   codigoUsuario       String?
