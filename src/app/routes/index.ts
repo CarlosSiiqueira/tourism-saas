@@ -21,6 +21,7 @@ import { tipoQuarto } from "./tipo.quarto.routes"
 import { reserva } from "./reserva.routes"
 import { subCategoriaTransacao } from "./subcategoria.transacao.routes"
 import { relatorios } from "./relatorios.routes"
+import { ranking } from "./ranking.clientes.routes"
 
 const router = Router()
 
@@ -46,5 +47,6 @@ router.use('/tipo-quarto', tipoQuarto)
 router.use('/reserva', reserva)
 router.use('/sub-categoria', subCategoriaTransacao)
 router.use('/relatorios', relatorios)
+router.use('/ranking-clientes', ranking)
 
 export { router }

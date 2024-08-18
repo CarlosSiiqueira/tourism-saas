@@ -147,7 +147,7 @@ class ProdutoRepository implements IProduto {
     })
 
     if (!produto) {
-      throw new Warning("Produto não encontrada", 400)
+      throw new Warning("Produto não encontrado", 400)
     }
 
     return produto
@@ -166,7 +166,7 @@ class ProdutoRepository implements IProduto {
     })
 
     if (!produtos) {
-      throw new Warning("Sem produtos registradas na base", 400)
+      throw new Warning("Sem produtos registrados na base", 400)
     }
 
     return produtos
@@ -219,7 +219,7 @@ class ProdutoRepository implements IProduto {
       throw new Warning('Não foi possível excluir o produto', 400)
     }
 
-    return ['Produto excluido com sucesso']
+    return ['Produto excluído com sucesso']
   }
 }
 

@@ -15,6 +15,15 @@ import { ExcursaoOnibusRepository } from '../../app/repositories/excursao.onibus
 import { EnderecoRepository } from "../../app/repositories/endereco.repository"
 import { LocalEmbarqueRepository } from "../../app/repositories/local.embarque.repository"
 import { PassageiroEmbarqueRepository } from "../../app/repositories/passageiro.embarque.repository"
+import { VendasRepository } from "../../app/repositories/vendas.repository"
+import { DestinosRepository } from "../../app/repositories/destinos.repository"
+import { FornecedorRepository } from "../../app/repositories/fornecedor.repository"
+import { ExcursaoPassageirosRepository } from "../../app/repositories/excursao.passageiros.repository"
+import { CategoriaTransacaoRepository } from "../../app/repositories/categoria.transacao.repository"
+import { TipoQuartoRepository } from "../../app/repositories/tipo.quarto.repository"
+import { ReservaRepository } from "../../app/repositories/reserva.repository"
+import { SubCategoriaTransacaoRepository } from "../../app/repositories/subcategoria.transacao.repository"
+import { RankingClientesRepository } from "../../app/repositories/ranking.clientes.repository"
 
 //interfaces
 import { IContaBancaria } from "../../app/interfaces/ContaBancaria"
@@ -30,22 +39,16 @@ import { IExcursaoOnibus } from "../../app/interfaces/ExcursaoOnibus"
 import { IEndereco } from "../../app/interfaces/Endereco"
 import { ILocalEmbarque } from "../../app/interfaces/LocalEmbarque"
 import { IVendas } from "../../app/interfaces/Vendas"
-import { VendasRepository } from "../../app/repositories/vendas.repository"
 import { IDestinos } from "../../app/interfaces/Destinos"
-import { DestinosRepository } from "../../app/repositories/destinos.repository"
 import { IFornecedor } from "../../app/interfaces/Fornecedor"
-import { FornecedorRepository } from "../../app/repositories/fornecedor.repository"
 import { IExcursaoPassageiros } from "../../app/interfaces/ExcursaoPassageiros"
-import { ExcursaoPassageirosRepository } from "../../app/repositories/excursao.passageiros.repository"
 import { IPassageiroEmbarque } from "../../app/interfaces/PassageiroEmbarque"
 import { ICategoriaTransacao } from "../../app/interfaces/CategoriaTransacao"
-import { CategoriaTransacaoRepository } from "../../app/repositories/categoria.transacao.repository"
 import { ITipoQuarto } from "../../app/interfaces/TipoQuarto"
-import { TipoQuartoRepository } from "../../app/repositories/tipo.quarto.repository"
 import { IReserva } from "../../app/interfaces/Reserva"
-import { ReservaRepository } from "../../app/repositories/reserva.repository"
 import { ISubCategoriaTransacao } from "../../app/interfaces/SubCategoriaTransacao"
-import { SubCategoriaTransacaoRepository } from "../../app/repositories/subcategoria.transacao.repository"
+import { IRankingCliente } from "../../app/interfaces/RankingCliente"
+
 
 
 container.registerSingleton<IContaBancaria>(
@@ -151,4 +154,9 @@ container.registerSingleton<IReserva>(
 container.registerSingleton<ISubCategoriaTransacao>(
   "SubCategoriaTransacaoRepository",
   SubCategoriaTransacaoRepository
+)
+
+container.registerSingleton<IRankingCliente>(
+  "RankingClientesRepository",
+  RankingClientesRepository
 )

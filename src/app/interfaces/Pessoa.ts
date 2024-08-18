@@ -25,6 +25,7 @@ export interface IPessoaDTO {
   usuarioCadastro: string
   rg: string | null
   emissor: string | null
+  rankingClientesId?: string | null
 }
 
 export interface IPessoaResponse extends IPessoaDTO {

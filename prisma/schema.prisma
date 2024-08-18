@@ -42,6 +42,8 @@ model Pessoas {
 
   Usuarios            Usuarios              @relation(fields: [usuarioCadastro], references: [id])
   usuarioCadastro     String
+  Ranking             RankingClientes?      @relation(fields: [rankingClientesId], references: [id])
+  rankingClientesId   String?
   Endereco            Endereco[]
   ExcursaoOnibus      ExcursaoOnibus[]
   PassageiroEmbarque  PassageiroEmbarque[]
@@ -81,6 +83,7 @@ model Usuarios {
   TipoQuarto            TipoQuarto[]
   Reservas              Reservas[]
   SubCategoriaTransacao SubCategoriaTransacao[]
+  RankingClientes       RankingClientes[]
 }
 
 model Pacotes {
@@ -398,4 +401,15 @@ model Reservas {
   ExcursaoPassageiros ExcursaoPassageiros[]
   Transacoes          Transacoes[]
   Opcionais           Produtos[]
+}
+
+model RankingClientes {
+  id            String    @id @default(uuid())
+  nome          String
+  qtdMinViagens Int
+  qtdMaxViagens Int
+  dataCadastro  DateTime  @default(now())
+  Usuario       Usuarios  @relation(fields: [usuariosId], references: [id])
+  usuariosId    String
+  Pessoas       Pessoas[]
 }
