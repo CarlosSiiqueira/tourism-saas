@@ -29,6 +29,7 @@ export interface IPessoaDTO {
 }
 
 export interface IPessoaResponse extends IPessoaDTO {
+  [key: string]: any
   id: string
 }
 

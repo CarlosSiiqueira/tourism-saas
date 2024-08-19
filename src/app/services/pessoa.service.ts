@@ -68,4 +68,11 @@ export class PessoaService {
 
     return report
   }
+
+  findAll = async (): Promise<any[]> => {
+
+    const pessoas = await this.pessoaRepository.findAll()
+
+    return pessoas
+  }
 }

@@ -26,6 +26,7 @@ import { ReservaController } from "./reservas.controller"
 import { SubCategoriaTransacaoController } from "./subcategoria.transacao.controller"
 import { RelatoriosController } from "./relatorios.controller"
 import { RankingClientesController } from "./ranking.clientes.controller"
+import { FilesController } from "./files.controller"
 
 export const contaBancariaController = container.resolve(ContaBancariaController)
 export const excursaoController = container.resolve(ExcursaoController)
@@ -50,3 +51,4 @@ export const reservaController = container.resolve(ReservaController)
 export const subCategoriaTransacaoController = container.resolve(SubCategoriaTransacaoController)
 export const relatoriosController = container.resolve(RelatoriosController)
 export const rankingClientesController = container.resolve(RankingClientesController)
+export const filesController = container.resolve(FilesController)

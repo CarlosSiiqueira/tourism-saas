@@ -156,7 +156,8 @@ class PessoaRepository implements IPessoa {
         ativo: true
       },
       include: {
-        Endereco: true
+        Endereco: true,
+        Ranking: true
       }
     })
 
