@@ -16,24 +16,38 @@ class FinanceiroRepository implements IFinanceiro {
     take,
     filter }: IIndex): Promise<{ count: number, rows: IFinanceiroResponse[] }> => {
 
-    const where = {
-      ativo: true,
-      // OR: [
-      //   {
-      //     dataPrevistaRecebimento: {
-      //       lt: new Date()
-      //     }
-      //   }
-      // ]
+    let filterOR = []
+    let expiredDate = new Date()
+    expiredDate.setDate(expiredDate.getDate())
+    expiredDate.setHours(23)
+    expiredDate.setMinutes(59)
+    expiredDate.setSeconds(59)
 
+    filterOR.push(
+      {
+        data: {
+          lte: expiredDate
+        }
+      },
+      {
+        data: {
+          lte: expiredDate
+        }
+      }
+    )
+
+    const where = {
+      ativo: true
     }
 
-    Object.entries(filter as { [key: string]: string }).map(([key, value]) => {
+    Object.entries(filter as {
+      [key: string]: string
+    }).map(([key, value]) => {
 
       switch (key) {
         case 'nome':
-          Object.assign(where, {
-            OR: [
+          if (value !== '') {
+            filterOR.push(
               {
                 Pessoas: {
                   nome: {
@@ -88,23 +102,68 @@ class FinanceiroRepository implements IFinanceiro {
                   contains: value,
                   mode: "insensitive"
                 }
+              },
+              {
+                ContaBancaria: {
+                  nome: {
+                    contains: value,
+                    mode: 'insensitive'
+                  }
+                }
               }
-            ]
-          })
+            )
+          }
           break;
 
         case 'valor':
-          Object.assign(where, {
+          filterOR.push({
             valor: parseFloat(value)
           })
           break;
 
-        case 'data':
-          Object.assign(where, {
-            dataPrevistaRecebimento: dateValidate(value)
+        case 'dataInicio':
+          let dataIni = dateValidate(value)
+          dataIni.setDate(dataIni.getDate() + 1)
+          dataIni.setHours(0)
+          filterOR.push({
+            data: {
+              gte: dataIni
+            }
           })
           break;
+
+        case 'dataFim':
+          let dataFim = dateValidate(value)
+          dataFim.setDate(dataFim.getDate() + 1)
+          dataFim.setHours(23)
+          dataFim.setMinutes(59)
+          dataFim.setSeconds(59)
+          filterOR.push({
+            data: {
+              lte: dataFim
+            }
+          })
+          break;
+
+        case 'efetivado':
+          if (value !== 'all') {
+            filterOR.push({
+              efetivado: parseInt(value) == 1 ? true : false
+            })
+          }
+          break;
+
+        case 'codigoContaBancaria':
+          Object.assign(where, {
+            codigoContaBancaria: {
+              in: value
+            }
+          })
       }
+    })
+
+    Object.assign(where, {
+      OR: filterOR
     })
 
     const [count, rows] = await this.prisma.$transaction([
@@ -129,7 +188,8 @@ class FinanceiroRepository implements IFinanceiro {
             include: {
               SubCategoria: true
             }
-          }
+          },
+          Reservas: true
         }
       })
     ])
@@ -146,7 +206,6 @@ class FinanceiroRepository implements IFinanceiro {
     observacao,
     ativo,
     numeroComprovanteBancario,
-    dataPrevistaRecebimento,
     idWP,
     codigoPessoa,
     codigoFornecedor,
@@ -164,7 +223,6 @@ class FinanceiroRepository implements IFinanceiro {
 
       const id = crypto.randomUUID();
       data = dateValidate(data)
-      dataPrevistaRecebimento = dateValidate(dataPrevistaRecebimento)
 
       await this.prisma.transacoes.create({
         data: {
@@ -177,7 +235,6 @@ class FinanceiroRepository implements IFinanceiro {
           observacao,
           ativo,
           numeroComprovanteBancario,
-          dataPrevistaRecebimento,
           idWP,
           codigoPessoa,
           codigoFornecedor,
@@ -219,7 +276,8 @@ class FinanceiroRepository implements IFinanceiro {
           include: {
             SubCategoria: true
           }
-        }
+        },
+        Reservas: true
       }
     })
 
@@ -228,7 +286,6 @@ class FinanceiroRepository implements IFinanceiro {
     }
 
     return financeiro
-
   }
 
   findAll = async (): Promise<IFinanceiroResponse[]> => {
@@ -250,7 +307,8 @@ class FinanceiroRepository implements IFinanceiro {
           include: {
             SubCategoria: true
           }
-        }
+        },
+        Reservas: true
       }
     })
 
@@ -270,7 +328,6 @@ class FinanceiroRepository implements IFinanceiro {
     observacao,
     ativo,
     numeroComprovanteBancario,
-    dataPrevistaRecebimento,
     idWP,
     codigoPessoa,
     codigoFornecedor,
@@ -287,7 +344,6 @@ class FinanceiroRepository implements IFinanceiro {
     try {
 
       data = dateValidate(data)
-      dataPrevistaRecebimento = new Date();
 
       const financeiro = await this.prisma.transacoes.update({
         data: {
@@ -299,7 +355,6 @@ class FinanceiroRepository implements IFinanceiro {
           observacao,
           ativo,
           numeroComprovanteBancario,
-          dataPrevistaRecebimento,
           codigoPessoa,
           codigoFornecedor,
           codigoExcursao,
@@ -390,6 +445,204 @@ class FinanceiroRepository implements IFinanceiro {
     }
 
     return ['Financeiro liberado para alteração']
+  }
+
+  relatorioFinanceiroCliente = async ({ orderBy,
+    order,
+    skip,
+    take,
+    filter }: IIndex, idCliente: string): Promise<{ count: number, sum: number, rows: IFinanceiroResponse[] }> => {
+
+    let filterOR = []
+    filterOR.push({})
+
+    const where = {
+      ativo: true
+    }
+
+    Object.entries(filter as {
+      [key: string]: string
+    }).map(([key, value]) => {
+
+      switch (key) {
+        case 'nome':
+          if (value !== '') {
+            filterOR.push(
+              {
+                Pessoas: {
+                  nome: {
+                    contains: value,
+                    mode: "insensitive"
+                  }
+                }
+              },
+              {
+                Fornecedor: {
+                  nome: {
+                    contains: value,
+                    mode: "insensitive"
+                  }
+
+                }
+              },
+              {
+                Excursao: {
+                  nome: {
+                    contains: value,
+                    mode: "insensitive"
+                  }
+                }
+              },
+              {
+                Produtos: {
+                  nome: {
+                    contains: value,
+                    mode: "insensitive"
+                  }
+                }
+              },
+              {
+                FormaPagamento: {
+                  nome: {
+                    contains: value,
+                    mode: "insensitive"
+                  }
+                }
+              },
+              {
+                Usuarios: {
+                  nome: {
+                    contains: value,
+                    mode: "insensitive"
+                  }
+                }
+              },
+              {
+                observacao: {
+                  contains: value,
+                  mode: "insensitive"
+                }
+              },
+              {
+                ContaBancaria: {
+                  nome: {
+                    contains: value,
+                    mode: 'insensitive'
+                  }
+                }
+              }
+            )
+          }
+          break;
+
+        case 'valor':
+          filterOR.push({
+            valor: parseFloat(value)
+          })
+          break;
+
+        case 'dataInicio':
+          let dataIni = dateValidate(value)
+          dataIni.setDate(dataIni.getDate() + 1)
+          dataIni.setHours(0)
+          filterOR.push({
+            data: {
+              gte: dataIni
+            }
+          })
+          break;
+
+        case 'dataFim':
+          let dataFim = dateValidate(value)
+          dataFim.setDate(dataFim.getDate() + 1)
+          dataFim.setHours(23)
+          dataFim.setMinutes(59)
+          dataFim.setSeconds(59)
+          filterOR.push({
+            data: {
+              lte: dataFim
+            }
+          })
+          break;
+
+        case 'efetivado':
+          if (value !== 'all') {
+            filterOR.push({
+              efetivado: parseInt(value) == 1 ? true : false
+            })
+          }
+          break;
+      }
+    })
+
+    Object.assign(where, {
+      OR: filterOR
+    })
+
+    const [sum, count, rows] = await this.prisma.$transaction([
+      this.prisma.transacoes.aggregate({
+        _sum: {
+          valor: true
+        },
+        where: {
+          codigoPessoa: idCliente,
+          efetivado: true,
+          AND: {
+            NOT: {
+              codigoExcursao: null,
+              codigoPacote: null
+            }
+          }
+        }
+      }),
+      this.prisma.transacoes.count({
+        where: {
+          codigoPessoa: idCliente,
+          efetivado: true,
+          AND: {
+            NOT: {
+              codigoExcursao: null,
+              codigoPacote: null
+            }
+          }
+        }
+      }),
+      this.prisma.transacoes.findMany({
+        skip,
+        take,
+        orderBy: {
+          [orderBy as string]: order
+        },
+        where: {
+          codigoPessoa: idCliente,
+          efetivado: true,
+          AND: {
+            NOT: {
+              codigoExcursao: null,
+              codigoPacote: null
+            }
+          }
+        },
+        include: {
+          Pessoas: true,
+          Fornecedor: true,
+          Excursao: true,
+          Pacotes: true,
+          Usuarios: true,
+          Produtos: true,
+          FormaPagamento: true,
+          ContaBancaria: true,
+          CategoriaTransacao: {
+            include: {
+              SubCategoria: true
+            }
+          },
+          Reservas: true
+        }
+      })
+    ])
+
+    return { sum: sum._sum.valor || 0, count, rows }
   }
 }
 

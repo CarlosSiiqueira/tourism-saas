@@ -19,9 +19,15 @@ export class ExcursaoQuartosService {
 
   countRoomTypes = async (quartos: IExcursaoQuartosResponse[], data: IIndex): Promise<summary[]> => {
 
-    const roomTypes = quartos.map((value) => {
+    let roomTypes = quartos.map((value) => {
       return { id: value.TipoQuarto?.id, nome: value.TipoQuarto?.nome, count: 0 }
     })
+
+    roomTypes = roomTypes.filter((value, index, self) =>
+      index === self.findIndex((t) => (
+        t.id === value.id
+      ))
+    );
 
     const updatedRoomTypes = await Promise.all(
       roomTypes.map(async (room) => {
@@ -40,5 +46,12 @@ export class ExcursaoQuartosService {
     const quartos = await this.excursaoQuartoRepositroy.findPassageirosWithRoom(idExcursao);
 
     return quartos;
+  }
+
+  find = async (idExcursao: string): Promise<IExcursaoQuartosResponse[]> => {
+
+    const quartos = await this.excursaoQuartoRepositroy.find(idExcursao)
+
+    return quartos
   }
 }

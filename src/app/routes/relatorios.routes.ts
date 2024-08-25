@@ -3,6 +3,6 @@ import { relatoriosController } from "../controllers"
 
 const relatorios = Router()
 
-relatorios.get('/clientes', relatoriosController.clientes)
+relatorios.get('/clientes/:idCliente', relatoriosController.clientes)
 
 export { relatorios }

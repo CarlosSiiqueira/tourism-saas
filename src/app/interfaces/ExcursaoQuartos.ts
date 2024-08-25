@@ -1,3 +1,5 @@
+import { IExcursaoResponse } from "./Excursao"
+
 export interface IExcursaoQuartos {
   create(data: IExcursaoQuartosDTO): Promise<string[]>
   find(idExcursao: string): Promise<IExcursaoQuartosResponse[]>
@@ -36,4 +38,5 @@ export interface IExcursaoQuartosResponse {
     id: string
     nome: string
   } | null
+  Excursao: IExcursaoResponse
 }

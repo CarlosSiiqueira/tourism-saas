@@ -10,6 +10,7 @@ export interface IFinanceiro {
   setVistoAdmin(visto: boolean, id: string): Promise<string[]>
   checkVistoAdmin(id: string): Promise<boolean>
   efetivaDesfetiva(id: string, acao: boolean): Promise<string[]>
+  relatorioFinanceiroCliente({ orderBy, order, skip, take, filter }: IIndex, idCliente: string): Promise<{ sum: number, count: number, rows: IFinanceiroResponse[] }>
 }
 
 export interface IFinanceiroDTO {
@@ -21,7 +22,6 @@ export interface IFinanceiroDTO {
   observacao?: string | null
   ativo: boolean
   numeroComprovanteBancario?: string | null
-  dataPrevistaRecebimento: Date
   idWP?: number | null
   codigoPessoa?: string | null
   codigoFornecedor?: string | null
@@ -95,7 +95,6 @@ export interface IFinanceiroResponse extends IFinanceiroDTO {
     idWP: number | null
     destino: string
     categoria: number | null
-    codigoDestino: string | null
     usuarioCadastro: string
   } | null,
   Usuarios: {
@@ -148,5 +147,13 @@ export interface IFinanceiroResponse extends IFinanceiroDTO {
       nome: string
       codigoUsuario: string
     }
+  } | null
+  Reservas: {
+    id: string,
+    reserva: number,
+    status: boolean,
+    codigoUsuario: string | null,
+    desconto: number
+    plataforma: number
   } | null
 }

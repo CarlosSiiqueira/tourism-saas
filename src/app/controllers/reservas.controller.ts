@@ -27,32 +27,38 @@ class ReservaController {
 
   create = async (request: Request, response: Response): Promise<void> => {
 
-    const reserva = await this.reservaRepository.create(request.body)
-    const formaPagamento = await this.formaPagamentoService.find(request.body.codigoFormaPagamento)
+    const passageiro = await this.excursaoPassageiroService.findByIdPessoa(request.body.passageiros, request.body.idExcursao)
+    let resp = 'Esse Passageiro já está nessa excursão'
 
-    request.body.idReserva = reserva || ''
-    request.body.tipo = 2
-    request.body.observacao = request.body.criancasColo > 0 ? `${request.body.criancasColo}x nessa Reserva` : ''
-    request.body.ativo = true
-    request.body.data = new Date()
-    request.body.dataPrevistaRecebimento = await this.financeiroService.setDataPrevistaPagamento(formaPagamento.qtdDiasRecebimento)
-    request.body.usuarioCadastro = request.body.codigoUsuario
-    request.body.valor = request.body.total
+    if (!passageiro) {
+      const reserva = await this.reservaRepository.create(request.body)
+      const formaPagamento = await this.formaPagamentoService.find(request.body.codigoFormaPagamento)
 
-    const financeiro = await this.financeiroService.create(request.body)
+      request.body.idReserva = reserva || ''
+      request.body.tipo = 2
+      request.body.observacao = request.body.criancasColo > 0 ? `${request.body.criancasColo}x nessa Reserva` : ''
+      request.body.ativo = true
+      request.body.data = new Date()
+      request.body.dataPrevistaRecebimento = await this.financeiroService.setDataPrevistaPagamento(formaPagamento.qtdDiasRecebimento)
+      request.body.usuarioCadastro = request.body.codigoUsuario
+      request.body.valor = request.body.total
+      request.body.codigoExcursao = request.body.idExcursao
 
-    const newPassageiro = await Promise.all(
-      request.body.passageiros.map(async (passageiro: string) => {
-        return await this.excursaoPassageiroService.create({
-          idExcursao: request.body.idExcursao,
-          idPassageiro: passageiro,
-          localEmbarque: request.body.localEmbarqueId,
-          reserva: reserva
+      const financeiro = await this.financeiroService.create(request.body)
+
+      const newPassageiro = await Promise.all(
+        request.body.passageiros.map(async (passageiro: string) => {
+          return await this.excursaoPassageiroService.create({
+            idExcursao: request.body.idExcursao,
+            idPassageiro: passageiro,
+            localEmbarque: request.body.localEmbarqueId,
+            reserva: reserva
+          })
         })
-      })
-    )
-
-    response.status(200).send(reserva)
+      )
+      resp = 'Reserva criada com sucesso'
+    }
+    response.status(200).send(resp)
   }
 
   find = async (request: Request, response: Response): Promise<void> => {

@@ -8,7 +8,6 @@ export interface IPessoa {
   findByCpf(cpf: string): Promise<IPessoaResponse | null>
   delete(id: string): Promise<string[]>
   update(data: IPessoaDTO, id: string, codigoEndereco: string): Promise<string[]>
-  relatorioClientes(data: IIndex): Promise<any>
 }
 
 export interface IPessoaDTO {

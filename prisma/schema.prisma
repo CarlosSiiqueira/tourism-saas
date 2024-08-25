@@ -100,8 +100,6 @@ model Pacotes {
   destino        String
   categoria      Int?
 
-  Destinos        Destinos?    @relation(fields: [codigoDestino], references: [id])
-  codigoDestino   String?
   Usuarios        Usuarios     @relation(fields: [usuarioCadastro], references: [id])
   usuarioCadastro String
   Excursao        Excursao[]
@@ -235,6 +233,7 @@ model Excursao {
   vagas           Int
   valor           Float
   publicadoSite   Boolean  @default(false)
+  concluida       Boolean  @default(false)
 
   Pacotes             Pacotes               @relation(fields: [codigoPacote], references: [id])
   codigoPacote        String
@@ -274,8 +273,6 @@ model Destinos {
   nome         String
   ativo        Boolean  @default(true)
   dataCadastro DateTime @default(now())
-
-  Pacotes Pacotes[]
 }
 
 model Transacoes {
@@ -288,7 +285,6 @@ model Transacoes {
   observacao                String?
   ativo                     Boolean
   numeroComprovanteBancario String?
-  dataPrevistaRecebimento   DateTime
   idWP                      Int?
 
   Pessoas              Pessoas?            @relation(fields: [codigoPessoa], references: [id])

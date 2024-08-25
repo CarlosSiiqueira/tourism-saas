@@ -10,5 +10,6 @@ excursao.get('/findAll', excursaoController.findAll)
 excursao.put('/update/:id', excursaoController.update)
 excursao.patch('/delete/:id', excursaoController.delete)
 excursao.patch('/publish/:id', excursaoController.publish)
+excursao.patch('/concluir/:id', excursaoController.concluir)
 
 export { excursao }

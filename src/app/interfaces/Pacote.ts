@@ -26,7 +26,6 @@ export interface IPacoteDTO {
   idWP: number | null
   destino: string
   categoria: number | null
-  codigoDestino: string | null
   usuarioCadastro: string
 }
 

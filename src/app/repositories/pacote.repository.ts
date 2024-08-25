@@ -55,8 +55,6 @@ class PacoteRepository implements IPacote {
         where,
         include: {
           Excursao: true,
-          Destinos: true,
-
         }
       })
     ])
@@ -73,7 +71,6 @@ class PacoteRepository implements IPacote {
     urlImgEsgotado,
     destino,
     categoria,
-    codigoDestino,
     usuarioCadastro }: IPacoteDTO): Promise<{ 'pacote': IPacoteResponse, 'success': boolean }> => {
 
     try {
@@ -91,7 +88,6 @@ class PacoteRepository implements IPacote {
           tipoTransporte,
           destino,
           categoria,
-          codigoDestino,
           usuarioCadastro
         }
       })
@@ -140,7 +136,6 @@ class PacoteRepository implements IPacote {
     categoria,
     origem,
     tipoTransporte,
-    codigoDestino,
     usuarioCadastro }: IPacoteDTO, id: string): Promise<{ 'pacote': IPacoteResponse, 'success': boolean }> => {
 
     try {
@@ -157,7 +152,6 @@ class PacoteRepository implements IPacote {
           categoria,
           origem,
           tipoTransporte,
-          codigoDestino,
           usuarioCadastro
         },
         where: {

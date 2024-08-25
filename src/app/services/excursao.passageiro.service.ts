@@ -27,9 +27,16 @@ export class ExcursaoPassageiroService {
     return passageiro
   }
 
-  findByIdPessoa = async (idsPassageiros: [string]): Promise<IExcursaoPassageirosResponse[]> => {
+  findByIdPessoa = async (idsPassageiros: [string], idExcursao: string): Promise<IExcursaoPassageirosResponse[]> => {
 
-    const passageiros = await this.excursaoPassageiroRepository.findByIdPessoa(idsPassageiros)
+    const passageiros = await this.excursaoPassageiroRepository.findByIdPessoa(idsPassageiros, idExcursao)
+
+    return passageiros
+  }
+
+  find = async (idExcursao: string): Promise<IExcursaoPassageirosResponse[]> => {
+
+    const passageiros = await this.excursaoPassageiroRepository.find(idExcursao)
 
     return passageiros
   }

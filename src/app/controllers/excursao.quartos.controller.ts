@@ -29,7 +29,7 @@ class ExcursaoQuartosController {
 
   create = async (request: Request, response: Response): Promise<void> => {
 
-    let passageiros = await this.excursaoPassageiroService.findByIdPessoa(request.body.passageiros)
+    let passageiros = await this.excursaoPassageiroService.findByIdPessoa(request.body.passageiros, request.body.codigoExcursao)
 
     if (passageiros.length) {
       request.body.passageiros = passageiros.map((passageiro) => {

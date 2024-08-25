@@ -2,7 +2,7 @@ import { inject, injectable } from "tsyringe";
 import { FinanceiroRepository } from "../repositories/financeiro.repository";
 import { IFinanceiroDTO } from "../interfaces/Financeiro";
 import { wooCommerce } from "../api/woocommerce";
-import { IFinanceiroHookArgs } from "../interfaces/Helper";
+import { IFinanceiroHookArgs, IIndex } from "../interfaces/Helper";
 import { proccessFinanceiroData } from "../../shared/utils/webHookBody";
 import { IPacoteResponse } from "../interfaces/Pacote";
 
@@ -93,6 +93,13 @@ export class FinanceiroService {
     const financeiro = await this.financeiroRepository.create(data)
 
     return financeiro
+  }
+
+  relatorioFinanceiroCliente = async (params: IIndex, idCliente: string): Promise<any> => {
+
+    const { sum, count, rows } = await this.financeiroRepository.relatorioFinanceiroCliente(params, idCliente)
+
+    return { sum, count, rows }
   }
 
 }

@@ -5,14 +5,20 @@ import { dateValidate } from "../../shared/helper/date"
 import { Warning } from "../errors"
 import crypto from 'crypto'
 
+interface where {
+  ativo: boolean
+  concluida?: boolean
+}
+
 class ExcursaoRepository implements IExcursao {
 
   private prisma = prismaManager.getPrisma()
 
   index = async ({ orderBy, order, skip, take, filter }: IIndex): Promise<{ count: number, rows: IExcursaoResponse[] }> => {
 
-    const where = {
-      ativo: true
+    const where: where = {
+      ativo: true,
+      concluida: false
     }
 
     Object.entries(filter as { [key: string]: string }).map(([key, value]) => {
@@ -22,24 +28,23 @@ class ExcursaoRepository implements IExcursao {
           Object.assign(where, {
             OR: [
               {
-                Pessoas: {
-                  nome: {
-                    contains: value,
-                    mode: "insensitive"
-                  }
-                }
-              },
-              {
-                LocalEmbarque: {
-                  nome: {
-                    contains: value,
-                    mode: "insensitive"
-                  }
-
+                nome: {
+                  contains: value,
+                  mode: 'insensitive'
                 }
               }
             ]
           })
+          break;
+
+        case 'concluida':
+          if (value !== 'all') {
+            where.concluida = parseInt(value) == 1 ? true : false
+          }
+
+          if (value == 'all') {
+            delete where.concluida
+          }
           break;
       }
     })
@@ -67,6 +72,7 @@ class ExcursaoRepository implements IExcursao {
           usuarioCadastro: true,
           valor: true,
           publicadoSite: true,
+          concluida: true,
           ExcursaoPassageiros: {
             include: {
               Pessoa: true,
@@ -271,6 +277,24 @@ class ExcursaoRepository implements IExcursao {
       },
       where: {
         id
+      }
+    })
+
+    if (!excursao) {
+      throw new Warning('Registro não encontrado', 400)
+    }
+
+    return excursao
+  }
+
+  concluir = async (id: string): Promise<IExcursaoResponse> => {
+
+    const excursao = await this.prisma.excursao.update({
+      where: {
+        id
+      },
+      data: {
+        concluida: true
       }
     })
 

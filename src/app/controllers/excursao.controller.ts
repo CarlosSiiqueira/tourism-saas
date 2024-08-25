@@ -73,6 +73,13 @@ class ExcursaoController {
     response.status(200).send('Excursão publicada com sucesso')
   }
 
+  concluir = async (request: Request, response: Response): Promise<void> => {
+
+    const excursao = await this.excursaoRepository.concluir(request.params.id)
+
+    response.status(200).send('Excursão concluída com sucesso')
+  }
+
 }
 
 export { ExcursaoController }

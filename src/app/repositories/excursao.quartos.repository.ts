@@ -84,6 +84,22 @@ class ExcursaoQuartosRepository implements IExcursaoQuartos {
               id: true,
               nome: true
             }
+          },
+          Excursao: {
+            select: {
+              id: true,
+              nome: true,
+              dataInicio: true,
+              dataFim: true,
+              observacoes: true,
+              dataCadastro: true,
+              ativo: true,
+              gerouFinanceiro: true,
+              vagas: true,
+              codigoPacote: true,
+              usuarioCadastro: true,
+              valor: true,
+            }
           }
         }
       })
@@ -201,6 +217,22 @@ class ExcursaoQuartosRepository implements IExcursaoQuartos {
           select: {
             id: true,
             nome: true
+          }
+        },
+        Excursao: {
+          select: {
+            id: true,
+            nome: true,
+            dataInicio: true,
+            dataFim: true,
+            observacoes: true,
+            dataCadastro: true,
+            ativo: true,
+            gerouFinanceiro: true,
+            vagas: true,
+            codigoPacote: true,
+            usuarioCadastro: true,
+            valor: true,
           }
         }
       }

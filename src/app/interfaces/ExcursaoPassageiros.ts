@@ -9,7 +9,7 @@ export interface IExcursaoPassageiros {
   find(idExcursao: string): Promise<IExcursaoPassageirosResponse[]>
   findAll(): Promise<IExcursaoPassageirosResponse[]>
   listPassageiros(idExcursao: string): Promise<any>
-  findByIdPessoa(idsPassageiros: [string]): Promise<IExcursaoPassageirosResponse[]>
+  findByIdPessoa(idsPassageiros: [string], idExcursao: string): Promise<IExcursaoPassageirosResponse[]>
   delete(idPassageiro: string, idExcursao: string): Promise<string[]>
 }
 
@@ -57,6 +57,14 @@ export interface IExcursaoPassageirosResponse extends IExcursaoPassageirosDTO {
     vagas: number
     codigoPacote: string
     usuarioCadastro: string
+  },
+  Reservas: {
+    id: string,
+    reserva: number,
+    status: boolean,
+    codigoUsuario: string | null,
+    desconto: number
+    plataforma: number
   }
 }
 

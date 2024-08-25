@@ -21,7 +21,6 @@ export const proccessFinanceiroData = (dados: IFinanceiroHookArgs): IFinanceiroD
     observacao: observacao,
     ativo: true,
     numeroComprovanteBancario: dados.order_key,
-    dataPrevistaRecebimento: new Date(),
     idWP: dados.id,
     codigoPessoa: dados.codigoPessoa,
     codigoExcursao: dados.codigoExcursao,
@@ -47,7 +46,6 @@ export const pacotes = (dados: IPacoteHookArgs): Array<IPacoteDTO> => {
       urlImgEsgotado: '',
       idWP: produto.id,
       destino: 'aa',
-      codigoDestino: null,
       categoria: null,
       usuarioCadastro: process.env.USERPADRAOWEBHOOK || ''
     })

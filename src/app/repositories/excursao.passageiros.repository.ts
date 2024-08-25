@@ -138,10 +138,64 @@ class ExcursaoPassageirosRepository implements IExcursaoPassageiros {
       where: {
         idExcursao
       },
-      include: {
-        Pessoa: true,
-        LocalEmbarque: true,
-        Excursao: true
+      select: {
+        id: true,
+        idExcursao: true,
+        idPassageiro: true,
+        localEmbarque: true,
+        reserva: true,
+        Pessoa: {
+          select: {
+            nome: true,
+            cpf: true,
+            sexo: true,
+            dataCadastro: true,
+            observacoes: true,
+            telefone: true,
+            telefoneWpp: true,
+            email: true,
+            contato: true,
+            telefoneContato: true,
+            ativo: true,
+            dataNascimento: true,
+            usuarioCadastro: true
+          }
+        },
+        LocalEmbarque: {
+          select: {
+            nome: true,
+            observacoes: true,
+            horaEmbarque: true,
+            dataCadastro: true,
+            codigoEndereco: true,
+            usuarioCadastro: true,
+            ativo: true
+          }
+        },
+        Excursao: {
+          select: {
+            nome: true,
+            dataInicio: true,
+            dataFim: true,
+            observacoes: true,
+            dataCadastro: true,
+            ativo: true,
+            gerouFinanceiro: true,
+            vagas: true,
+            codigoPacote: true,
+            usuarioCadastro: true
+          }
+        },
+        Reservas: {
+          select: {
+            id: true,
+            reserva: true,
+            status: true,
+            codigoUsuario: true,
+            desconto: true,
+            plataforma: true
+          }
+        }
       }
     })
 
@@ -156,10 +210,64 @@ class ExcursaoPassageirosRepository implements IExcursaoPassageiros {
   findAll = async (): Promise<IExcursaoPassageirosResponse[]> => {
 
     const excursaoPassageiros = await this.prisma.excursaoPassageiros.findMany({
-      include: {
-        Pessoa: true,
-        LocalEmbarque: true,
-        Excursao: true
+      select: {
+        id: true,
+        idExcursao: true,
+        idPassageiro: true,
+        localEmbarque: true,
+        reserva: true,
+        Pessoa: {
+          select: {
+            nome: true,
+            cpf: true,
+            sexo: true,
+            dataCadastro: true,
+            observacoes: true,
+            telefone: true,
+            telefoneWpp: true,
+            email: true,
+            contato: true,
+            telefoneContato: true,
+            ativo: true,
+            dataNascimento: true,
+            usuarioCadastro: true
+          }
+        },
+        LocalEmbarque: {
+          select: {
+            nome: true,
+            observacoes: true,
+            horaEmbarque: true,
+            dataCadastro: true,
+            codigoEndereco: true,
+            usuarioCadastro: true,
+            ativo: true
+          }
+        },
+        Excursao: {
+          select: {
+            nome: true,
+            dataInicio: true,
+            dataFim: true,
+            observacoes: true,
+            dataCadastro: true,
+            ativo: true,
+            gerouFinanceiro: true,
+            vagas: true,
+            codigoPacote: true,
+            usuarioCadastro: true
+          }
+        },
+        Reservas: {
+          select: {
+            id: true,
+            reserva: true,
+            status: true,
+            codigoUsuario: true,
+            desconto: true,
+            plataforma: true
+          }
+        }
       }
     })
 
@@ -202,18 +310,73 @@ class ExcursaoPassageirosRepository implements IExcursaoPassageiros {
     return response;
   }
 
-  findByIdPessoa = async (idsPassageiros: [string]): Promise<IExcursaoPassageirosResponse[]> => {
+  findByIdPessoa = async (idsPassageiros: [string], idExcursao: string): Promise<IExcursaoPassageirosResponse[]> => {
 
     const passageiros = await this.prisma.excursaoPassageiros.findMany({
       where: {
         idPassageiro: {
           in: idsPassageiros
-        }
+        },
+        idExcursao: idExcursao
       },
-      include: {
-        Pessoa: true,
-        LocalEmbarque: true,
-        Excursao: true
+      select: {
+        id: true,
+        idExcursao: true,
+        idPassageiro: true,
+        localEmbarque: true,
+        reserva: true,
+        Pessoa: {
+          select: {
+            nome: true,
+            cpf: true,
+            sexo: true,
+            dataCadastro: true,
+            observacoes: true,
+            telefone: true,
+            telefoneWpp: true,
+            email: true,
+            contato: true,
+            telefoneContato: true,
+            ativo: true,
+            dataNascimento: true,
+            usuarioCadastro: true
+          }
+        },
+        LocalEmbarque: {
+          select: {
+            nome: true,
+            observacoes: true,
+            horaEmbarque: true,
+            dataCadastro: true,
+            codigoEndereco: true,
+            usuarioCadastro: true,
+            ativo: true
+          }
+        },
+        Excursao: {
+          select: {
+            nome: true,
+            dataInicio: true,
+            dataFim: true,
+            observacoes: true,
+            dataCadastro: true,
+            ativo: true,
+            gerouFinanceiro: true,
+            vagas: true,
+            codigoPacote: true,
+            usuarioCadastro: true
+          }
+        },
+        Reservas: {
+          select: {
+            id: true,
+            reserva: true,
+            status: true,
+            codigoUsuario: true,
+            desconto: true,
+            plataforma: true
+          }
+        }
       }
     })
 

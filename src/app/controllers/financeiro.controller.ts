@@ -40,7 +40,9 @@ class FinanceiroController {
 
     const formaPagamento = await this.formaPagamentoService.find(request.body.codigoFormaPagamento)
 
-    request.body.dataPrevistaRecebimento = await this.financeiroService.setDataPrevistaPagamento(formaPagamento.qtdDiasRecebimento)
+    if (request.body.tipo == 2) {
+      request.body.data = await this.financeiroService.setDataPrevistaPagamento(formaPagamento.qtdDiasRecebimento)
+    }
 
     request.body.valor = request.body.tipo == 2 ? await this.formaPagamentoService.calculateTaxes(request.body.valor, formaPagamento.id, 1) : request.body.valor
 
@@ -127,7 +129,7 @@ class FinanceiroController {
       desconto: 0,
       localEmbarqueId: '1'
     })
-    
+
     request.body.reserva = reserva
     const financeiro = await this.financeiroRepository.create(request.body)
     const passageiro = await this.excursaoPassageiroService.create({

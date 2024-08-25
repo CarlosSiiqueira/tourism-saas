@@ -62,13 +62,6 @@ export class PessoaService {
     return pessoas
   }
 
-  relatorioClientes = async (data: IIndex): Promise<IPessoaReportResponse[]> => {
-
-    const report = await this.pessoaRepository.relatorioClientes(data)
-
-    return report
-  }
-
   findAll = async (): Promise<any[]> => {
 
     const pessoas = await this.pessoaRepository.findAll()
