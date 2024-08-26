@@ -27,6 +27,7 @@ import { SubCategoriaTransacaoController } from "./subcategoria.transacao.contro
 import { RelatoriosController } from "./relatorios.controller"
 import { RankingClientesController } from "./ranking.clientes.controller"
 import { FilesController } from "./files.controller"
+import { CreditoClienteController } from "./credito.cliente.controller"
 
 export const contaBancariaController = container.resolve(ContaBancariaController)
 export const excursaoController = container.resolve(ExcursaoController)
@@ -52,3 +53,4 @@ export const subCategoriaTransacaoController = container.resolve(SubCategoriaTra
 export const relatoriosController = container.resolve(RelatoriosController)
 export const rankingClientesController = container.resolve(RankingClientesController)
 export const filesController = container.resolve(FilesController)
+export const creditoClienteController = container.resolve(CreditoClienteController)

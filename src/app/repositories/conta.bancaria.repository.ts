@@ -106,8 +106,7 @@ class ContaBancariaRepository implements IContaBancaria {
       return ['Conta bancária cadastrada com sucesso!']
 
     } catch (error) {
-      const a = error
-      return ['not found']
+      throw new Warning('Erro ao criar conta bancária', 400)
     }
   }
 

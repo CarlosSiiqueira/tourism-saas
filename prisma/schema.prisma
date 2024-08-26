@@ -51,6 +51,7 @@ model Pessoas {
   Transacoes          Transacoes[]
   ExcursaoPassageiros ExcursaoPassageiros[]
   Reservas            Reservas[]
+  CreditoClientes     CreditoClientes[]
 }
 
 model Usuarios {
@@ -84,6 +85,7 @@ model Usuarios {
   Reservas              Reservas[]
   SubCategoriaTransacao SubCategoriaTransacao[]
   RankingClientes       RankingClientes[]
+  CreditoClientes       CreditoClientes[]
 }
 
 model Pacotes {
@@ -397,6 +399,7 @@ model Reservas {
   ExcursaoPassageiros ExcursaoPassageiros[]
   Transacoes          Transacoes[]
   Opcionais           Produtos[]
+  CreditoClientes     CreditoClientes[]
 }
 
 model RankingClientes {
@@ -408,4 +411,18 @@ model RankingClientes {
   Usuario       Usuarios  @relation(fields: [usuariosId], references: [id])
   usuariosId    String
   Pessoas       Pessoas[]
+}
+
+model CreditoClientes {
+  id           String   @id @default(uuid())
+  valor        Float
+  ativo        Boolean  @default(true)
+  dataCadastro DateTime @default(now())
+
+  Cliente    Pessoas  @relation(fields: [pessoasId], references: [id])
+  pessoasId  String
+  Reserva    Reservas @relation(fields: [idReserva], references: [id])
+  idReserva  String
+  Usuario    Usuarios @relation(fields: [usuariosId], references: [id])
+  usuariosId String
 }

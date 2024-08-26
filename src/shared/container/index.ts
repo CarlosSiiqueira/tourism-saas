@@ -48,6 +48,8 @@ import { ITipoQuarto } from "../../app/interfaces/TipoQuarto"
 import { IReserva } from "../../app/interfaces/Reserva"
 import { ISubCategoriaTransacao } from "../../app/interfaces/SubCategoriaTransacao"
 import { IRankingCliente } from "../../app/interfaces/RankingCliente"
+import { ICreditoCliente } from "../../app/interfaces/CreditoCliente"
+import { CreditoClienteRepository } from "../../app/repositories/credito.cliente.repository"
 
 
 
@@ -159,4 +161,9 @@ container.registerSingleton<ISubCategoriaTransacao>(
 container.registerSingleton<IRankingCliente>(
   "RankingClientesRepository",
   RankingClientesRepository
+)
+
+container.registerSingleton<ICreditoCliente>(
+  "CreditoClienteRepository",
+  CreditoClienteRepository
 )
