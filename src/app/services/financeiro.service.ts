@@ -1,6 +1,6 @@
 import { inject, injectable } from "tsyringe";
 import { FinanceiroRepository } from "../repositories/financeiro.repository";
-import { IFinanceiroDTO } from "../interfaces/Financeiro";
+import { IFinanceiroDTO, IFinanceiroResponse } from "../interfaces/Financeiro";
 import { wooCommerce } from "../api/woocommerce";
 import { IFinanceiroHookArgs, IIndex } from "../interfaces/Helper";
 import { proccessFinanceiroData } from "../../shared/utils/webHookBody";
@@ -100,6 +100,27 @@ export class FinanceiroService {
     const { sum, count, rows } = await this.financeiroRepository.relatorioFinanceiroCliente(params, idCliente)
 
     return { sum, count, rows }
+  }
+
+  find = async (id: string): Promise<IFinanceiroResponse> => {
+
+    const financeiro = await this.financeiroRepository.find(id)
+
+    return financeiro
+  }
+
+  update = async (data: IFinanceiroDTO, id: string): Promise<string[]> => {
+
+    const financeiro = await this.financeiroRepository.update(data, id)
+
+    return financeiro
+  }
+
+  delete = async (id: string): Promise<string[]> => {
+
+    const financeiro = await this.financeiroRepository.delete(id)
+
+    return financeiro
   }
 
 }

@@ -16,14 +16,16 @@ export class ReservaService {
     passageiros,
     idExcursao,
     desconto,
-    localEmbarqueId }: IReservaDTO): Promise<string> => {
+    localEmbarqueId,
+    criancasColo }: IReservaDTO): Promise<string> => {
 
     const newReserva = await this.reservaRepository.create({
       codigoUsuario,
       passageiros,
       idExcursao,
       desconto,
-      localEmbarqueId
+      localEmbarqueId,
+      criancasColo
     })
 
     return newReserva

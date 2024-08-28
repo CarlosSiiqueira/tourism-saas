@@ -41,4 +41,11 @@ export class ExcursaoPassageiroService {
     return passageiros
   }
 
+  deleteMultiple = async (idsPassageiros: Array<string>, idExcursao: string): Promise<any> => {
+
+    const passageiros = await this.excursaoPassageiroRepository.deleteMultiple(idsPassageiros, idExcursao)
+
+    return passageiros
+  }
+
 }

@@ -21,6 +21,7 @@ export interface IReservaDTO {
   desconto: number
   plataforma?: number
   localEmbarqueId: string
+  criancasColo: number
 }
 
 export interface IReservaResponse {
@@ -30,7 +31,7 @@ export interface IReservaResponse {
   codigoUsuario: string | null,
   desconto: number
   plataforma: number
-  Pessoa?: {
+  Pessoa: {
     id: string,
     nome: string,
     cpf: string,
@@ -40,13 +41,22 @@ export interface IReservaResponse {
     id: string,
     nome: string,
     dataInicio: Date,
-    dataFim: Date
+    dataFim: Date,
+    valor: number
   },
   Usuario: {
     nome: string
   } | null
   LocalEmbarque: {
+    id: string
     nome: string
     horaEmbarque: string
-  }
+  },
+  Transacoes?: {
+    id: string
+    FormaPagamento: {
+      id: string
+      nome: string
+    }
+  }[]
 }

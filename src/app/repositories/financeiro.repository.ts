@@ -257,7 +257,7 @@ class FinanceiroRepository implements IFinanceiro {
 
   }
 
-  find = async (id: string): Promise<IFinanceiroResponse | null> => {
+  find = async (id: string): Promise<IFinanceiroResponse> => {
 
     const financeiro = await this.prisma.transacoes.findFirst({
       where: {

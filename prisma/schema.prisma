@@ -388,6 +388,7 @@ model Reservas {
   status       Boolean  @default(false)
   desconto     Int
   plataforma   Int      @default(1)
+  criancasColo Int      @default(0)
 
   Usuario             Usuarios?             @relation(fields: [codigoUsuario], references: [id])
   codigoUsuario       String?

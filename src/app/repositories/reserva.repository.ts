@@ -72,6 +72,7 @@ class ReservaRepository implements IReserva {
           dataCadastro: true,
           desconto: true,
           plataforma: true,
+          criancasColo: true,
           Pessoa: {
             select: {
               id: true,
@@ -85,7 +86,8 @@ class ReservaRepository implements IReserva {
               id: true,
               nome: true,
               dataInicio: true,
-              dataFim: true
+              dataFim: true,
+              valor: true
             }
           },
           Usuario: {
@@ -95,8 +97,26 @@ class ReservaRepository implements IReserva {
           },
           LocalEmbarque: {
             select: {
+              id: true,
               nome: true,
               horaEmbarque: true
+            }
+          },
+          Transacoes: {
+            select: {
+              id: true,
+              FormaPagamento: {
+                select: {
+                  id: true,
+                  nome: true
+                }
+              },
+              ContaBancaria: {
+                select: {
+                  id: true,
+                  nome: true
+                }
+              }
             }
           }
         },
@@ -114,7 +134,8 @@ class ReservaRepository implements IReserva {
     idExcursao,
     desconto,
     plataforma = 1,
-    localEmbarqueId }: IReservaDTO): Promise<string> => {
+    localEmbarqueId,
+    criancasColo }: IReservaDTO): Promise<string> => {
 
     try {
 
@@ -128,6 +149,7 @@ class ReservaRepository implements IReserva {
           desconto,
           plataforma,
           localEmbarqueId,
+          criancasColo,
           Pessoa: {
             connect: passageiros.map(codigoPassageiro => ({ id: codigoPassageiro }))
           }
@@ -168,32 +190,37 @@ class ReservaRepository implements IReserva {
 
   findAll = async (): Promise<IReservaResponse[]> => {
 
-    const contasBancarias = await this.prisma.reservas.findMany({
+    const reservas = await this.prisma.reservas.findMany({
       include: {
         Pessoa: true,
         Excursao: true,
         Usuario: true,
-        Transacoes: true,
+        Transacoes: {
+          include: {
+            FormaPagamento: true,
+            ContaBancaria: true
+          }
+        },
         LocalEmbarque: true
       }
     })
 
-    if (!contasBancarias) {
+    if (!reservas) {
       throw new Warning("Sem reservas cadastradas na base", 400)
     }
 
-    return contasBancarias
+    return reservas
   }
 
   delete = async (id: string): Promise<string> => {
 
-    const Reserva = await this.prisma.reservas.delete({
+    const reserva = await this.prisma.reservas.delete({
       where: {
         id: id
       }
     })
 
-    if (!Reserva) {
+    if (!reserva) {
       throw new Warning('Registro não encontrado', 400)
     }
 
@@ -206,7 +233,8 @@ class ReservaRepository implements IReserva {
     passageiros,
     idExcursao,
     desconto,
-    plataforma }: IReservaDTO, id: string): Promise<string[]> => {
+    plataforma,
+    criancasColo }: IReservaDTO, id: string): Promise<string[]> => {
 
     await this.prisma.reservas.update({
       where: {
@@ -226,6 +254,7 @@ class ReservaRepository implements IReserva {
         idExcursao,
         desconto,
         plataforma,
+        criancasColo,
         Pessoa: {
           connect: passageiros.map((codigoPassageiro) => { return { id: codigoPassageiro } })
         }

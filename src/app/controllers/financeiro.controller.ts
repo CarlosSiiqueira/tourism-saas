@@ -127,7 +127,8 @@ class FinanceiroController {
       passageiros: [codigoCliente],
       codigoUsuario: '1',
       desconto: 0,
-      localEmbarqueId: '1'
+      localEmbarqueId: '1',
+      criancasColo: 0
     })
 
     request.body.reserva = reserva
