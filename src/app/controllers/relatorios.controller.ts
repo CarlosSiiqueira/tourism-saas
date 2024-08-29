@@ -12,7 +12,7 @@ class RelatoriosController {
 
   clientes = async (request: Request, response: Response): Promise<void> => {
 
-    const { orderBy, order, skip, take, filter } = formatIndexFilters(request)
+    const { orderBy, order, skip, take, filter } = formatIndexFilters(request, 'data')
 
     const report = await this.financeiroService.relatorioFinanceiroCliente({ orderBy, order, skip, take, filter }, request.params.idCliente)
 

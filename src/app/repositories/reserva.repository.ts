@@ -11,9 +11,7 @@ class ReservaRepository implements IReserva {
   index = async ({ orderBy, order, skip, take, filter }: IIndex): Promise<{ count: number, rows: IReservaResponse[] }> => {
 
     const where = {
-      NOT: {
-        id: undefined
-      }
+      excluida: false
     }
 
     Object.entries(filter as { [key: string]: string }).map(([key, value]) => {
@@ -105,6 +103,7 @@ class ReservaRepository implements IReserva {
           Transacoes: {
             select: {
               id: true,
+              valor: true,
               FormaPagamento: {
                 select: {
                   id: true,
@@ -214,9 +213,12 @@ class ReservaRepository implements IReserva {
 
   delete = async (id: string): Promise<string> => {
 
-    const reserva = await this.prisma.reservas.delete({
+    const reserva = await this.prisma.reservas.update({
       where: {
         id: id
+      },
+      data: {
+        excluida: true
       }
     })
 

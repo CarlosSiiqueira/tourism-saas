@@ -23,6 +23,7 @@ import { subCategoriaTransacao } from "./subcategoria.transacao.routes"
 import { relatorios } from "./relatorios.routes"
 import { ranking } from "./ranking.clientes.routes"
 import { files } from "./files.routes"
+import { creditoCliente } from "./credito.cliente.routes"
 
 const router = Router()
 
@@ -50,5 +51,6 @@ router.use('/sub-categoria', subCategoriaTransacao)
 router.use('/relatorios', relatorios)
 router.use('/ranking-clientes', ranking)
 router.use('/files', files)
+router.use('/credito-cliente', creditoCliente)
 
 export { router }

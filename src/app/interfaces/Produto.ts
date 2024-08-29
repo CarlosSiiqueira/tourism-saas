@@ -20,6 +20,7 @@ export interface IProdutoDTO {
   ativo: boolean
   codigoFornecedor: string
   usuarioCadastro: string
+  valor: number
 }
 
 export interface IProdutoResponse {

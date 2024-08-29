@@ -8,6 +8,7 @@ reserva.post('/create', reservaController.create)
 reserva.get('/find/:id', reservaController.find)
 reserva.get('/findAll', reservaController.findAll)
 reserva.put('/update/:id', reservaController.update)
-reserva.delete('/delete/:id', reservaController.delete)
+reserva.patch('/delete/:id', reservaController.delete)
+reserva.post('/cancelar/:id', reservaController.cancelar)
 
 export { reserva }

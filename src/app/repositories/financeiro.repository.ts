@@ -585,7 +585,14 @@ class FinanceiroRepository implements IFinanceiro {
           valor: true
         },
         where: {
-          codigoPessoa: idCliente,
+          Reservas: {
+            excluida: false,
+            Pessoa: {
+              some: {
+                id: idCliente
+              }
+            }
+          },
           efetivado: true,
           AND: {
             NOT: {
@@ -597,7 +604,14 @@ class FinanceiroRepository implements IFinanceiro {
       }),
       this.prisma.transacoes.count({
         where: {
-          codigoPessoa: idCliente,
+          Reservas: {
+            excluida: false,
+            Pessoa: {
+              some: {
+                id: idCliente
+              }
+            }
+          },
           efetivado: true,
           AND: {
             NOT: {
@@ -614,7 +628,14 @@ class FinanceiroRepository implements IFinanceiro {
           [orderBy as string]: order
         },
         where: {
-          codigoPessoa: idCliente,
+          Reservas: {
+            excluida: false,
+            Pessoa: {
+              some: {
+                id: idCliente
+              }
+            }
+          },
           efetivado: true,
           AND: {
             NOT: {

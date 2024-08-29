@@ -54,6 +54,7 @@ export interface IReservaResponse {
   },
   Transacoes?: {
     id: string
+    valor: number
     FormaPagamento: {
       id: string
       nome: string

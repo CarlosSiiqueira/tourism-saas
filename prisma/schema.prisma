@@ -153,6 +153,7 @@ model Produtos {
   dataCompra   DateTime?
   dataCadastro DateTime
   ativo        Boolean   @default(true)
+  valor        Float
 
   Fornecedor       Fornecedor   @relation(fields: [codigoFornecedor], references: [id])
   codigoFornecedor String
@@ -389,6 +390,7 @@ model Reservas {
   desconto     Int
   plataforma   Int      @default(1)
   criancasColo Int      @default(0)
+  excluida     Boolean  @default(false)
 
   Usuario             Usuarios?             @relation(fields: [codigoUsuario], references: [id])
   codigoUsuario       String?

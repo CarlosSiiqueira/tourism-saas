@@ -5,6 +5,7 @@ import { formatIndexFilters } from '../../shared/utils/filters'
 import { FinanceiroService } from '../services/financeiro.service'
 import { FormaPagamentoService } from '../services/forma.pagamento.service'
 import { ExcursaoPassageiroService } from '../services/excursao.passageiro.service'
+import { CreditoClienteService } from '../services/credito.cliente.service'
 
 @injectable()
 class ReservaController {
@@ -13,7 +14,8 @@ class ReservaController {
     private reservaRepository: ReservaRepository,
     private financeiroService: FinanceiroService,
     private formaPagamentoService: FormaPagamentoService,
-    private excursaoPassageiroService: ExcursaoPassageiroService
+    private excursaoPassageiroService: ExcursaoPassageiroService,
+    private creditoClienteService: CreditoClienteService
   ) { }
 
   index = async (request: Request, response: Response): Promise<void> => {
@@ -36,7 +38,7 @@ class ReservaController {
 
       request.body.idReserva = reserva || ''
       request.body.tipo = 2
-      request.body.observacao = request.body.criancasColo > 0 ? `${request.body.criancasColo}x nessa Reserva` : ''
+      request.body.observacao = request.body.criancasColo > 0 ? `${request.body.criancasColo}x crianças de colo nessa Reserva` : ''
       request.body.ativo = true
       request.body.data = await this.financeiroService.setDataPrevistaPagamento(formaPagamento.qtdDiasRecebimento)
       request.body.usuarioCadastro = request.body.codigoUsuario
@@ -82,7 +84,7 @@ class ReservaController {
       return passageiro.id
     })
 
-    const passageiro = await this.excursaoPassageiroService.deleteMultiple(idPassageiros, reserva.Excursao.id)
+    await this.excursaoPassageiroService.deleteMultiple(idPassageiros, reserva.Excursao.id)
     const res = await this.reservaRepository.delete(request.params.id)
 
     if (reserva.Transacoes?.length) {
@@ -96,10 +98,37 @@ class ReservaController {
     response.status(200).send(res)
   }
 
+  cancelar = async (request: Request, response: Response): Promise<void> => {
+
+    const reserva = await this.reservaRepository.find(request.params.id)
+
+    const idPassageiros = reserva.Pessoa.map((passageiro) => {
+      return passageiro.id
+    })
+
+    await this.excursaoPassageiroService.deleteMultiple(idPassageiros, reserva.Excursao.id)
+    const res = await this.reservaRepository.delete(request.params.id)
+
+    if (reserva.status) {
+      await Promise.all(
+        reserva.Pessoa.map(async (person) => {
+          return await this.creditoClienteService.create({
+            valor: request.body.valor / reserva.Pessoa.length,
+            pessoasId: person.id,
+            idReserva: reserva.id,
+            usuariosId: request.body.codigoUsuario
+          })
+        })
+      )
+    }
+
+    response.status(200).send(res)
+  }
+
   update = async (request: Request, response: Response): Promise<void> => {
 
     const financeiro = await this.financeiroService.find(request.body.Transacoes[0].id)
-    const passageiro = await this.excursaoPassageiroService.deleteMultiple(request.body.passageiros, request.body.idExcursao)
+    await this.excursaoPassageiroService.deleteMultiple(request.body.passageiros, request.body.idExcursao)
 
     if (financeiro) {
       const formaPagamento = await this.formaPagamentoService.find(request.body.codigoFormaPagamento)

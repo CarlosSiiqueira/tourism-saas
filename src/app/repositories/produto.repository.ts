@@ -75,6 +75,7 @@ class ProdutoRepository implements IProduto {
           dataCompra: true,
           dataCadastro: true,
           ativo: true,
+          valor: true,
           codigoFornecedor: true,
           usuarioCadastro: true,
           Fornecedor: {
@@ -108,6 +109,7 @@ class ProdutoRepository implements IProduto {
     dataCompra,
     ativo,
     codigoFornecedor,
+    valor,
     usuarioCadastro }: IProdutoDTO): Promise<string[]> => {
 
     try {
@@ -124,6 +126,7 @@ class ProdutoRepository implements IProduto {
           ativo,
           codigoFornecedor,
           usuarioCadastro,
+          valor,
           dataCadastro: new Date()
         }
       })
@@ -178,6 +181,7 @@ class ProdutoRepository implements IProduto {
     dataCompra,
     ativo,
     codigoFornecedor,
+    valor,
     usuarioCadastro }: IProdutoDTO, id: string): Promise<string[]> => {
 
     try {
@@ -190,6 +194,7 @@ class ProdutoRepository implements IProduto {
           dataCompra,
           ativo,
           codigoFornecedor,
+          valor,
           usuarioCadastro
         },
         where: {
