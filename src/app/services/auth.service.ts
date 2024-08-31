@@ -1,10 +1,11 @@
 import jwt from 'jsonwebtoken';
 import { UsuarioRepository } from '../repositories/usuario.repository';
 import { injectable, inject } from 'tsyringe';
+import { IUsuarioResponse } from '../interfaces/Usuario';
 
 interface User {
   id: string
-  username: string
+  user: IUsuarioResponse
 }
 
 @injectable()
@@ -38,7 +39,7 @@ export class AuthService {
       const user = await this.usuarioRepository.find(payload.id)
 
       if (user) {
-        return { id: payload.id, username: user.username };
+        return { id: payload.id, user: user };
       }
 
       return null

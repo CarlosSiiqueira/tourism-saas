@@ -253,12 +253,13 @@ model Excursao {
 }
 
 model Vendas {
-  id        String   @id @default(uuid())
-  valor     Float
-  qtd       Int
-  efetivada Boolean  @default(false)
-  data      DateTime @default(now())
-  origem    Int      @default(1)
+  id            String   @id @default(uuid())
+  valorTotal    Float
+  valorUnitario Float
+  qtd           Int
+  efetivada     Boolean  @default(false)
+  data          DateTime @default(now())
+  origem        Int      @default(1)
 
   Pessoas              Pessoas        @relation(fields: [codigoCliente], references: [id])
   codigoCliente        String

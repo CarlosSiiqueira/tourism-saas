@@ -54,7 +54,9 @@ class VendasRepository implements IVendas {
         include: {
           Usuarios: true,
           Produtos: true,
-          Excursao: true
+          Excursao: true,
+          Pessoas: true,
+          FormaPagamento: true
         }
       })
     ])
@@ -63,7 +65,8 @@ class VendasRepository implements IVendas {
   }
 
   create = async ({
-    valor,
+    valorUnitario,
+    valorTotal,
     qtd,
     origem = 1,
     codigoCliente,
@@ -80,7 +83,8 @@ class VendasRepository implements IVendas {
       const venda = await this.prisma.vendas.create({
         data: {
           id,
-          valor,
+          valorUnitario,
+          valorTotal,
           qtd,
           origem,
           codigoCliente,
@@ -104,6 +108,13 @@ class VendasRepository implements IVendas {
     const venda = await this.prisma.vendas.findUnique({
       where: {
         id
+      },
+      include: {
+        Usuarios: true,
+        Produtos: true,
+        Excursao: true,
+        Pessoas: true,
+        FormaPagamento: true
       }
     })
 
@@ -116,7 +127,15 @@ class VendasRepository implements IVendas {
 
   findAll = async (): Promise<IVendasResponse[]> => {
 
-    const vendas = await this.prisma.vendas.findMany()
+    const vendas = await this.prisma.vendas.findMany({
+      include: {
+        Usuarios: true,
+        Produtos: true,
+        Excursao: true,
+        Pessoas: true,
+        FormaPagamento: true
+      }
+    })
 
     if (!vendas) {
       throw new Warning("Sem vendas na base", 400)
@@ -126,7 +145,8 @@ class VendasRepository implements IVendas {
   }
 
   update = async ({
-    valor,
+    valorUnitario,
+    valorTotal,
     qtd,
     efetivada,
     codigoCliente,
@@ -142,7 +162,8 @@ class VendasRepository implements IVendas {
 
       const venda = await this.prisma.vendas.update({
         data: {
-          valor,
+          valorUnitario,
+          valorTotal,
           qtd,
           efetivada,
           data,
@@ -184,6 +205,41 @@ class VendasRepository implements IVendas {
     return ['Venda excluída com sucesso']
   }
 
+  efetivar = async (id: string): Promise<IVendasResponse> => {
+
+    const venda = await this.prisma.vendas.update({
+      where: {
+        id
+      },
+      data: {
+        efetivada: true
+      }
+    })
+
+    if (!venda) {
+      throw new Warning('Venda não efetivada', 400)
+    }
+
+    return venda
+  }
+
+  desEfetivar = async (id: string): Promise<IVendasResponse> => {
+
+    const venda = await this.prisma.vendas.update({
+      where: {
+        id
+      },
+      data: {
+        efetivada: false
+      }
+    })
+
+    if (!venda) {
+      throw new Warning('Venda não desefetivada', 400)
+    }
+
+    return venda
+  }
 }
 
 export { VendasRepository }

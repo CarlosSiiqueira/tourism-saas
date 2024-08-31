@@ -4,10 +4,13 @@ export interface IVendas {
   findAll(): Promise<IVendasResponse[]>
   delete(id: string): Promise<string[]>
   update(data: IVendasDTO, id: string): Promise<string[]>
+  efetivar(id: string): Promise<IVendasResponse>
+  desEfetivar(id: string): Promise<IVendasResponse>
 }
 
 export interface IVendasDTO {
-  valor: number
+  valorTotal: number
+  valorUnitario: number
   qtd: number
   efetivada: boolean
   origem: number
