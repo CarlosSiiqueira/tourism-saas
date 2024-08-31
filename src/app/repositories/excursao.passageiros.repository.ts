@@ -410,26 +410,16 @@ class ExcursaoPassageirosRepository implements IExcursaoPassageiros {
   deleteMultiple = async (idPassageiros: Array<string>, idExcursao: string): Promise<string[]> => {
 
     try {
-      const passageiros = await this.prisma.excursaoPassageiros.findMany({
+
+      const excursaoPassageiros = await this.prisma.excursaoPassageiros.deleteMany({
         where: {
-          idExcursao,
           idPassageiro: {
             in: idPassageiros
-          }
+          },
+          idExcursao: idExcursao
         }
       })
 
-      if (passageiros) {
-        const result = await Promise.all(
-          passageiros.map(async (passageiro) => {
-            const excursaoPassageiros = await this.prisma.excursaoPassageiros.delete({
-              where: {
-                id: passageiro.id
-              }
-            })
-          })
-        )
-      }
       return ['Passageiro Excluido com sucesso']
     } catch (error) {
       throw new Warning("Houve um erro ao realizar exclusao de passageiro", 400)

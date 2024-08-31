@@ -24,9 +24,9 @@ export interface IPacoteDTO {
   urlImagem: string | null
   urlImgEsgotado: string | null
   idWP: number | null
-  destino: string
   categoria: number | null
   usuarioCadastro: string
+  opcionais?: [string]
 }
 
 export interface IPacoteResponse extends IPacoteDTO {

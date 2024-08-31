@@ -117,6 +117,18 @@ class ReservaRepository implements IReserva {
                 }
               }
             }
+          },
+          Opcionais: {
+            select: {
+              id: true,
+              qtd: true,
+              Produto: {
+                select: {
+                  id: true,
+                  nome: true
+                }
+              }
+            }
           }
         },
         where
@@ -176,6 +188,11 @@ class ReservaRepository implements IReserva {
           include: {
             FormaPagamento: true
           }
+        },
+        Opcionais: {
+          include: {
+            Produto: true
+          }
         }
       }
     })
@@ -200,7 +217,12 @@ class ReservaRepository implements IReserva {
             ContaBancaria: true
           }
         },
-        LocalEmbarque: true
+        LocalEmbarque: true,
+        Opcionais: {
+          include: {
+            Produto: true
+          }
+        }
       }
     })
 
@@ -249,7 +271,7 @@ class ReservaRepository implements IReserva {
       }
     })
 
-    const Reserva = await this.prisma.reservas.update({
+    const reservas = await this.prisma.reservas.update({
       data: {
         reserva,
         codigoUsuario,
@@ -266,7 +288,7 @@ class ReservaRepository implements IReserva {
       }
     })
 
-    if (!Reserva) {
+    if (!reservas) {
       throw new Warning('Registro não encontrado', 400)
     }
 
@@ -285,6 +307,26 @@ class ReservaRepository implements IReserva {
     })
 
     return id
+  }
+
+  setOpcionais = async (opcionais: string[], id: string): Promise<string[]> => {
+
+    const reserva = await this.prisma.reservas.update({
+      where: {
+        id
+      },
+      data: {
+        Opcionais: {
+          connect: opcionais.map((opt) => { return { id: opt } })
+        }
+      }
+    })
+
+    if (!reserva) {
+      throw new Warning("Registro não encontrado", 400)
+    }
+
+    return ['Opcionais adicionados à reserva']
   }
 }
 

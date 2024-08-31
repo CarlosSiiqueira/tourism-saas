@@ -1,59 +1,59 @@
-import { ContaBancariaRepository } from '../repositories/conta.bancaria.repository'
+import { OpcionaisRepository } from '../repositories/opcionais.repository'
 import { inject, injectable } from "tsyringe"
 import { Request, Response } from "express"
 import { formatIndexFilters } from '../../shared/utils/filters'
 
 @injectable()
-class ContaBancariaController {
+class OpcionaisController {
   constructor(
-    @inject("ContaBancariaRepository")
-    private contaBancariaRepository: ContaBancariaRepository
+    @inject("OpcionaisRepository")
+    private opcionaisRepository: OpcionaisRepository
   ) { }
 
   index = async (request: Request, response: Response): Promise<void> => {
 
     const { orderBy, order, skip, take, filter } = formatIndexFilters(request)
 
-    const res = await this.contaBancariaRepository.index({ orderBy, order, skip, take, filter })
+    const res = await this.opcionaisRepository.index({ orderBy, order, skip, take, filter })
 
     response.status(200).send(res)
   }
 
   create = async (request: Request, response: Response): Promise<void> => {
 
-    const res = await this.contaBancariaRepository.create(request.body)
+    const res = await this.opcionaisRepository.create(request.body)
 
     response.status(200).send(res)
   }
 
   find = async (request: Request, response: Response): Promise<void> => {
 
-    const res = await this.contaBancariaRepository.find(request.params.id)
+    const res = await this.opcionaisRepository.find(request.params.id)
 
     response.status(200).send(res)
   }
 
   findAll = async (request: Request, response: Response): Promise<void> => {
 
-    const res = await this.contaBancariaRepository.findAll();
+    const res = await this.opcionaisRepository.findAll();
 
     response.status(200).send(res)
   }
 
   delete = async (request: Request, response: Response): Promise<void> => {
 
-    const res = await this.contaBancariaRepository.delete(request.params.id)
+    const res = await this.opcionaisRepository.delete(request.params.id)
 
     response.status(200).send(res)
   }
 
   update = async (request: Request, response: Response): Promise<void> => {
 
-    const res = await this.contaBancariaRepository.update(request.body, request.params.id)
+    const res = await this.opcionaisRepository.update(request.body, request.params.id)
 
     response.status(200).send(res)
   }
 
 }
 
-export { ContaBancariaController }
+export { OpcionaisController }

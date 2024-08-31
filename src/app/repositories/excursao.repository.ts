@@ -158,7 +158,11 @@ class ExcursaoRepository implements IExcursao {
             LocalEmbarque: true
           }
         },
-        Pacotes: {}
+        Pacotes: {
+          include: {
+            Produto: true
+          }
+        }
       }
     })
 

@@ -93,7 +93,6 @@ export interface IFinanceiroResponse extends IFinanceiroDTO {
     urlImagem: string | null
     urlImgEsgotado: string | null
     idWP: number | null
-    destino: string
     categoria: number | null
     usuarioCadastro: string
   } | null,

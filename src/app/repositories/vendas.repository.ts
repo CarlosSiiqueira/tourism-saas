@@ -1,5 +1,6 @@
 import prismaManager from "../database/database";
 import { Warning } from "../errors";
+import { IIndex } from "../interfaces/Helper";
 import { IVendas, IVendasDTO, IVendasResponse } from "../interfaces/Vendas";
 import crypto from 'crypto'
 
@@ -7,15 +8,68 @@ class VendasRepository implements IVendas {
 
   private prisma = prismaManager.getPrisma()
 
+  index = async ({ orderBy, order, skip, take, filter }: IIndex): Promise<{ count: number, rows: IVendasResponse[] }> => {
+
+    const where = {
+      NOT: {
+        id: undefined
+      }
+    }
+
+    Object.entries(filter as { [key: string]: string }).map(([key, value]) => {
+
+      switch (key) {
+        case 'nome':
+          Object.assign(where, {
+            OR: [
+              {
+                nome: {
+                  contains: value,
+                  mode: "insensitive"
+                }
+              },
+              {
+                Usuarios: {
+                  nome: {
+                    contains: value,
+                    mode: "insensitive"
+                  }
+                }
+              }
+            ]
+          })
+          break;
+      }
+    })
+
+    const [count, rows] = await this.prisma.$transaction([
+      this.prisma.vendas.count({ where }),
+      this.prisma.vendas.findMany({
+        skip,
+        take,
+        orderBy: {
+          [orderBy as string]: order
+        },
+        where,
+        include: {
+          Usuarios: true,
+          Produtos: true,
+          Excursao: true
+        }
+      })
+    ])
+
+    return { count, rows }
+  }
+
   create = async ({
     valor,
-    tipo,
     qtd,
     origem = 1,
     codigoCliente,
     codigoFormaPagamento,
     codigoProduto = null,
-    codigoPacote = null,
+    codigoExcursao = null,
     usuarioCadastro
   }: IVendasDTO): Promise<string[]> => {
 
@@ -27,13 +81,12 @@ class VendasRepository implements IVendas {
         data: {
           id,
           valor,
-          tipo,
           qtd,
           origem,
           codigoCliente,
           codigoFormaPagamento,
           codigoProduto,
-          codigoPacote,
+          codigoExcursao,
           usuarioCadastro
         }
       })
@@ -74,13 +127,12 @@ class VendasRepository implements IVendas {
 
   update = async ({
     valor,
-    tipo,
     qtd,
     efetivada,
     codigoCliente,
     codigoFormaPagamento,
     codigoProduto,
-    codigoPacote,
+    codigoExcursao,
     usuarioCadastro
   }: IVendasDTO, id: string): Promise<string[]> => {
 
@@ -91,14 +143,13 @@ class VendasRepository implements IVendas {
       const venda = await this.prisma.vendas.update({
         data: {
           valor,
-          tipo,
           qtd,
           efetivada,
           data,
           codigoCliente,
           codigoFormaPagamento,
           codigoProduto,
-          codigoPacote,
+          codigoExcursao,
           usuarioCadastro
         },
         where: {

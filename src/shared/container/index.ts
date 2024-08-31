@@ -50,6 +50,8 @@ import { ISubCategoriaTransacao } from "../../app/interfaces/SubCategoriaTransac
 import { IRankingCliente } from "../../app/interfaces/RankingCliente"
 import { ICreditoCliente } from "../../app/interfaces/CreditoCliente"
 import { CreditoClienteRepository } from "../../app/repositories/credito.cliente.repository"
+import { IOpcionais } from "../../app/interfaces/Opcionais"
+import { OpcionaisRepository } from "../../app/repositories/opcionais.repository"
 
 
 
@@ -166,4 +168,9 @@ container.registerSingleton<IRankingCliente>(
 container.registerSingleton<ICreditoCliente>(
   "CreditoClienteRepository",
   CreditoClienteRepository
+)
+
+container.registerSingleton<IOpcionais>(
+  "OpcionaisRepository",
+  OpcionaisRepository
 )

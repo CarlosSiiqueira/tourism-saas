@@ -45,7 +45,6 @@ export const pacotes = (dados: IPacoteHookArgs): Array<IPacoteDTO> => {
       urlImagem: produto.image.src || '',
       urlImgEsgotado: '',
       idWP: produto.id,
-      destino: 'aa',
       categoria: null,
       usuarioCadastro: process.env.USERPADRAOWEBHOOK || ''
     })

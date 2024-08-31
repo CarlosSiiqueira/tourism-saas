@@ -86,6 +86,7 @@ model Usuarios {
   SubCategoriaTransacao SubCategoriaTransacao[]
   RankingClientes       RankingClientes[]
   CreditoClientes       CreditoClientes[]
+  Opcionais             Opcionais[]
 }
 
 model Pacotes {
@@ -99,14 +100,13 @@ model Pacotes {
   urlImagem      String?
   urlImgEsgotado String?
   idWP           Int?
-  destino        String
   categoria      Int?
 
   Usuarios        Usuarios     @relation(fields: [usuarioCadastro], references: [id])
   usuarioCadastro String
   Excursao        Excursao[]
-  Vendas          Vendas[]
   Transacoes      Transacoes[]
+  Produto         Produtos[]
 }
 
 model FormaPagamento {
@@ -161,7 +161,8 @@ model Produtos {
   usuarioCadastro  String
   Vendas           Vendas[]
   Transacoes       Transacoes[]
-  Reservas         Reservas[]
+  Opcionais        Opcionais[]
+  Pacotes          Pacotes[]
 }
 
 model ExcursaoQuartos {
@@ -248,12 +249,12 @@ model Excursao {
   Transacoes          Transacoes[]
   ExcursaoPassageiros ExcursaoPassageiros[]
   Reservas            Reservas[]
+  Vendas              Vendas[]
 }
 
 model Vendas {
   id        String   @id @default(uuid())
   valor     Float
-  tipo      Int
   qtd       Int
   efetivada Boolean  @default(false)
   data      DateTime @default(now())
@@ -265,8 +266,8 @@ model Vendas {
   codigoFormaPagamento String
   Produtos             Produtos?      @relation(fields: [codigoProduto], references: [id])
   codigoProduto        String?
-  Pacotes              Pacotes?       @relation(fields: [codigoPacote], references: [id])
-  codigoPacote         String?
+  Excursao             Excursao?      @relation(fields: [codigoExcursao], references: [id])
+  codigoExcursao       String?
   Usuarios             Usuarios       @relation(fields: [usuarioCadastro], references: [id])
   usuarioCadastro      String
 }
@@ -401,8 +402,8 @@ model Reservas {
   localEmbarqueId     String
   ExcursaoPassageiros ExcursaoPassageiros[]
   Transacoes          Transacoes[]
-  Opcionais           Produtos[]
   CreditoClientes     CreditoClientes[]
+  Opcionais           Opcionais[]
 }
 
 model RankingClientes {
@@ -428,4 +429,17 @@ model CreditoClientes {
   idReserva  String
   Usuario    Usuarios @relation(fields: [usuariosId], references: [id])
   usuariosId String
+}
+
+model Opcionais {
+  id           String   @id @default(uuid())
+  qtd          Int
+  dataCadastro DateTime @default(now())
+
+  Reserva       Reservas @relation(fields: [idReserva], references: [id])
+  idReserva     String
+  Produto       Produtos @relation(fields: [idProduto], references: [id])
+  idProduto     String
+  Usuario       Usuarios @relation(fields: [codigoUsuario], references: [id])
+  codigoUsuario String
 }

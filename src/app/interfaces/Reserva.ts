@@ -11,6 +11,7 @@ export interface IReserva {
   delete(id: string): Promise<string>
   update(data: IReservaDTO, id: string): Promise<string[]>
   setConfirm(id: string, status: boolean): Promise<string>
+  setOpcionais(opcionais: string[], id: string): Promise<string[]>
 }
 
 export interface IReservaDTO {
@@ -57,6 +58,14 @@ export interface IReservaResponse {
     valor: number
     FormaPagamento: {
       id: string
+      nome: string
+    }
+  }[]
+  Opcionais: {
+    id: string,
+    qtd: number,
+    Produto: {
+      id: string,
       nome: string
     }
   }[]

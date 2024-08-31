@@ -55,6 +55,7 @@ class PacoteRepository implements IPacote {
         where,
         include: {
           Excursao: true,
+          Produto: true
         }
       })
     ])
@@ -69,13 +70,25 @@ class PacoteRepository implements IPacote {
     tipoTransporte,
     urlImagem,
     urlImgEsgotado,
-    destino,
     categoria,
-    usuarioCadastro }: IPacoteDTO): Promise<{ 'pacote': IPacoteResponse, 'success': boolean }> => {
+    usuarioCadastro,
+    opcionais }: IPacoteDTO): Promise<{ 'pacote': IPacoteResponse, 'success': boolean }> => {
 
     try {
 
       const id = crypto.randomUUID()
+
+      const opcional = {}
+
+      if (opcionais) {
+        Object.assign(opcional,
+          {
+            Produto: {
+              connect: opcionais.map((opt) => { return { id: opt } })
+            }
+          }
+        )
+      }
 
       const pacote = await this.prisma.pacotes.create({
         data: {
@@ -86,9 +99,9 @@ class PacoteRepository implements IPacote {
           urlImgEsgotado,
           origem,
           tipoTransporte,
-          destino,
           categoria,
-          usuarioCadastro
+          usuarioCadastro,
+          ...opcional
         }
       })
 
@@ -104,6 +117,9 @@ class PacoteRepository implements IPacote {
     const pacote = await this.prisma.pacotes.findFirst({
       where: {
         id
+      },
+      include: {
+        Produto: true
       }
     })
 
@@ -116,7 +132,11 @@ class PacoteRepository implements IPacote {
 
   findAll = async (): Promise<IPacoteResponse[]> => {
 
-    const pacotes = await this.prisma.pacotes.findMany()
+    const pacotes = await this.prisma.pacotes.findMany({
+      include: {
+        Produto: true
+      }
+    })
 
     if (!pacotes) {
       throw new Warning("Sem pacotes encontrados na base", 400)
@@ -132,13 +152,36 @@ class PacoteRepository implements IPacote {
     urlImagem,
     urlImgEsgotado,
     idWP,
-    destino,
     categoria,
     origem,
     tipoTransporte,
-    usuarioCadastro }: IPacoteDTO, id: string): Promise<{ 'pacote': IPacoteResponse, 'success': boolean }> => {
+    usuarioCadastro,
+    opcionais }: IPacoteDTO, id: string): Promise<{ 'pacote': IPacoteResponse, 'success': boolean }> => {
 
     try {
+
+      const opcional = {}
+
+      await this.prisma.pacotes.update({
+        where: {
+          id
+        },
+        data: {
+          Produto: {
+            set: []
+          }
+        }
+      })
+
+      if (opcionais) {
+        Object.assign(opcional,
+          {
+            Produto: {
+              connect: opcionais.map((opt) => { return { id: opt } })
+            }
+          }
+        )
+      }
 
       const pacote = await this.prisma.pacotes.update({
         data: {
@@ -148,11 +191,11 @@ class PacoteRepository implements IPacote {
           urlImagem,
           urlImgEsgotado,
           idWP,
-          destino,
           categoria,
           origem,
           tipoTransporte,
-          usuarioCadastro
+          usuarioCadastro,
+          ...opcional
         },
         where: {
           id
