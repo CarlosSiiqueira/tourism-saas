@@ -2,16 +2,18 @@ import { FormaPagamentoRepository } from '../repositories/forma.pagamento.reposi
 import { inject, injectable } from "tsyringe"
 import { Request, Response } from 'express'
 import { formatIndexFilters } from '../../shared/utils/filters'
+import { LogService } from '../services/log.service'
 
 @injectable()
 class FormaPagamentoController {
   constructor(
     @inject("FormaPagamentoRepository")
-    private formaPagamentoRepository: FormaPagamentoRepository
+    private formaPagamentoRepository: FormaPagamentoRepository,
+    private logService: LogService
   ) { }
 
   index = async (request: Request, response: Response) => {
-    
+
     const { orderBy, order, skip, take, filter } = formatIndexFilters(request)
 
     const res = await this.formaPagamentoRepository.index({ orderBy, order, skip, take, filter })
@@ -22,6 +24,8 @@ class FormaPagamentoController {
   create = async (request: Request, response: Response): Promise<void> => {
 
     const res = await this.formaPagamentoRepository.create(request.body)
+
+    await this.logService.create({ tipo: 'CREATE', newData: JSON.stringify(request.body), oldData: '', usuariosId: request.body.usuarioCadastro })
 
     response.status(200).send(res)
   }

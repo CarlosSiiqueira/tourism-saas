@@ -2,7 +2,7 @@ import { dateValidate } from "../../shared/helper/date";
 import prismaManager from "../database/database";
 import { Warning } from "../errors";
 import { IFinanceiro, IFinanceiroDTO, IFinanceiroResponse } from "../interfaces/Financeiro";
-import { IIndex } from "../interfaces/Helper";
+import { IFinanceiroFilter, IIndex } from "../interfaces/Helper";
 import crypto from 'crypto'
 
 class FinanceiroRepository implements IFinanceiro {
@@ -16,28 +16,18 @@ class FinanceiroRepository implements IFinanceiro {
     take,
     filter }: IIndex): Promise<{ count: number, rows: IFinanceiroResponse[] }> => {
 
-    let filterOR = []
+    let filterOR: IFinanceiroFilter[] = []
+    var filtered = false;
     let expiredDate = new Date()
+    var dataIni: Date
+    var dataFim: Date
     expiredDate.setDate(expiredDate.getDate())
     expiredDate.setHours(23)
     expiredDate.setMinutes(59)
     expiredDate.setSeconds(59)
 
-    filterOR.push(
-      {
-        data: {
-          lte: expiredDate
-        }
-      },
-      {
-        data: {
-          lte: expiredDate
-        }
-      }
-    )
-
     const where = {
-      ativo: true
+      ativo: true,
     }
 
     Object.entries(filter as {
@@ -47,6 +37,7 @@ class FinanceiroRepository implements IFinanceiro {
       switch (key) {
         case 'nome':
           if (value !== '') {
+            filtered = true
             filterOR.push(
               {
                 Pessoas: {
@@ -116,16 +107,18 @@ class FinanceiroRepository implements IFinanceiro {
           break;
 
         case 'valor':
+          filtered = true
           filterOR.push({
             valor: parseFloat(value)
           })
           break;
 
         case 'dataInicio':
-          let dataIni = dateValidate(value)
+          filtered = true
+          dataIni = dateValidate(value)
           dataIni.setDate(dataIni.getDate() + 1)
           dataIni.setHours(0)
-          filterOR.push({
+          Object.assign(where, {
             data: {
               gte: dataIni
             }
@@ -133,21 +126,36 @@ class FinanceiroRepository implements IFinanceiro {
           break;
 
         case 'dataFim':
-          let dataFim = dateValidate(value)
+          filtered = true
+          dataFim = dateValidate(value)
           dataFim.setDate(dataFim.getDate() + 1)
           dataFim.setHours(23)
           dataFim.setMinutes(59)
           dataFim.setSeconds(59)
-          filterOR.push({
+
+          if (dataIni) {
+            Object.assign(where, {
+              data: {
+                lte: dataFim,
+                gte: dataIni
+              }
+            })
+
+            break;
+          }
+
+          Object.assign(where, {
             data: {
-              lte: dataFim
+              lte: dataFim,
+              gte: dataFim
             }
           })
           break;
 
         case 'efetivado':
           if (value !== 'all') {
-            filterOR.push({
+            filtered = true
+            Object.assign(where, {
               efetivado: parseInt(value) == 1 ? true : false
             })
           }
@@ -162,9 +170,23 @@ class FinanceiroRepository implements IFinanceiro {
       }
     })
 
-    Object.assign(where, {
-      OR: filterOR
-    })
+    if (filterOR.length) {
+      Object.assign(where, {
+        OR: filterOR
+      })
+    }
+
+    if (!filtered) {
+      Object.assign(where,
+        {
+          OR: [{
+            data: {
+              lte: expiredDate
+            }
+          }]
+        }
+      )
+    }
 
     const [count, rows] = await this.prisma.$transaction([
       this.prisma.transacoes.count({ where }),
@@ -178,7 +200,11 @@ class FinanceiroRepository implements IFinanceiro {
         include: {
           Pessoas: true,
           Fornecedor: true,
-          Excursao: true,
+          Excursao: {
+            include: {
+              Pacotes: true
+            }
+          },
           Pacotes: true,
           Usuarios: true,
           Produtos: true,

@@ -24,6 +24,9 @@ import { TipoQuartoRepository } from "../../app/repositories/tipo.quarto.reposit
 import { ReservaRepository } from "../../app/repositories/reserva.repository"
 import { SubCategoriaTransacaoRepository } from "../../app/repositories/subcategoria.transacao.repository"
 import { RankingClientesRepository } from "../../app/repositories/ranking.clientes.repository"
+import { LogRepository } from "../../app/repositories/log.repository"
+import { CreditoClienteRepository } from "../../app/repositories/credito.cliente.repository"
+import { OpcionaisRepository } from "../../app/repositories/opcionais.repository"
 
 //interfaces
 import { IContaBancaria } from "../../app/interfaces/ContaBancaria"
@@ -49,10 +52,8 @@ import { IReserva } from "../../app/interfaces/Reserva"
 import { ISubCategoriaTransacao } from "../../app/interfaces/SubCategoriaTransacao"
 import { IRankingCliente } from "../../app/interfaces/RankingCliente"
 import { ICreditoCliente } from "../../app/interfaces/CreditoCliente"
-import { CreditoClienteRepository } from "../../app/repositories/credito.cliente.repository"
 import { IOpcionais } from "../../app/interfaces/Opcionais"
-import { OpcionaisRepository } from "../../app/repositories/opcionais.repository"
-
+import { ILog } from "../../app/interfaces/Log"
 
 
 container.registerSingleton<IContaBancaria>(
@@ -173,4 +174,9 @@ container.registerSingleton<ICreditoCliente>(
 container.registerSingleton<IOpcionais>(
   "OpcionaisRepository",
   OpcionaisRepository
+)
+
+container.registerSingleton<ILog>(
+  "LogRepository",
+  LogRepository
 )

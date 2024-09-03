@@ -102,7 +102,7 @@ class ExcursaoRepository implements IExcursao {
     valor,
     codigoPacote,
     usuarioCadastro,
-  }: IExcursaoDTO): Promise<string[]> => {
+  }: IExcursaoDTO): Promise<string> => {
 
     try {
 
@@ -126,8 +126,7 @@ class ExcursaoRepository implements IExcursao {
         }
       })
 
-      return ['Excursao criada com sucesso']
-
+      return id
     } catch (error) {
       throw new Warning('Erro ao criar excursao', 400)
     }

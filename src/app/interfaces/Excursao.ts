@@ -5,7 +5,7 @@ export interface IExcursao {
     count: number
     rows: IExcursaoResponse[]
   }>
-  create(data: IExcursaoDTO): Promise<string[]>
+  create(data: IExcursaoDTO): Promise<string>
   find(id: string): Promise<IExcursaoResponse>
   findAll(): Promise<IExcursaoResponse[]>
   delete(id: string): Promise<string>

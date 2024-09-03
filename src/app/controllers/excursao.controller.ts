@@ -4,6 +4,9 @@ import { Request, Response } from 'express'
 import { formatIndexFilters } from '../../shared/utils/filters'
 import { PacoteService } from '../services/pacote.service'
 import { PacoteRepository } from '../repositories/pacote.repository'
+import { FinanceiroService } from '../services/financeiro.service'
+import { FormaPagamentoService } from '../services/forma.pagamento.service'
+import { dateValidate } from '../../shared/helper/date'
 
 @injectable()
 class ExcursaoController {
@@ -11,7 +14,9 @@ class ExcursaoController {
   constructor(
     @inject("ExcursaoRepository")
     private excursaoRepository: ExcursaoRepository,
-    private pacoteService: PacoteService
+    private pacoteService: PacoteService,
+    private financeiroService: FinanceiroService,
+    private formaPagamentoService: FormaPagamentoService
   ) { }
 
   index = async (request: Request, response: Response): Promise<void> => {
@@ -25,9 +30,25 @@ class ExcursaoController {
 
   create = async (request: Request, response: Response): Promise<void> => {
 
-    const res = await this.excursaoRepository.create(request.body)
+    const excursao = await this.excursaoRepository.create(request.body)
 
-    response.status(200).send(res)
+    const result = await Promise.all(
+      request.body.itensAdicionais.map(async (item: { data: string, valor: number, codigoFormaPagamento: string, idFornecedor: string }) => {
+
+        request.body.tipo = 1
+        request.body.ativo = true
+        request.body.data = dateValidate(item.data)
+        request.body.usuarioCadastro = request.body.usuarioCadastro
+        request.body.valor = item.valor
+        request.body.codigoExcursao = excursao
+        request.body.codigoFormaPagamento = item.codigoFormaPagamento
+        request.body.codigoFornecedor = item.idFornecedor 
+
+        const financeiro = await this.financeiroService.create(request.body)
+      })
+    )
+
+    response.status(200).send(excursao)
   }
 
   find = async (request: Request, response: Response): Promise<void> => {

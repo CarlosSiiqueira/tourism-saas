@@ -87,6 +87,7 @@ model Usuarios {
   RankingClientes       RankingClientes[]
   CreditoClientes       CreditoClientes[]
   Opcionais             Opcionais[]
+  Logs                  Logs[]
 }
 
 model Pacotes {
@@ -443,4 +444,15 @@ model Opcionais {
   idProduto     String
   Usuario       Usuarios @relation(fields: [codigoUsuario], references: [id])
   codigoUsuario String
+}
+
+model Logs {
+  id      String   @id @default(uuid())
+  data    DateTime @default(now())
+  tipo    String
+  newData Json
+  oldData Json
+
+  Usuario    Usuarios @relation(fields: [usuariosId], references: [id])
+  usuariosId String
 }
