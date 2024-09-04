@@ -1,0 +1,7 @@
+{
+    "watch": ["src"],
+    "ext": "js,json,ts,tsx",
+    "ignore": ["node_modules", ".git", "Dockerfile", "docker-compose.yml"],
+    "exec": "node --inspect=0.0.0.0:9229 --require ts-node/register ./src/server.ts",
+    "legacyWatch": true
+  }
