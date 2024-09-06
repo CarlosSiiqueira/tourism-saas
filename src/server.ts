@@ -7,6 +7,8 @@ import { authenticateToken } from "./app/middlewares/authentication.middleware"
 import { router } from "../src/app/routes"
 import { warning } from "./app/middlewares/error.middleware"
 import cors from 'cors'
+import { connectKafka, createDefaultMailTopic } from './shared/kafka'
+import { processMailQueue } from './app/services/queue.consumer.service'
 
 const app = express()
 const PORT = process.env.PORT
@@ -28,6 +30,19 @@ app.use(authenticateToken)
 app.use(router)
 app.use(warning)
 
-app.listen(PORT, () => {
-  console.log(`Servidor rodando na url:http://localhost:${PORT}`)
+const initializeKafka = async () => {
+  try {
+    await connectKafka();
+    await createDefaultMailTopic();
+  } catch (error) {
+    console.error('Error initializing Kafka:', error);
+    process.exit(1);
+  }
+};
+
+initializeKafka().then(() => {
+  processMailQueue().catch(console.error)
+  app.listen(PORT, () => {
+    console.log(`Servidor rodando na url:http://localhost:${PORT}`)
+  })
 })

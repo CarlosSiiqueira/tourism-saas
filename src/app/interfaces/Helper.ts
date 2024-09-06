@@ -111,3 +111,9 @@ export interface IFinanceiroFilter {
     in: string[]
   }
 }
+
+export interface IEmail {
+  to: string
+  subject: string
+  text: string | null
+}
