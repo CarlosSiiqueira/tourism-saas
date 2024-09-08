@@ -10,6 +10,8 @@ export interface IOpcionais {
   findAll(): Promise<IOpcionaisResponse[]>
   delete(id: string): Promise<string>
   update(data: IOpcionaisDTO, id: string): Promise<string[]>
+  summary(idExcursao: string): Promise<IOpcionaisGroupByResponse[]>
+  findByProduto(idProduto: string): Promise<IOpcionaisResponse>
 }
 
 export interface IOpcionaisDTO {
@@ -21,4 +23,16 @@ export interface IOpcionaisDTO {
 
 export interface IOpcionaisResponse extends IOpcionaisDTO {
   id: string
+  Produto: {
+    id: string
+    nome: string
+  }
+}
+
+export interface IOpcionaisGroupByResponse {
+  _sum?: {
+    qtd: number | null
+  }
+
+  idProduto: string
 }

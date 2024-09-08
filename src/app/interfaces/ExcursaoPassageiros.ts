@@ -3,7 +3,7 @@ import { IIndex } from "./Helper"
 export interface IExcursaoPassageiros {
   index(data: IIndex, idExcursao: string): Promise<{
     count: number,
-    rows: IExcursaoPassageirosEmbarqueReponse[]
+    rows: IExcursaoPassageirosResponse[]
   }>
   create(data: IExcursaoPassageirosDTO): Promise<string[]>
   find(idExcursao: string): Promise<IExcursaoPassageirosResponse[]>
@@ -65,12 +65,24 @@ export interface IExcursaoPassageirosResponse extends IExcursaoPassageirosDTO {
     codigoUsuario: string | null,
     desconto: number
     plataforma: number
+    Opcionais: {
+      id: string
+      qtd: number
+      idReserva: string,
+      Produto: {
+        id: string
+        nome: string
+      }
+    }[]
   }
 }
 
 export interface IExcursaoPassageirosListResponse {
   id: string
-  nome: string
+  Pessoa: {
+    id: string
+    nome: string
+  }
   reserva: number
 }
 

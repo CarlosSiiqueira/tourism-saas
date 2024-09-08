@@ -43,7 +43,11 @@ class ExcursaoOnibusRepository implements IExcursaoOnibus {
         },
         where,
         include: {
-          Pessoa: true
+          Passageiro: {
+            include: {
+              Pessoa: true
+            }
+          }
         }
 
       })
@@ -62,6 +66,13 @@ class ExcursaoOnibusRepository implements IExcursaoOnibus {
     try {
 
       const id = crypto.randomUUID()
+
+      await this.prisma.excursaoOnibus.deleteMany({
+        where: {
+          numeroCadeira,
+          codigoExcursao
+        }
+      })
 
       const excursaoOnibus = await this.prisma.excursaoOnibus.create({
         data: {
@@ -91,7 +102,7 @@ class ExcursaoOnibusRepository implements IExcursaoOnibus {
         id: idCadeira
       },
       include: {
-        Pessoa: true,
+        Passageiro: true,
         Excursao: true
       }
     })
@@ -110,7 +121,7 @@ class ExcursaoOnibusRepository implements IExcursaoOnibus {
         codigoExcursao: idExcursao
       },
       include: {
-        Pessoa: true,
+        Passageiro: true,
         Excursao: true
       }
     })
@@ -136,6 +147,9 @@ class ExcursaoOnibusRepository implements IExcursaoOnibus {
       },
       where: {
         id: id
+      },
+      include: {
+        Passageiro: true
       }
     })
 
@@ -144,6 +158,32 @@ class ExcursaoOnibusRepository implements IExcursaoOnibus {
     }
 
     return excursaoOnibus
+  }
+
+  deleteManyByIdPassageiro = async (idPassageiros: string[], idExcursao: string): Promise<string[]> => {
+
+    try {
+
+      await this.prisma.excursaoOnibus.deleteMany({
+        where: {
+          Excursao: {
+            id: idExcursao
+          },
+          Passageiro: {
+            Pessoa: {
+              id: {
+                in: idPassageiros
+              }
+            }
+          }
+        }
+      })
+
+      return ['Passageiros removidos das poltronas com sucesso']
+    } catch (error) {
+      return ['Erro ao remover passageiro']
+    }
+
   }
 }
 

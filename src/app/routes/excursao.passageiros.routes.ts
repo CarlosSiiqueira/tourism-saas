@@ -10,5 +10,6 @@ excursaoPassageiros.get('/findAll', excursaoPassageirosController.findAll)
 excursaoPassageiros.get('/list-passageiros/:idExcursao', excursaoPassageirosController.listPassageiros)
 excursaoPassageiros.get('/list-passageiros-no-room/:idExcursao', excursaoPassageirosController.listPassageirosNoRoom)
 excursaoPassageiros.delete('/delete/:idPassageiro/:idExcursao', excursaoPassageirosController.delete)
+excursaoPassageiros.get('/list-passageiros-no-chair/:idExcursao', excursaoPassageirosController.listPassageirosNoChair)
 
 export { excursaoPassageiros }

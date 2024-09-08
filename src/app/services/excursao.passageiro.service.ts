@@ -1,6 +1,13 @@
 import { inject, injectable } from "tsyringe";
 import { ExcursaoPassageirosRepository } from "../repositories/excursao.passageiros.repository";
-import { IExcursaoPassageirosDTO, IExcursaoPassageirosResponse } from "../interfaces/ExcursaoPassageiros";
+import { IExcursaoPassageirosDTO, IExcursaoPassageirosEmbarqueReponse, IExcursaoPassageirosResponse } from "../interfaces/ExcursaoPassageiros";
+import { IIndex } from "../interfaces/Helper";
+
+interface summary {
+  id?: string | null
+  nome?: string | null
+  count: number
+}
 
 @injectable()
 export class ExcursaoPassageiroService {
@@ -47,5 +54,4 @@ export class ExcursaoPassageiroService {
 
     return passageiros
   }
-
 }

@@ -8,6 +8,8 @@ import { ExcursaoPassageiroService } from '../services/excursao.passageiro.servi
 import { CreditoClienteService } from '../services/credito.cliente.service'
 import { OpcionaisService } from '../services/opcionais.service'
 import { LogService } from '../services/log.service'
+import { ExcursaoQuartosService } from '../services/excursao.quarto.service'
+import { ExcursaoOnibusService } from '../services/excursao.onibus.service'
 
 @injectable()
 class ReservaController {
@@ -19,7 +21,9 @@ class ReservaController {
     private excursaoPassageiroService: ExcursaoPassageiroService,
     private creditoClienteService: CreditoClienteService,
     private opcionaisService: OpcionaisService,
-    private logService: LogService
+    private logService: LogService,
+    private excursaoQuartosService: ExcursaoQuartosService,
+    private excursaoOnibusService: ExcursaoOnibusService
   ) { }
 
   index = async (request: Request, response: Response): Promise<void> => {
@@ -39,7 +43,7 @@ class ReservaController {
 
     if (!passageiro.length) {
       let observacoes = ''
-      const reserva = await this.reservaRepository.create(request.body) 
+      const reserva = await this.reservaRepository.create(request.body)
       const formaPagamento = await this.formaPagamentoService.find(request.body.codigoFormaPagamento)
 
       if (request.body.opcionais.length) {
@@ -127,6 +131,8 @@ class ReservaController {
       return passageiro.id
     })
 
+    await this.excursaoQuartosService.deleteManyByIdPassageiro(idPassageiros, reserva.Excursao.id)
+    await this.excursaoOnibusService.deleteManyByIdPassageiro(idPassageiros, reserva.Excursao.id)
     await this.excursaoPassageiroService.deleteMultiple(idPassageiros, reserva.Excursao.id)
     const res = await this.reservaRepository.delete(request.params.id)
 

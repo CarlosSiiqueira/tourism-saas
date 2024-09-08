@@ -1,7 +1,8 @@
 import { inject, injectable } from "tsyringe";
-import { IExcursaoPassageirosListResponse } from "../interfaces/ExcursaoPassageiros";
+import { IExcursaoPassageirosListResponse, IExcursaoPassageirosResponse } from "../interfaces/ExcursaoPassageiros";
 import { IExcursaoQuartosResponse } from "../interfaces/ExcursaoQuartos";
 import { ExcursaoRepository } from "../repositories/excursao.repository";
+import { IExcursaoOnibusResponse } from "../interfaces/ExcursaoOnibus";
 
 @injectable()
 export class ExcursaoService {
@@ -17,16 +18,30 @@ export class ExcursaoService {
   ): Promise<IExcursaoPassageirosListResponse[]> => {
     let pessoaQuarto: Array<any> = []
 
-    passsageirosQuartos.forEach(element => {
-      pessoaQuarto.push(element.Passageiros.map((passageiro) => {
-        return { ...passageiro.Pessoa }
-      }))
+    passsageirosQuartos.map(element => {
+      pessoaQuarto = element.Passageiros.map((passageiro) => { return passageiro.id })
     });
 
     pessoaQuarto.forEach(quartos => {
-      quartos.forEach((hospede: IExcursaoPassageirosListResponse) => {
-        passageiros = passageiros.filter((pessoa) => pessoa.id !== hospede.id)
-      });
+      passageiros = passageiros.filter((pessoa) => pessoa.id !== quartos)
+    })
+
+    return passageiros;
+  }
+
+  filterPassageirosWithoutChair = async (
+    passageiros: IExcursaoPassageirosListResponse[],
+    passsageirosOnibus: IExcursaoOnibusResponse[]
+  ): Promise<IExcursaoPassageirosListResponse[]> => {
+
+    let pessoaOnibus: Array<any> = []
+
+    passsageirosOnibus.forEach(element => {
+      pessoaOnibus.push(element.Passageiro.id)
+    });
+
+    pessoaOnibus.forEach(onibus => {
+      passageiros = passageiros.filter((pessoa) => pessoa.id !== onibus)
     })
 
     return passageiros;

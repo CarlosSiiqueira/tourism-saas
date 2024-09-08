@@ -1,6 +1,11 @@
 import { inject, injectable } from "tsyringe";
 import { OpcionaisRepository } from "../repositories/opcionais.repository";
-import { IOpcionaisDTO } from "../interfaces/Opcionais";
+import { IOpcionaisDTO, IOpcionaisGroupByResponse } from "../interfaces/Opcionais";
+
+interface IOptionalSumary {
+  sum: number,
+  nome: string
+}
 
 @injectable()
 export class OpcionaisService {
@@ -20,5 +25,18 @@ export class OpcionaisService {
     const opcional = await this.opcionaisRepository.deleteByReservaId(idReserva)
 
     return opcional
+  }
+
+  summary = async (idExcursao: string): Promise<IOptionalSumary[]> => {
+
+    const groupBy = await this.opcionaisRepository.summary(idExcursao)
+
+    const summary = await Promise.all(
+      groupBy.map(async (value) => {
+        return { nome: (await this.opcionaisRepository.findByProduto(value.idProduto)).Produto.nome, sum: value._sum?.qtd || 0 }
+      })
+    )
+
+    return summary
   }
 }

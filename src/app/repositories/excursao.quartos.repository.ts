@@ -298,6 +298,30 @@ class ExcursaoQuartosRepository implements IExcursaoQuartos {
 
     return ['Quarto excluído com sucesso']
   }
+
+  deleteManyByIdPassageiro = async (idPassageiros: string[], idExcursao: string): Promise<string[]> => {
+
+    try {
+      await this.prisma.excursaoQuartos.deleteMany({
+        where: {
+          codigoExcursao: idExcursao,
+          Passageiros: {
+            every: {
+              Pessoa: {
+                id: {
+                  in: idPassageiros
+                }
+              }
+            }
+          }
+        }
+      })
+
+      return ['Passageiros removidos do quarto com sucesso']
+    } catch (error) {
+      return ['Erro ao remover passageiro']
+    }
+  }
 }
 
 export { ExcursaoQuartosRepository }

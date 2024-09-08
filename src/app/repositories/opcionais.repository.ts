@@ -1,6 +1,6 @@
 import prismaManager from "../database/database"
 import { Warning } from "../errors"
-import { IOpcionais, IOpcionaisDTO, IOpcionaisResponse } from "../interfaces/Opcionais"
+import { IOpcionais, IOpcionaisDTO, IOpcionaisGroupByResponse, IOpcionaisResponse } from "../interfaces/Opcionais"
 import { IIndex } from "../interfaces/Helper"
 import crypto from 'crypto';
 
@@ -60,6 +60,9 @@ class OpcionaisRepository implements IOpcionais {
       this.prisma.opcionais.findMany({
         skip,
         take,
+        include: {
+          Produto: true
+        },
         orderBy: {
           [orderBy as string]: order
         },
@@ -102,6 +105,9 @@ class OpcionaisRepository implements IOpcionais {
     const opcionais = await this.prisma.opcionais.findUnique({
       where: {
         id
+      },
+      include: {
+        Produto: true
       }
     })
 
@@ -114,7 +120,11 @@ class OpcionaisRepository implements IOpcionais {
 
   findAll = async (): Promise<IOpcionaisResponse[]> => {
 
-    const opcionais = await this.prisma.opcionais.findMany()
+    const opcionais = await this.prisma.opcionais.findMany({
+      include: {
+        Produto: true
+      }
+    })
 
     if (!opcionais) {
       throw new Warning("Sem opcionais cadastradas na base", 400)
@@ -176,6 +186,41 @@ class OpcionaisRepository implements IOpcionais {
     }
 
     return ['Registro Atualizado com sucesso'];
+  }
+
+  summary = async (idExcursao: string): Promise<IOpcionaisGroupByResponse[]> => {
+
+    const summary = await this.prisma.opcionais.groupBy({
+      by: ['idProduto'],
+      where: {
+        Reserva: {
+          idExcursao
+        }
+      },
+      _sum: {
+        qtd: true
+      },
+    })
+
+    return summary
+  }
+
+  findByProduto = async (idProduto: string): Promise<IOpcionaisResponse> => {
+
+    const opcionais = await this.prisma.opcionais.findFirst({
+      where: {
+        idProduto
+      },
+      include: {
+        Produto: true
+      }
+    })
+
+    if (!opcionais) {
+      throw new Warning('Opcional não encontrado', 400)
+    }
+
+    return opcionais
   }
 }
 

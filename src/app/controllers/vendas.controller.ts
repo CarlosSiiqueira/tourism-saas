@@ -5,6 +5,7 @@ import { formatIndexFilters } from "../../shared/utils/filters";
 import { FinanceiroService } from "../services/financeiro.service";
 import { FormaPagamentoService } from "../services/forma.pagamento.service";
 import { LogService } from "../services/log.service";
+import { OpcionaisService } from "../services/opcionais.service";
 
 @injectable()
 class VendasController {
@@ -14,7 +15,8 @@ class VendasController {
     private vendasRepository: VendasRepository,
     private financeiroService: FinanceiroService,
     private formaPagamentoService: FormaPagamentoService,
-    private logService: LogService
+    private logService: LogService,
+    private opcionaisService: OpcionaisService
   ) { }
 
   index = async (request: Request, response: Response): Promise<void> => {
@@ -31,6 +33,13 @@ class VendasController {
     let user = JSON.parse(request.headers.user as string);
 
     const res = await this.vendasRepository.create(request.body)
+
+    const opcional = await this.opcionaisService.create({
+      idReserva: request.body.reserva,
+      idProduto: request.body.codigoProduto,
+      qtd: request.body.qtd,
+      codigoUsuario: user.id
+    })
 
     await this.logService.create({
       tipo: 'CREATE',

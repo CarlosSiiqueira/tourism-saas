@@ -54,4 +54,11 @@ export class ExcursaoQuartosService {
 
     return quartos
   }
+
+  deleteManyByIdPassageiro = async (idPassageiros: string[], idExcursao: string): Promise<any> => {
+
+    const passageiro = await this.excursaoQuartoRepositroy.deleteManyByIdPassageiro(idPassageiros, idExcursao);
+
+    return passageiro
+  }
 }

@@ -20,7 +20,7 @@ class ExcursaoPassageirosRepository implements IExcursaoPassageiros {
     skip,
     take,
     filter }: IIndex,
-    idExcursao: string): Promise<{ count: number, rows: IExcursaoPassageirosEmbarqueReponse[] }> => {
+    idExcursao: string): Promise<{ count: number, rows: IExcursaoPassageirosResponse[] }> => {
 
     const where = {
       idExcursao: idExcursao
@@ -58,6 +58,27 @@ class ExcursaoPassageirosRepository implements IExcursaoPassageiros {
             localEmbarque: value
           })
           break;
+
+        case 'idReserva':
+          Object.assign(where, {
+            AND: [{
+              reserva: value
+            }]
+          })
+          break;
+
+        case 'opcional':
+          Object.assign(where, {
+            Reservas: {
+              Opcionais: {
+                every: {
+                  Produto: {
+                    id: value
+                  }
+                }
+              }
+            }
+          })
       }
     })
 
@@ -73,7 +94,17 @@ class ExcursaoPassageirosRepository implements IExcursaoPassageiros {
         include: {
           Pessoa: true,
           LocalEmbarque: true,
-          Reservas: true
+          Excursao: true,
+          Onibus: true,
+          Reservas: {
+            include: {
+              Opcionais: {
+                include: {
+                  Produto: true
+                }
+              }
+            }
+          }
         }
       })
     ])
@@ -193,7 +224,20 @@ class ExcursaoPassageirosRepository implements IExcursaoPassageiros {
             status: true,
             codigoUsuario: true,
             desconto: true,
-            plataforma: true
+            plataforma: true,
+            Opcionais: {
+              select: {
+                id: true,
+                qtd: true,
+                idReserva: true,
+                Produto: {
+                  select: {
+                    id: true,
+                    nome: true
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -265,7 +309,20 @@ class ExcursaoPassageirosRepository implements IExcursaoPassageiros {
             status: true,
             codigoUsuario: true,
             desconto: true,
-            plataforma: true
+            plataforma: true,
+            Opcionais: {
+              select: {
+                id: true,
+                qtd: true,
+                idReserva: true,
+                Produto: {
+                  select: {
+                    id: true,
+                    nome: true
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -285,6 +342,7 @@ class ExcursaoPassageirosRepository implements IExcursaoPassageiros {
         idExcursao
       },
       select: {
+        id: true,
         Reservas: {
           select: {
             reserva: true
@@ -304,7 +362,7 @@ class ExcursaoPassageirosRepository implements IExcursaoPassageiros {
     }
 
     const response = excursaoPassageiros.map((passageiro) => {
-      return { ...passageiro.Pessoa, 'reserva': passageiro.Reservas.reserva }
+      return { id: passageiro.id, Pessoa: { ...passageiro.Pessoa }, 'reserva': passageiro.Reservas.reserva }
     })
 
     return response;
@@ -374,7 +432,20 @@ class ExcursaoPassageirosRepository implements IExcursaoPassageiros {
             status: true,
             codigoUsuario: true,
             desconto: true,
-            plataforma: true
+            plataforma: true,
+            Opcionais: {
+              select: {
+                id: true,
+                qtd: true,
+                idReserva: true,
+                Produto: {
+                  select: {
+                    id: true,
+                    nome: true
+                  }
+                }
+              }
+            }
           }
         }
       }

@@ -4,6 +4,8 @@ import { Request, Response } from 'express'
 import { formatIndexFilters } from '../../shared/utils/filters'
 import { ExcursaoService } from '../services/excursao.service'
 import { ExcursaoQuartosService } from '../services/excursao.quarto.service'
+import { ExcursaoOnibusService } from '../services/excursao.onibus.service'
+import { OpcionaisService } from '../services/opcionais.service'
 
 @injectable()
 class ExcursaoPassageirosController {
@@ -12,7 +14,9 @@ class ExcursaoPassageirosController {
     @inject("ExcursaoPassageirosRepository")
     private excursaoPassageirosRepository: ExcursaoPassageirosRepository,
     private excursaoService: ExcursaoService,
-    private excursaoQuartoService: ExcursaoQuartosService
+    private excursaoQuartoService: ExcursaoQuartosService,
+    private excursaoOnibusService: ExcursaoOnibusService,
+    private opcionaisService: OpcionaisService
   ) { }
 
   index = async (request: Request, response: Response): Promise<void> => {
@@ -21,7 +25,9 @@ class ExcursaoPassageirosController {
 
     const res = await this.excursaoPassageirosRepository.index({ orderBy, order, skip, take, filter }, request.params.idExcursao)
 
-    response.status(200).send(res)
+    const summary = await this.opcionaisService.summary(request.params.idExcursao)
+
+    response.status(200).send({ passageiros: res, summary: summary })
   }
 
   create = async (request: Request, response: Response): Promise<void> => {
@@ -64,6 +70,15 @@ class ExcursaoPassageirosController {
   delete = async (request: Request, response: Response): Promise<void> => {
 
     const res = await this.excursaoPassageirosRepository.delete(request.params.idPassageiro, request.params.idExcursao)
+
+    response.status(200).send(res)
+  }
+
+  listPassageirosNoChair = async (request: Request, response: Response): Promise<void> => {
+
+    const passageiros = await this.excursaoPassageirosRepository.listPassageiros(request.params.idExcursao)
+    const onibus = await this.excursaoOnibusService.findAll(request.params.idExcursao)
+    const res = await this.excursaoService.filterPassageirosWithoutChair(passageiros, onibus);
 
     response.status(200).send(res)
   }

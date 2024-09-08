@@ -6,6 +6,7 @@ export interface IExcursaoQuartos {
   findPassageirosWithRoom(idExcursao: string): Promise<IExcursaoQuartosResponse[]>
   update(data: IExcursaoQuartosDTO, id: string): Promise<string[]>
   delete(id: string): Promise<string[]>
+  deleteManyByIdPassageiro(idPassageiros: string[], idExcursao: string): Promise<string[]>
 }
 
 export interface IExcursaoQuartosDTO {

@@ -46,7 +46,6 @@ model Pessoas {
   Ranking             RankingClientes?      @relation(fields: [rankingClientesId], references: [id])
   rankingClientesId   String?
   Endereco            Endereco[]
-  ExcursaoOnibus      ExcursaoOnibus[]
   PassageiroEmbarque  PassageiroEmbarque[]
   Vendas              Vendas[]
   Transacoes          Transacoes[]
@@ -186,11 +185,11 @@ model ExcursaoOnibus {
   numeroCadeira String
   dataCadastro  DateTime @default(now())
 
-  Pessoa           Pessoas  @relation(fields: [codigoPassageiro], references: [id])
+  Passageiro       ExcursaoPassageiros @relation(fields: [codigoPassageiro], references: [id])
   codigoPassageiro String
-  Excursao         Excursao @relation(fields: [codigoExcursao], references: [id])
+  Excursao         Excursao            @relation(fields: [codigoExcursao], references: [id])
   codigoExcursao   String
-  Usuarios         Usuarios @relation(fields: [usuarioCadastro], references: [id])
+  Usuarios         Usuarios            @relation(fields: [usuarioCadastro], references: [id])
   usuarioCadastro  String
 }
 
@@ -351,6 +350,7 @@ model ExcursaoPassageiros {
   LocalEmbarque LocalEmbarque     @relation(fields: [localEmbarque], references: [id])
   localEmbarque String
   Quartos       ExcursaoQuartos[]
+  Onibus        ExcursaoOnibus[]
 }
 
 model CategoriaTransacao {

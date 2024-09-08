@@ -6,6 +6,7 @@ export interface IExcursaoOnibus {
   find(idCadeira: string): Promise<IExcursaoOnibusResponse>
   findAll(idExcursao: string): Promise<IExcursaoOnibusResponse[]>
   update(data: IExcursaoOnibusDTO, id: string): Promise<IExcursaoOnibusResponse>
+  deleteManyByIdPassageiro(idPassageiros: string[], idExcursao: string): Promise<string[]>
 }
 
 export interface IExcursaoOnibusDTO {
@@ -18,4 +19,11 @@ export interface IExcursaoOnibusDTO {
 
 export interface IExcursaoOnibusResponse extends IExcursaoOnibusDTO {
   id: string
+  Passageiro: {
+    id: string
+    idExcursao: string
+    idPassageiro: string
+    localEmbarque: string
+    reserva: string
+  }
 }
