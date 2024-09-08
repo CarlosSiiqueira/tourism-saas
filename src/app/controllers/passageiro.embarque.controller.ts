@@ -2,13 +2,15 @@ import { inject, injectable } from "tsyringe";
 import { PassageiroEmbarqueRepository } from "../repositories/passageiro.embarque.repository";
 import { Request, Response } from 'express'
 import { formatIndexFilters } from "../../shared/utils/filters";
+import { LogService } from "../services/log.service";
 
 @injectable()
 class PassageiroEmbarqueController {
 
   constructor(
     @inject("PassageiroEmbarqueRepository")
-    private passageiroEmbarqueRepository: PassageiroEmbarqueRepository
+    private passageiroEmbarqueRepository: PassageiroEmbarqueRepository,
+    private logService: LogService
   ) { }
 
   index = async (request: Request, response: Response): Promise<void> => {
@@ -21,7 +23,17 @@ class PassageiroEmbarqueController {
 
   create = async (request: Request, response: Response): Promise<void> => {
 
+    let user = JSON.parse(request.headers.user as string);
+
     const res = await this.passageiroEmbarqueRepository.create(request.body)
+
+    await this.logService.create({
+      tipo: 'CREATE',
+      newData: JSON.stringify({ id: res, ...request.body }),
+      oldData: null,
+      rotina: 'Excursão/Passageiro Embarque',
+      usuariosId: user.id
+    })
 
     response.status(200).send(res)
   }
@@ -49,7 +61,17 @@ class PassageiroEmbarqueController {
 
   embarqueDesembarque = async (request: Request, response: Response): Promise<void> => {
 
+    let user = JSON.parse(request.headers.user as string);
+
     const res = await this.passageiroEmbarqueRepository.embarqueDesembarque(request.body)
+
+    await this.logService.create({
+      tipo: 'UPDATE',
+      newData: JSON.stringify({ acao: res, ...request.body }),
+      oldData: null,
+      rotina: 'Excursão/Passageiro Embarque',
+      usuariosId: user.id
+    })
 
     response.status(200).send(res)
   }

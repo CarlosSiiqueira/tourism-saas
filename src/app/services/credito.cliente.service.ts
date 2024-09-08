@@ -12,14 +12,14 @@ export class CreditoClienteService {
   ) { }
 
 
-  create = async (data: ICreditoClienteDTO): Promise<string[]> => {
+  create = async (data: ICreditoClienteDTO): Promise<string> => {
 
     const credito = await this.creditoClienteRepository.create(data)
 
     return credito
   }
 
-  update = async (data: ICreditoClienteDTO, id: string): Promise<string[]> => {
+  update = async (data: ICreditoClienteDTO, id: string): Promise<ICreditoClienteResponse> => {
 
     const credito = await this.creditoClienteRepository.update(data, id)
 

@@ -65,7 +65,7 @@ class CategoriaTransacaoRepository implements ICategoriaTransacao {
     tipo,
     codigoUsuario,
     codigoSubCategoria
-  }: ICategoriaTransacaoDTO): Promise<string[]> => {
+  }: ICategoriaTransacaoDTO): Promise<string> => {
 
     try {
 
@@ -81,8 +81,7 @@ class CategoriaTransacaoRepository implements ICategoriaTransacao {
         }
       })
 
-      return ['Categoria criada com sucesso']
-
+      return id
     } catch (error) {
       throw new Warning('Não foi possível criar Categoria', 400)
     }
@@ -127,11 +126,11 @@ class CategoriaTransacaoRepository implements ICategoriaTransacao {
     tipo,
     codigoUsuario,
     codigoSubCategoria
-  }: ICategoriaTransacaoDTO, id: string): Promise<string[]> => {
+  }: ICategoriaTransacaoDTO, id: string): Promise<ICategoriaTransacaoResponse> => {
 
     try {
 
-      const venda = await this.prisma.categoriaTransacao.update({
+      const categoriaTransacao = await this.prisma.categoriaTransacao.update({
         data: {
           nome,
           tipo,
@@ -143,11 +142,11 @@ class CategoriaTransacaoRepository implements ICategoriaTransacao {
         }
       })
 
-      if (!venda) {
+      if (!categoriaTransacao) {
         throw new Warning("Categoria não encontrada", 400)
       }
 
-      return ['Categoria atualizada com sucesso']
+      return categoriaTransacao
 
     } catch (error) {
       throw new Warning('Erro ao atualizar categoria', 400)
@@ -155,19 +154,19 @@ class CategoriaTransacaoRepository implements ICategoriaTransacao {
 
   }
 
-  delete = async (id: string): Promise<string[]> => {
+  delete = async (id: string): Promise<ICategoriaTransacaoResponse> => {
 
-    const venda = await this.prisma.categoriaTransacao.delete({
+    const categoriaTransacao = await this.prisma.categoriaTransacao.delete({
       where: {
         id
       }
     })
 
-    if (!venda) {
+    if (!categoriaTransacao) {
       throw new Warning("Categoria não encontrada", 400)
     }
 
-    return ['Categoria excluída com sucesso']
+    return categoriaTransacao
   }
 
 }

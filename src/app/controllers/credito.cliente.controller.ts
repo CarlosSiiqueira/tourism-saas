@@ -2,12 +2,14 @@ import { CreditoClienteRepository } from '../repositories/credito.cliente.reposi
 import { inject, injectable } from "tsyringe"
 import { Request, Response } from "express"
 import { formatIndexFilters } from '../../shared/utils/filters'
+import { LogService } from '../services/log.service'
 
 @injectable()
 class CreditoClienteController {
   constructor(
     @inject("CreditoClienteRepository")
-    private creditoClienteRepository: CreditoClienteRepository
+    private creditoClienteRepository: CreditoClienteRepository,
+    private logService: LogService
   ) { }
 
   index = async (request: Request, response: Response): Promise<void> => {
@@ -22,6 +24,14 @@ class CreditoClienteController {
   create = async (request: Request, response: Response): Promise<void> => {
 
     const res = await this.creditoClienteRepository.create(request.body)
+
+    await this.logService.create({
+      tipo: 'CREATE',
+      newData: JSON.stringify({ id: res, ...request.body }),
+      oldData: null,
+      rotina: 'Crédito Cliente',
+      usuariosId: request.body.usuariosId
+    })
 
     response.status(200).send(res)
   }
@@ -44,14 +54,34 @@ class CreditoClienteController {
 
     const res = await this.creditoClienteRepository.delete(request.params.id)
 
+    if (res) {
+      await this.logService.create({
+        tipo: 'DELETE',
+        newData: JSON.stringify({ id: request.params.id }),
+        oldData: null,
+        rotina: 'Crédito Cliente',
+        usuariosId: request.body.usuariosId
+      })
+    }
+
     response.status(200).send(res)
   }
 
   update = async (request: Request, response: Response): Promise<void> => {
 
-    const res = await this.creditoClienteRepository.update(request.body, request.params.id)
+    const creditoCliente = await this.creditoClienteRepository.update(request.body, request.params.id)
 
-    response.status(200).send(res)
+    if (creditoCliente) {
+      await this.logService.create({
+        tipo: 'UPDATE',
+        newData: JSON.stringify({ id: request.params.id, ...request.body }),
+        oldData: JSON.stringify(creditoCliente),
+        rotina: 'Crédito Cliente',
+        usuariosId: request.body.usuariosId
+      })
+    }
+
+    response.status(200).send(creditoCliente)
   }
 }
 

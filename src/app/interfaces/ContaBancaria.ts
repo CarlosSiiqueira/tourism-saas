@@ -5,11 +5,11 @@ export interface IContaBancaria {
     count: number
     rows: IContaBancariaResponse[]
   }>
-  create(data: IContaBancariaDTO): Promise<string[]>
+  create(data: IContaBancariaDTO): Promise<string>
   find(id: string): Promise<IContaBancariaResponse>
   findAll(): Promise<IContaBancariaResponse[]>
-  delete(id: string): Promise<string>
-  update(data: IContaBancariaDTO, id: string): Promise<string[]>
+  delete(id: string): Promise<IContaBancariaResponse>
+  update(data: IContaBancariaDTO, id: string): Promise<IContaBancariaResponse>
   setSaldo(id: string, saldo: number): Promise<IContaBancariaResponse>
 }
 

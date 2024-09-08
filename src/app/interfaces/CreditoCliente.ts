@@ -5,11 +5,11 @@ export interface ICreditoCliente {
     count: number
     rows: ICreditoClienteResponse[]
   }>
-  create(data: ICreditoClienteDTO): Promise<string[]>
+  create(data: ICreditoClienteDTO): Promise<string>
   find(id: string): Promise<ICreditoClienteResponse>
   findAll(): Promise<ICreditoClienteResponse[]>
   delete(id: string): Promise<string>
-  update(data: ICreditoClienteDTO, id: string): Promise<string[]>
+  update(data: ICreditoClienteDTO, id: string): Promise<ICreditoClienteResponse>
   findByCliente(idCliente: string): Promise<ICreditoClienteResponse[]>
 }
 

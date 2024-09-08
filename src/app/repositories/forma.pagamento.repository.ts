@@ -173,7 +173,7 @@ class FormaPagamentoRepository implements IFormaPagamento {
     taxa12x,
     qtdDiasRecebimento,
     usuarioCadastro
-  }: IFormaPagamentoDTO, id: string): Promise<string[]> => {
+  }: IFormaPagamentoDTO, id: string): Promise<string> => {
 
     const formaPagamento = await this.prisma.formaPagamento.update({
       data: {
@@ -203,10 +203,10 @@ class FormaPagamentoRepository implements IFormaPagamento {
       throw new Warning('Registro não encontrado, falha na atualização', 400)
     }
 
-    return ['Registro atualizado com sucesso']
+    return id
   }
 
-  delete = async (id: string): Promise<string[]> => {
+  delete = async (id: string): Promise<IFormaPagamentoResponse> => {
 
     const formaPagamento = await this.prisma.formaPagamento.delete({
       where: {
@@ -218,7 +218,7 @@ class FormaPagamentoRepository implements IFormaPagamento {
       throw new Warning('Não foi possivel excluir registro, registro não encontrado', 400)
     }
 
-    return ["Registro excluido com sucesso"]
+    return formaPagamento
   }
 }
 

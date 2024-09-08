@@ -108,13 +108,11 @@ class TipoQuartoRepository implements ITipoQuarto {
   update = async ({
     nome,
     codigoUsuario
-  }: ITipoQuartoDTO, id: string): Promise<string[]> => {
+  }: ITipoQuartoDTO, id: string): Promise<ITipoQuartoResponse> => {
 
     try {
 
-      let data = new Date(Date.now())
-
-      const venda = await this.prisma.tipoQuarto.update({
+      const tipoQuarto = await this.prisma.tipoQuarto.update({
         data: {
           nome,
           codigoUsuario
@@ -124,11 +122,11 @@ class TipoQuartoRepository implements ITipoQuarto {
         }
       })
 
-      if (!venda) {
+      if (!tipoQuarto) {
         throw new Warning("Tipo quarto não encontrado", 400)
       }
 
-      return ['Tipo Quarto atualizado com sucesso']
+      return tipoQuarto
 
     } catch (error) {
       throw new Warning('Erro ao atualizar tipo quarto', 400)
@@ -136,19 +134,19 @@ class TipoQuartoRepository implements ITipoQuarto {
 
   }
 
-  delete = async (id: string): Promise<string[]> => {
+  delete = async (id: string): Promise<ITipoQuartoResponse> => {
 
-    const venda = await this.prisma.tipoQuarto.delete({
+    const tipoQuarto = await this.prisma.tipoQuarto.delete({
       where: {
         id
       }
     })
 
-    if (!venda) {
+    if (!tipoQuarto) {
       throw new Warning("Tipo Quarto não encontrado", 400)
     }
 
-    return ['Tipo Quarto excluído com sucesso']
+    return tipoQuarto
   }
 
 }

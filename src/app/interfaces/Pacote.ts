@@ -8,7 +8,7 @@ export interface IPacote {
   create(data: IPacoteDTO): Promise<{ 'pacote': IPacoteResponse, 'success': boolean }>
   find(id: string): Promise<IPacoteResponse>
   findAll(): Promise<IPacoteResponse[]>
-  delete(id: string): Promise<string[]>
+  delete(id: string): Promise<IPacoteResponse>
   update(data: IPacoteDTO, id: string): Promise<{ 'pacote': IPacoteResponse, 'success': boolean }>
   setIdWP(id: string, idWP: number): Promise<string[]>
   getAllByIds(id: Array<number>): Promise<IPacoteResponse[]>

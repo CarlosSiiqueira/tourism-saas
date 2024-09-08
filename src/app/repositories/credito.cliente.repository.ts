@@ -78,7 +78,7 @@ class CreditoClienteRepository implements ICreditoCliente {
     valor,
     pessoasId,
     idReserva,
-    usuariosId }: ICreditoClienteDTO): Promise<string[]> => {
+    usuariosId }: ICreditoClienteDTO): Promise<string> => {
 
     try {
 
@@ -94,7 +94,7 @@ class CreditoClienteRepository implements ICreditoCliente {
         }
       })
 
-      return ['Crédito registrado com sucesso!']
+      return id
     } catch (error) {
       throw new Warning('Houve um error ao gerar crédito', 400)
     }
@@ -102,7 +102,7 @@ class CreditoClienteRepository implements ICreditoCliente {
 
   find = async (id: string): Promise<ICreditoClienteResponse> => {
 
-    const CreditoCliente = await this.prisma.creditoClientes.findUnique({
+    const creditoCliente = await this.prisma.creditoClientes.findUnique({
       where: {
         id
       },
@@ -113,16 +113,16 @@ class CreditoClienteRepository implements ICreditoCliente {
       }
     })
 
-    if (!CreditoCliente) {
+    if (!creditoCliente) {
       throw new Warning("Crédito não encontrada", 400);
     }
 
-    return CreditoCliente
+    return creditoCliente
   }
 
   findAll = async (): Promise<ICreditoClienteResponse[]> => {
 
-    const contasBancarias = await this.prisma.creditoClientes.findMany({
+    const creditoClientes = await this.prisma.creditoClientes.findMany({
       where: {
         ativo: true
       },
@@ -133,11 +133,11 @@ class CreditoClienteRepository implements ICreditoCliente {
       }
     })
 
-    if (!contasBancarias) {
+    if (!creditoClientes) {
       throw new Warning("Sem créditos cadastrados na base", 400)
     }
 
-    return contasBancarias
+    return creditoClientes
   }
 
   findByCliente = async (idCliente: string): Promise<ICreditoClienteResponse[]> => {
@@ -157,7 +157,7 @@ class CreditoClienteRepository implements ICreditoCliente {
 
   delete = async (id: string): Promise<string> => {
 
-    const CreditoCliente = await this.prisma.creditoClientes.update({
+    const creditoCliente = await this.prisma.creditoClientes.update({
       where: {
         id: id
       },
@@ -166,7 +166,7 @@ class CreditoClienteRepository implements ICreditoCliente {
       }
     })
 
-    if (!CreditoCliente) {
+    if (!creditoCliente) {
       throw new Warning('Registro não encontrado', 400)
     }
 
@@ -177,9 +177,9 @@ class CreditoClienteRepository implements ICreditoCliente {
     valor,
     pessoasId,
     idReserva,
-    usuariosId }: ICreditoClienteDTO, id: string): Promise<string[]> => {
+    usuariosId }: ICreditoClienteDTO, id: string): Promise<ICreditoClienteResponse> => {
 
-    const CreditoCliente = await this.prisma.creditoClientes.update({
+    const creditoCliente = await this.prisma.creditoClientes.update({
       data: {
         valor,
         pessoasId,
@@ -191,11 +191,11 @@ class CreditoClienteRepository implements ICreditoCliente {
       }
     })
 
-    if (!CreditoCliente) {
+    if (!creditoCliente) {
       throw new Warning('Registro não encontrado', 400)
     }
 
-    return ['Registro Atualizado com sucesso'];
+    return creditoCliente
   }
 }
 

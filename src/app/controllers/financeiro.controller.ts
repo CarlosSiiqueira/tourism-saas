@@ -11,6 +11,7 @@ import { EnderecoService } from '../services/endereco.service'
 import { PessoaService } from '../services/pessoa.service'
 import { ExcursaoPassageiroService } from '../services/excursao.passageiro.service'
 import { ContaBancariaService } from '../services/conta.bancaria.service'
+import { LogService } from '../services/log.service'
 
 @injectable()
 class FinanceiroController {
@@ -24,7 +25,8 @@ class FinanceiroController {
     private pessoaService: PessoaService,
     private enderecoService: EnderecoService,
     private excursaoPassageiroService: ExcursaoPassageiroService,
-    private contaBancariaService: ContaBancariaService
+    private contaBancariaService: ContaBancariaService,
+    private logService: LogService
   ) { }
 
   index = async (request: Request, response: Response): Promise<void> => {
@@ -37,6 +39,8 @@ class FinanceiroController {
   }
 
   create = async (request: Request, response: Response): Promise<void> => {
+
+    let user = JSON.parse(request.headers.user as string);
 
     const formaPagamento = await this.formaPagamentoService.find(request.body.codigoFormaPagamento)
 
@@ -52,6 +56,14 @@ class FinanceiroController {
       let tipoMovimentacao = request.body.tipo == 2 ? "C" : "D"
       await this.contaBancariaService.movimentar(request.body.codigoContaBancaria, request.body.valor, tipoMovimentacao)
     }
+
+    await this.logService.create({
+      tipo: 'Create',
+      newData: JSON.stringify({ id: res, ...request.body }),
+      oldData: null,
+      rotina: 'Financeiro',
+      usuariosId: user.id
+    })
 
     response.status(200).send(res)
   }
@@ -159,12 +171,15 @@ class FinanceiroController {
 
   update = async (request: Request, response: Response): Promise<void> => {
 
+    let user = JSON.parse(request.headers.user as string);
+
     const formaPagamento = await this.formaPagamentoService.find(request.body.codigoFormaPagamento)
 
     request.body.dataPrevistaRecebimento = await this.financeiroService.setDataPrevistaPagamento(formaPagamento.qtdDiasRecebimento)
 
     request.body.valor = request.body.tipo == 2 ? await this.formaPagamentoService.calculateTaxes(request.body.valor, formaPagamento.id, 1) : request.body.valor
 
+    const financeiro = await this.financeiroRepository.find(request.params.id)
     const res = await this.financeiroRepository.update(request.body, request.params.id)
 
     if (res && request.body.efetivado) {
@@ -172,10 +187,20 @@ class FinanceiroController {
       await this.contaBancariaService.movimentar(request.body.codigoContaBancaria, request.body.valor, tipoMovimentacao)
     }
 
+    await this.logService.create({
+      tipo: 'UPDATE',
+      newData: JSON.stringify({ id: res, ...request.body }),
+      oldData: JSON.stringify(financeiro),
+      rotina: 'Financeiro',
+      usuariosId: user.id
+    })
+
     response.status(200).send(res)
   }
 
   delete = async (request: Request, response: Response): Promise<void> => {
+
+    let user = JSON.parse(request.headers.user as string);
 
     const financeiro = await this.financeiroRepository.find(request.params.id)
 
@@ -186,23 +211,40 @@ class FinanceiroController {
 
     const res = await this.financeiroRepository.delete(request.params.id)
 
+    await this.logService.create({
+      tipo: 'DELETE',
+      newData: null,
+      oldData: JSON.stringify(financeiro),
+      rotina: 'Financeiro',
+      usuariosId: user.id
+    })
+
     response.status(200).send(res)
   }
 
   setVistoAdmin = async (request: Request, response: Response): Promise<void> => {
 
-    const res = await this.financeiroService.setVistoAdmin(request.body.visto, request.params.id)
+    let user = JSON.parse(request.headers.user as string);
+
+    const res = await this.financeiroRepository.setVistoAdmin(request.body.visto, request.params.id)
+
+    await this.logService.create({
+      tipo: 'UPDATE',
+      newData: JSON.stringify({ id: request.params.id, user: `Usuário ${user.nome} marcou como visto` }),
+      oldData: null,
+      rotina: 'Financeiro/SetVistoAdmin',
+      usuariosId: user.id
+    })
 
     response.status(200).send(res)
   }
 
   efetivarTransacao = async (request: Request, response: Response): Promise<void> => {
 
+    let user = JSON.parse(request.headers.user as string);
     let res: string = ''
     const efetivar = await this.financeiroService.efetivarTransacao(request.params.id)
     const financeiro = await this.financeiroRepository.find(request.params.id)
-
-    // await this.financeiroService.confirmaPagamentoWoo(request.params.id)
 
     if (financeiro && efetivar) {
       let tipoMovimentacao: string = financeiro.tipo == 2 ? "C" : "D"
@@ -213,11 +255,20 @@ class FinanceiroController {
       await this.reservaService.confirmaReserva(financeiro.idReserva)
     }
 
+    await this.logService.create({
+      tipo: 'UPDATE',
+      newData: JSON.stringify(financeiro),
+      oldData: null,
+      rotina: 'Financeiro/Efetivar',
+      usuariosId: user.id
+    })
+
     response.status(200).send(res)
   }
 
   desEfetivar = async (request: Request, response: Response): Promise<void> => {
 
+    let user = JSON.parse(request.headers.user as string);
     let res: string = ''
     const desefetivar = await this.financeiroService.desEfetivar(request.params.id)
     const financeiro = await this.financeiroRepository.find(request.params.id)
@@ -227,10 +278,20 @@ class FinanceiroController {
       res = await this.contaBancariaService.movimentar(financeiro.codigoContaBancaria || '', financeiro.valor, tipoMovimentacao)
     }
 
+    await this.logService.create({
+      tipo: 'UPDATE',
+      newData: JSON.stringify(financeiro),
+      oldData: null,
+      rotina: 'Financeiro/Desefetivar',
+      usuariosId: user.id
+    })
+
     response.status(200).send(res)
   }
 
   clone = async (request: Request, response: Response): Promise<void> => {
+
+    let user = JSON.parse(request.headers.user as string);
 
     const clonedTransaction = await this.financeiroRepository.find(request.params.id)
 
@@ -239,6 +300,14 @@ class FinanceiroController {
       response.status(200).send(id)
       return;
     }
+
+    await this.logService.create({
+      tipo: 'CREATE',
+      newData: JSON.stringify({ id: request.params.id, transacaoClonada: clonedTransaction }),
+      oldData: null,
+      rotina: 'Financeiro/Clonar',
+      usuariosId: user.id
+    })
 
     response.status(301).send('Não foi possivel realizar procedimento')
   }

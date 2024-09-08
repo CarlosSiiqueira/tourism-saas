@@ -4,6 +4,7 @@ import { Request, Response } from "express";
 import { formatIndexFilters } from "../../shared/utils/filters";
 import { FinanceiroService } from "../services/financeiro.service";
 import { FormaPagamentoService } from "../services/forma.pagamento.service";
+import { LogService } from "../services/log.service";
 
 @injectable()
 class VendasController {
@@ -12,7 +13,8 @@ class VendasController {
     @inject("VendasRepository")
     private vendasRepository: VendasRepository,
     private financeiroService: FinanceiroService,
-    private formaPagamentoService: FormaPagamentoService
+    private formaPagamentoService: FormaPagamentoService,
+    private logService: LogService
   ) { }
 
   index = async (request: Request, response: Response): Promise<void> => {
@@ -26,7 +28,17 @@ class VendasController {
 
   create = async (request: Request, response: Response): Promise<void> => {
 
+    let user = JSON.parse(request.headers.user as string);
+
     const res = await this.vendasRepository.create(request.body)
+
+    await this.logService.create({
+      tipo: 'CREATE',
+      newData: JSON.stringify({ id: res, ...request.body }),
+      oldData: null,
+      rotina: 'Vendas',
+      usuariosId: user.id
+    })
 
     response.status(200).send(res)
   }
@@ -47,21 +59,54 @@ class VendasController {
 
   update = async (request: Request, response: Response): Promise<void> => {
 
+    let user = JSON.parse(request.headers.user as string);
+
+    const venda = await this.vendasRepository.find(request.params.id)
     const res = await this.vendasRepository.update(request.body, request.params.id)
+
+    await this.logService.create({
+      tipo: 'UPDATE',
+      newData: JSON.stringify(res),
+      oldData: JSON.stringify(venda),
+      rotina: 'Vendas',
+      usuariosId: user.id
+    })
 
     response.status(200).send(res)
   }
 
   delete = async (request: Request, response: Response): Promise<void> => {
 
+    let user = JSON.parse(request.headers.user as string);
+
     const res = await this.vendasRepository.delete(request.params.id)
+
+    if (res) {
+      await this.logService.create({
+        tipo: 'DELETE',
+        newData: null,
+        oldData: JSON.stringify(res),
+        rotina: 'Vendas',
+        usuariosId: user.id
+      })
+    }
 
     response.status(200).send(res)
   }
 
   efetivar = async (request: Request, response: Response): Promise<void> => {
 
+    let user = JSON.parse(request.headers.user as string);
+
     const venda = await this.vendasRepository.efetivar(request.params.id)
+
+    await this.logService.create({
+      tipo: 'UPDATE',
+      newData: JSON.stringify(venda),
+      oldData: null,
+      rotina: 'Vendas/Efetivar',
+      usuariosId: user.id
+    })
 
     if (venda) {
       const formaPagamento = await this.formaPagamentoService.find(venda.codigoFormaPagamento)
@@ -78,6 +123,14 @@ class VendasController {
       request.body.codigoFormaPagamento = formaPagamento.id
 
       const res = await this.financeiroService.create(request.body);
+
+      await this.logService.create({
+        tipo: 'UPDATE',
+        newData: JSON.stringify({ id: res, ...request.body }),
+        oldData: null,
+        rotina: 'Vendas/Efetivar/Financeiro',
+        usuariosId: user.id
+      })
     }
 
     response.status(200).send(venda)
@@ -85,7 +138,17 @@ class VendasController {
 
   desEfetivar = async (request: Request, response: Response): Promise<void> => {
 
+    let user = JSON.parse(request.headers.user as string);
+
     const venda = await this.vendasRepository.desEfetivar(request.params.id)
+
+    await this.logService.create({
+      tipo: 'UPDATE',
+      newData: JSON.stringify(venda),
+      oldData: null,
+      rotina: 'Vendas/Desefetivar',
+      usuariosId: user.id
+    })
 
     response.status(200).send(venda)
   }

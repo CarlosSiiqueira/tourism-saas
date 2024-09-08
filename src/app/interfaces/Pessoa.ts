@@ -6,8 +6,8 @@ export interface IPessoa {
   find(id: string): Promise<IPessoaResponse | null>
   findAll(): Promise<IPessoaResponse[]>
   findByCpf(cpf: string): Promise<IPessoaResponse | null>
-  delete(id: string): Promise<string[]>
-  update(data: IPessoaDTO, id: string, codigoEndereco: string): Promise<string[]>
+  delete(id: string): Promise<IPessoaDeleteResponse>
+  update(data: IPessoaDTO, id: string, codigoEndereco: string): Promise<IPessoaResponse>
 }
 
 export interface IPessoaDTO {
@@ -86,4 +86,8 @@ export interface IPessoaReportResponse extends IPessoaResponse {
   }>
   valorTotal?: number | null
   count?: number | null
+}
+
+export interface IPessoaDeleteResponse extends IPessoaDTO {
+  id: string
 }

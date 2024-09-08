@@ -8,8 +8,8 @@ export interface IRankingCliente {
   create(data: IRankingClienteDTO): Promise<string>
   find(id: string): Promise<IRankingClienteResponse | null>
   findAll(): Promise<IRankingClienteResponse[]>
-  delete(id: string): Promise<string[]>
-  update(data: IRankingClienteDTO, id: string): Promise<string>
+  delete(id: string): Promise<IRankingClienteResponse>
+  update(data: IRankingClienteDTO, id: string): Promise<IRankingClienteResponse>
 }
 
 

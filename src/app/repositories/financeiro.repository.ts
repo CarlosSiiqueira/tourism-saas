@@ -365,7 +365,7 @@ class FinanceiroRepository implements IFinanceiro {
     codigoCategoria,
     idReserva,
     usuarioCadastro
-  }: IFinanceiroDTO, id: string): Promise<string[]> => {
+  }: IFinanceiroDTO, id: string): Promise<string> => {
 
     try {
 
@@ -397,14 +397,14 @@ class FinanceiroRepository implements IFinanceiro {
         }
       })
 
-      return ['Transação atualizada com sucesso']
+      return id
 
     } catch (error) {
       throw new Warning('Houve um error ao atualizar transação', 400)
     }
   }
 
-  delete = async (id: string): Promise<string[]> => {
+  delete = async (id: string): Promise<string> => {
 
     const financeiro = await this.prisma.transacoes.delete({
       where: {
@@ -416,7 +416,7 @@ class FinanceiroRepository implements IFinanceiro {
       throw new Warning('Transação não encontrada', 400)
     }
 
-    return [id]
+    return id
   }
 
   setVistoAdmin = async (visto: boolean, id: string): Promise<string[]> => {

@@ -5,8 +5,8 @@ export interface IFormaPagamento {
   create(data: IFormaPagamentoDTO): Promise<string[]>
   find(id: string): Promise<IFormaPagamentoResponse | null>
   findAll(): Promise<IFormaPagamentoResponse[]>
-  delete(id: string): Promise<string[]>
-  update(data: IFormaPagamentoDTO, id: string): Promise<string[]>
+  delete(id: string): Promise<IFormaPagamentoResponse>
+  update(data: IFormaPagamentoDTO, id: string): Promise<string>
 }
 
 export interface IFormaPagamentoDTO {

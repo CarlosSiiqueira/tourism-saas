@@ -7,6 +7,7 @@ import { PacoteRepository } from '../repositories/pacote.repository'
 import { FinanceiroService } from '../services/financeiro.service'
 import { FormaPagamentoService } from '../services/forma.pagamento.service'
 import { dateValidate } from '../../shared/helper/date'
+import { LogService } from '../services/log.service'
 
 @injectable()
 class ExcursaoController {
@@ -16,7 +17,7 @@ class ExcursaoController {
     private excursaoRepository: ExcursaoRepository,
     private pacoteService: PacoteService,
     private financeiroService: FinanceiroService,
-    private formaPagamentoService: FormaPagamentoService
+    private logService: LogService
   ) { }
 
   index = async (request: Request, response: Response): Promise<void> => {
@@ -30,6 +31,8 @@ class ExcursaoController {
 
   create = async (request: Request, response: Response): Promise<void> => {
 
+    let user = JSON.parse(request.headers.user as string);
+
     const excursao = await this.excursaoRepository.create(request.body)
 
     const result = await Promise.all(
@@ -42,11 +45,19 @@ class ExcursaoController {
         request.body.valor = item.valor
         request.body.codigoExcursao = excursao
         request.body.codigoFormaPagamento = item.codigoFormaPagamento
-        request.body.codigoFornecedor = item.idFornecedor 
+        request.body.codigoFornecedor = item.idFornecedor
 
         const financeiro = await this.financeiroService.create(request.body)
       })
     )
+
+    await this.logService.create({
+      tipo: 'CREATE',
+      newData: JSON.stringify({ id: excursao, ...request.body }),
+      oldData: null,
+      rotina: 'Excursões',
+      usuariosId: user.id
+    })
 
     response.status(200).send(excursao)
   }
@@ -68,7 +79,19 @@ class ExcursaoController {
 
   delete = async (request: Request, response: Response): Promise<void> => {
 
+    let user = JSON.parse(request.headers.user as string);
+
     const res = await this.excursaoRepository.delete(request.params.id)
+
+    if (res) {
+      await this.logService.create({
+        tipo: 'DELETE',
+        newData: JSON.stringify({ id: request.params.id }),
+        oldData: null,
+        rotina: 'Excursões',
+        usuariosId: user.id
+      })
+    }
 
     response.status(200).send(res)
 
@@ -76,12 +99,27 @@ class ExcursaoController {
 
   update = async (request: Request, response: Response): Promise<void> => {
 
-    const res = await this.excursaoRepository.update(request.body, request.params.id)
+    let user = JSON.parse(request.headers.user as string);
 
-    response.status(200).send(res)
+    const oldExcrusao = await this.excursaoRepository.find(request.params.id)
+    const excursao = await this.excursaoRepository.update(request.body, request.params.id)
+
+    if (excursao) {
+      await this.logService.create({
+        tipo: 'UPDATE',
+        newData: JSON.stringify({ id: request.params.id, ...request.body }),
+        oldData: JSON.stringify(oldExcrusao),
+        rotina: 'Excursões',
+        usuariosId: user.id
+      })
+    }
+
+    response.status(200).send(excursao)
   }
 
   publish = async (request: Request, response: Response): Promise<void> => {
+
+    let user = JSON.parse(request.headers.user as string);
 
     const excursao = await this.excursaoRepository.publish(request.params.id)
 
@@ -89,6 +127,14 @@ class ExcursaoController {
       const pacote = await this.pacoteService.find(excursao.codigoPacote)
       const pacoteWP = await this.pacoteService.createEvent(excursao.nome, excursao.dataInicio.toISOString().split('T')[0], excursao.dataFim.toISOString().split('T')[0], excursao.observacoes || '')
       await this.pacoteService.setIdWP(pacote.id, pacoteWP.id)
+
+      await this.logService.create({
+        tipo: 'UPDATE',
+        newData: JSON.stringify(excursao),
+        oldData: null,
+        rotina: 'Excursões/Publicar',
+        usuariosId: user.id
+      })
     }
 
     response.status(200).send('Excursão publicada com sucesso')
@@ -96,7 +142,17 @@ class ExcursaoController {
 
   concluir = async (request: Request, response: Response): Promise<void> => {
 
+    let user = JSON.parse(request.headers.user as string);
+
     const excursao = await this.excursaoRepository.concluir(request.params.id)
+
+    await this.logService.create({
+      tipo: 'UPDATE',
+      newData: JSON.stringify(excursao),
+      oldData: null,
+      rotina: 'Excursões/Concluir',
+      usuariosId: user.id
+    })
 
     response.status(200).send('Excursão concluída com sucesso')
   }

@@ -1,9 +1,9 @@
 export interface IVendas {
-  create(data: IVendasDTO): Promise<string[]>
+  create(data: IVendasDTO): Promise<string>
   find(id: string): Promise<IVendasResponse | null>
   findAll(): Promise<IVendasResponse[]>
-  delete(id: string): Promise<string[]>
-  update(data: IVendasDTO, id: string): Promise<string[]>
+  delete(id: string): Promise<IVendasResponse>
+  update(data: IVendasDTO, id: string): Promise<IVendasResponse>
   efetivar(id: string): Promise<IVendasResponse>
   desEfetivar(id: string): Promise<IVendasResponse>
 }

@@ -4,13 +4,15 @@ import { Request, Response } from 'express'
 import { EnderecoRepository } from '../repositories/endereco.repository'
 import { EnderecoService } from '../services/endereco.service'
 import { formatIndexFilters } from '../../shared/utils/filters'
+import { LogService } from '../services/log.service'
 
 @injectable()
 class PessoaController {
   constructor(
     @inject("PessoaRepository")
     private pessoaRepository: PessoaRepository,
-    private enderecoService: EnderecoService
+    private enderecoService: EnderecoService,
+    private logService: LogService
   ) { }
 
   index = async (request: Request, response: Response): Promise<void> => {
@@ -44,7 +46,17 @@ class PessoaController {
       return;
     }
 
+    let user = JSON.parse(request.headers.user as string);
+
     const res = await this.pessoaRepository.create(request.body, codigoEndereco)
+
+    await this.logService.create({
+      tipo: 'CREATE',
+      newData: JSON.stringify({ id: res, ...request.body }),
+      oldData: '',
+      rotina: 'Cliente',
+      usuariosId: user.id
+    })
 
     response.status(200).send(res)
   }
@@ -92,14 +104,37 @@ class PessoaController {
       return;
     }
 
-    const res = await this.pessoaRepository.update(request.body, request.params.id, codigoEndereco)
+    let user = JSON.parse(request.headers.user as string);
 
-    response.status(200).send(res)
+    const oldPessoa = await this.pessoaRepository.find(request.params.id)
+    const pessoa = await this.pessoaRepository.update(request.body, request.params.id, codigoEndereco)
+
+    await this.logService.create({
+      tipo: 'UPDATE',
+      newData: JSON.stringify(pessoa),
+      oldData: JSON.stringify(oldPessoa),
+      rotina: 'Cliente',
+      usuariosId: user.id
+    })
+
+    response.status(200).send(pessoa)
   }
 
   delete = async (request: Request, response: Response): Promise<void> => {
 
+    let user = JSON.parse(request.headers.user as string);
+
     const res = await this.pessoaRepository.delete(request.params.id)
+
+    if (res) {
+      await this.logService.create({
+        tipo: 'DELETE',
+        newData: JSON.stringify(res),
+        oldData: null,
+        rotina: 'Cliente',
+        usuariosId: user.id
+      })
+    }
 
     response.status(200).send(res)
   }

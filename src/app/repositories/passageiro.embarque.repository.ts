@@ -70,7 +70,7 @@ class PassageiroEmbarqueRepository implements IPassageiroEmbarque {
     codigoLocalEmbarque,
     codigoExcursao,
     codigoPassageiro,
-    usuarioCadastro }: IPassageiroEmbarqueDTO): Promise<string[]> => {
+    usuarioCadastro }: IPassageiroEmbarqueDTO): Promise<string> => {
 
     try {
 
@@ -88,7 +88,7 @@ class PassageiroEmbarqueRepository implements IPassageiroEmbarque {
         }
       })
 
-      return ['Embarque registrado com sucesso']
+      return id
     } catch (error) {
       throw new Warning('Erro ao inserir embarque', 400)
     }

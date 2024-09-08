@@ -1,9 +1,9 @@
 export interface ILocalEmbarque {
-  create(data: ILocalEmbarqueDTO): Promise<string[]>
+  create(data: ILocalEmbarqueDTO): Promise<string>
   find(id: string): Promise<ILocalEmbarqueResponse | null>
   findAll(): Promise<ILocalEmbarqueResponse[]>
-  delete(id: string): Promise<string[]>
-  update(data: ILocalEmbarqueDTO, id: string): Promise<string[]>
+  delete(id: string): Promise<ILocalEmbarqueResponse>
+  update(data: ILocalEmbarqueDTO, id: string): Promise<ILocalEmbarqueResponse>
 }
 
 

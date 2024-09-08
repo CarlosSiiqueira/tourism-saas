@@ -69,7 +69,7 @@ class LocalEmbarqueRepository implements ILocalEmbarque {
     horaEmbarque,
     codigoEndereco,
     usuarioCadastro,
-  }: ILocalEmbarqueDTO): Promise<string[]> => {
+  }: ILocalEmbarqueDTO): Promise<string> => {
 
     try {
 
@@ -86,7 +86,7 @@ class LocalEmbarqueRepository implements ILocalEmbarque {
         }
       })
 
-      return ['LocalEmbarque inserido com sucesso']
+      return id
 
     } catch (error) {
       throw new Warning('Erro ao inserir LocalEmbarque', 400)
@@ -129,7 +129,7 @@ class LocalEmbarqueRepository implements ILocalEmbarque {
     observacoes,
     horaEmbarque,
     codigoEndereco,
-    usuarioCadastro }: ILocalEmbarqueDTO, id: string): Promise<string[]> => {
+    usuarioCadastro }: ILocalEmbarqueDTO, id: string): Promise<ILocalEmbarqueResponse> => {
 
     try {
 
@@ -147,14 +147,14 @@ class LocalEmbarqueRepository implements ILocalEmbarque {
         }
       })
 
-      return ['Local de embarque atualizado com sucesso']
+      return localEmbarque
 
     } catch (error) {
       throw new Warning('Erro ao atualizar LocalEmbarque', 400)
     }
   }
 
-  delete = async (id: string): Promise<string[]> => {
+  delete = async (id: string): Promise<ILocalEmbarqueResponse> => {
 
     const localEmbarque = await this.prisma.localEmbarque.update({
       data: {
@@ -169,7 +169,7 @@ class LocalEmbarqueRepository implements ILocalEmbarque {
       throw new Warning('Não foi possível excluir o Local de embarque', 400)
     }
 
-    return ['Local de embarque excluido com sucesso']
+    return localEmbarque
   }
 }
 

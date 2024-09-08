@@ -57,7 +57,7 @@ class ExcursaoOnibusRepository implements IExcursaoOnibus {
     codigoExcursao,
     codigoPassageiro,
     usuarioCadastro
-  }: IExcursaoOnibusDTO): Promise<string[]> => {
+  }: IExcursaoOnibusDTO): Promise<string> => {
 
     try {
 
@@ -77,18 +77,17 @@ class ExcursaoOnibusRepository implements IExcursaoOnibus {
         throw new Warning('excursao sem Onibus configurados', 400)
       }
 
-      return ['Cadeira do onibus definidos com sucesso']
+      return id
 
     } catch (error) {
-      return ['Erro ao definir cadeira']
+      return 'Erro ao definir cadeira'
     }
   }
 
-  find = async (idExcursao: string, idCadeira: string): Promise<IExcursaoOnibusResponse> => {
+  find = async (idCadeira: string): Promise<IExcursaoOnibusResponse> => {
 
     const excursaoOnibus = await this.prisma.excursaoOnibus.findFirst({
       where: {
-        codigoExcursao: idExcursao,
         id: idCadeira
       },
       include: {
@@ -126,7 +125,7 @@ class ExcursaoOnibusRepository implements IExcursaoOnibus {
   update = async ({
     numeroCadeira,
     codigoPassageiro,
-    usuarioCadastro }: IExcursaoOnibusDTO, id: string): Promise<string[]> => {
+    usuarioCadastro }: IExcursaoOnibusDTO, id: string): Promise<IExcursaoOnibusResponse> => {
 
     const excursaoOnibus = await this.prisma.excursaoOnibus.update({
       data: {
@@ -144,7 +143,7 @@ class ExcursaoOnibusRepository implements IExcursaoOnibus {
       throw new Warning('registro não encontrado', 400)
     }
 
-    return ['Registro atualizado com sucesso']
+    return excursaoOnibus
   }
 }
 

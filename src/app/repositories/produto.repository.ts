@@ -2,7 +2,7 @@ import { dateValidate } from "../../shared/helper/date"
 import prismaManager from "../database/database"
 import { Warning } from "../errors"
 import { IIndex } from "../interfaces/Helper"
-import { IProduto, IProdutoDTO, IProdutoResponse } from "../interfaces/Produto"
+import { IProduto, IProdutoDeleteResponse, IProdutoDTO, IProdutoResponse } from "../interfaces/Produto"
 import crypto from 'crypto'
 
 class ProdutoRepository implements IProduto {
@@ -110,7 +110,7 @@ class ProdutoRepository implements IProduto {
     ativo,
     codigoFornecedor,
     valor,
-    usuarioCadastro }: IProdutoDTO): Promise<string[]> => {
+    usuarioCadastro }: IProdutoDTO): Promise<string> => {
 
     try {
 
@@ -131,7 +131,7 @@ class ProdutoRepository implements IProduto {
         }
       })
 
-      return ['Produto inserido com sucesso']
+      return id
 
     } catch (error) {
       throw new Warning("Erro ao inserir produto", 400)
@@ -182,7 +182,7 @@ class ProdutoRepository implements IProduto {
     ativo,
     codigoFornecedor,
     valor,
-    usuarioCadastro }: IProdutoDTO, id: string): Promise<string[]> => {
+    usuarioCadastro }: IProdutoDTO, id: string): Promise<IProdutoDTO> => {
 
     try {
       dataCompra = dataCompra && dateValidate(dataCompra)
@@ -202,14 +202,17 @@ class ProdutoRepository implements IProduto {
         }
       })
 
-      return ['Produto atualizado com sucesso']
+      if (!produto) {
+        throw new Warning('Erro ao atualizar produto', 400)
+      }
 
+      return produto
     } catch (error) {
       throw new Warning('Erro ao atualizar produto', 400)
     }
   }
 
-  delete = async (id: string): Promise<string[]> => {
+  delete = async (id: string): Promise<IProdutoDeleteResponse> => {
 
     const produto = await this.prisma.produtos.update({
       data: {
@@ -224,7 +227,7 @@ class ProdutoRepository implements IProduto {
       throw new Warning('Não foi possível excluir o produto', 400)
     }
 
-    return ['Produto excluído com sucesso']
+    return produto
   }
 }
 

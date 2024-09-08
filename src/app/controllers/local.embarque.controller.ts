@@ -3,13 +3,15 @@ import { inject, injectable } from "tsyringe"
 import { Request, Response } from 'express'
 import { EnderecoService } from '../services/endereco.service'
 import { formatIndexFilters } from '../../shared/utils/filters'
+import { LogService } from '../services/log.service'
 
 @injectable()
 class LocalEmbarqueController {
   constructor(
     @inject("LocalEmbarqueRepository")
     private localEmbarqueRepository: LocalEmbarqueRepository,
-    private enderecoService: EnderecoService
+    private enderecoService: EnderecoService,
+    private logService: LogService
   ) { }
 
   index = async (request: Request, response: Response): Promise<void> => {
@@ -44,7 +46,17 @@ class LocalEmbarqueController {
       return;
     }
 
+    let user = JSON.parse(request.headers.user as string);
+
     const res = await this.localEmbarqueRepository.create(request.body)
+
+    await this.logService.create({
+      tipo: 'CREATE',
+      newData: JSON.stringify({ id: res, ...request.body }),
+      oldData: null,
+      rotina: 'Local Embarque',
+      usuariosId: user.id
+    })
 
     response.status(200).send(res)
   }
@@ -65,14 +77,37 @@ class LocalEmbarqueController {
 
   update = async (request: Request, response: Response): Promise<void> => {
 
-    const res = await this.localEmbarqueRepository.update(request.body, request.params.id)
+    let user = JSON.parse(request.headers.user as string);
 
-    response.status(200).send(res)
+    const oldLocalEmbarque = await this.localEmbarqueRepository.find(request.params.id)
+    const localEmbarque = await this.localEmbarqueRepository.update(request.body, request.params.id)
+
+    await this.logService.create({
+      tipo: 'UPDATE',
+      newData: JSON.stringify(localEmbarque),
+      oldData: JSON.stringify(oldLocalEmbarque),
+      rotina: 'Local Embarque',
+      usuariosId: user.id
+    })
+
+    response.status(200).send(localEmbarque)
   }
 
   delete = async (request: Request, response: Response): Promise<void> => {
 
+    let user = JSON.parse(request.headers.user as string);
+
     const res = await this.localEmbarqueRepository.delete(request.params.id)
+
+    if (res) {
+      await this.logService.create({
+        tipo: 'DELETE',
+        newData: null,
+        oldData: JSON.stringify(res),
+        rotina: 'Local Embarque',
+        usuariosId: user.id
+      })
+    }
 
     response.status(200).send(res)
   }

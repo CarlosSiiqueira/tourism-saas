@@ -7,6 +7,7 @@ import { FormaPagamentoService } from '../services/forma.pagamento.service'
 import { ExcursaoPassageiroService } from '../services/excursao.passageiro.service'
 import { CreditoClienteService } from '../services/credito.cliente.service'
 import { OpcionaisService } from '../services/opcionais.service'
+import { LogService } from '../services/log.service'
 
 @injectable()
 class ReservaController {
@@ -17,7 +18,8 @@ class ReservaController {
     private formaPagamentoService: FormaPagamentoService,
     private excursaoPassageiroService: ExcursaoPassageiroService,
     private creditoClienteService: CreditoClienteService,
-    private opcionaisService: OpcionaisService
+    private opcionaisService: OpcionaisService,
+    private logService: LogService
   ) { }
 
   index = async (request: Request, response: Response): Promise<void> => {
@@ -33,10 +35,21 @@ class ReservaController {
 
     const passageiro = await this.excursaoPassageiroService.findByIdPessoa(request.body.passageiros, request.body.idExcursao)
     let resp = 'Esse Passageiro já está nessa excursão'
+    let user = JSON.parse(request.headers.user as string);
 
     if (!passageiro.length) {
       let observacoes = ''
       const reserva = await this.reservaRepository.create(request.body)
+
+      await this.logService.create({
+        tipo: 'CREATE',
+        newData: JSON.stringify({ id: reserva, ...request.body }),
+        oldData: null,
+        rotina: 'Rersevas',
+        usuariosId: user.id
+      })
+
+
       const formaPagamento = await this.formaPagamentoService.find(request.body.codigoFormaPagamento)
 
       if (request.body.opcionais.length) {
@@ -66,7 +79,15 @@ class ReservaController {
       request.body.valor = request.body.total
       request.body.codigoExcursao = request.body.idExcursao
 
-      await this.financeiroService.create(request.body)
+      const financeiro = await this.financeiroService.create(request.body)
+
+      await this.logService.create({
+        tipo: 'CREATE',
+        newData: JSON.stringify({ id: financeiro, ...request.body }),
+        oldData: null,
+        rotina: 'Rersevas/Financeiro',
+        usuariosId: user.id
+      })
 
       await Promise.all(
         request.body.passageiros.map(async (passageiro: string) => {
@@ -100,6 +121,8 @@ class ReservaController {
 
   delete = async (request: Request, response: Response): Promise<void> => {
 
+    let user = JSON.parse(request.headers.user as string);
+
     const reserva = await this.reservaRepository.find(request.params.id)
 
     const idPassageiros = reserva.Pessoa.map((passageiro) => {
@@ -108,6 +131,14 @@ class ReservaController {
 
     await this.excursaoPassageiroService.deleteMultiple(idPassageiros, reserva.Excursao.id)
     const res = await this.reservaRepository.delete(request.params.id)
+
+    await this.logService.create({
+      tipo: 'DELETE',
+      newData: null,
+      oldData: JSON.stringify(reserva),
+      rotina: 'Rersevas',
+      usuariosId: user.id
+    })
 
     if (reserva.Transacoes?.length) {
       await Promise.all(
@@ -122,6 +153,8 @@ class ReservaController {
 
   cancelar = async (request: Request, response: Response): Promise<void> => {
 
+    let user = JSON.parse(request.headers.user as string);
+
     const reserva = await this.reservaRepository.find(request.params.id)
 
     const idPassageiros = reserva.Pessoa.map((passageiro) => {
@@ -130,6 +163,14 @@ class ReservaController {
 
     await this.excursaoPassageiroService.deleteMultiple(idPassageiros, reserva.Excursao.id)
     const res = await this.reservaRepository.delete(request.params.id)
+
+    await this.logService.create({
+      tipo: 'DELETE',
+      newData: null,
+      oldData: JSON.stringify(reserva),
+      rotina: 'Rersevas/Cancelar',
+      usuariosId: user.id
+    })
 
     if (reserva.status) {
       await Promise.all(
@@ -150,10 +191,20 @@ class ReservaController {
   update = async (request: Request, response: Response): Promise<void> => {
 
     let observacoes = ''
+    let user = JSON.parse(request.headers.user as string);
 
+    const currentReserva = await this.reservaRepository.find(request.params.id)
     const financeiro = await this.financeiroService.find(request.body.Transacoes[0].id)
     await this.excursaoPassageiroService.deleteMultiple(request.body.passageiros, request.body.idExcursao)
     const reserva = await this.reservaRepository.update(request.body, request.params.id)
+
+    await this.logService.create({
+      tipo: 'UPDATE',
+      newData: JSON.stringify({ id: request.params.id, ...request.body }),
+      oldData: JSON.stringify(currentReserva),
+      rotina: 'Rersevas',
+      usuariosId: user.id
+    })
 
     await Promise.all(
       request.body.passageiros.map(async (passageiro: string) => {

@@ -119,7 +119,7 @@ class RankingClientesRepository implements IRankingCliente {
     nome,
     qtdMinViagens,
     qtdMaxViagens,
-    usuariosId }: IRankingClienteDTO, id: string): Promise<string> => {
+    usuariosId }: IRankingClienteDTO, id: string): Promise<IRankingClienteResponse> => {
 
     try {
 
@@ -135,13 +135,13 @@ class RankingClientesRepository implements IRankingCliente {
         }
       })
 
-      return id
+      return ranking
     } catch (error) {
       throw new Warning('Erro ao atualizar produto', 400)
     }
   }
 
-  delete = async (id: string): Promise<string[]> => {
+  delete = async (id: string): Promise<IRankingClienteResponse> => {
 
     const ranking = await this.prisma.rankingClientes.delete({
       where: {
@@ -153,7 +153,7 @@ class RankingClientesRepository implements IRankingCliente {
       throw new Warning('Não foi possível excluir o produto', 400)
     }
 
-    return ['Raking excluído com sucesso']
+    return ranking
   }
 }
 

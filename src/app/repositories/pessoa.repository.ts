@@ -1,6 +1,6 @@
 import crypto from 'crypto';
 import prismaManager from "../database/database";
-import { IPessoa, IPessoaDTO, IPessoaReportResponse, IPessoaResponse } from "../interfaces/Pessoa";
+import { IPessoa, IPessoaDeleteResponse, IPessoaDTO, IPessoaReportResponse, IPessoaResponse } from "../interfaces/Pessoa";
 import { dateValidate } from "../../shared/helper/date";
 import { Warning } from "../errors";
 import { IIndex } from "../interfaces/Helper";
@@ -194,7 +194,7 @@ class PessoaRepository implements IPessoa {
     usuarioCadastro,
     rg,
     emissor,
-    rankingClientesId }: IPessoaDTO, id: string, codigoEndereco: string): Promise<string[]> => {
+    rankingClientesId }: IPessoaDTO, id: string, codigoEndereco: string): Promise<IPessoaResponse> => {
 
     try {
       let endereco = {}
@@ -247,14 +247,14 @@ class PessoaRepository implements IPessoa {
         }
       })
 
-      return ['Pessoa atualizada com sucesso']
+      return pessoa
 
     } catch (error) {
       throw new Warning('Erro ao atualizar pessoa', 400)
     }
   }
 
-  delete = async (id: string): Promise<string[]> => {
+  delete = async (id: string): Promise<IPessoaDeleteResponse> => {
 
     const pessoa = await this.prisma.pessoas.update({
       data: {
@@ -269,7 +269,7 @@ class PessoaRepository implements IPessoa {
       throw new Warning('Não foi possível excluir pessoa', 400)
     }
 
-    return ['Pessoa excluida com sucesso']
+    return pessoa
   }
 }
 

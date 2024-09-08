@@ -63,7 +63,7 @@ class SubCategoriaTransacaoRepository implements ISubCategoriaTransacao {
   create = async ({
     nome,
     codigoUsuario,
-  }: ISubCategoriaTransacaoDTO): Promise<string[]> => {
+  }: ISubCategoriaTransacaoDTO): Promise<string> => {
 
     try {
 
@@ -77,7 +77,7 @@ class SubCategoriaTransacaoRepository implements ISubCategoriaTransacao {
         }
       })
 
-      return ['Subcategoria criada com sucesso']
+      return id
 
     } catch (error) {
       throw new Warning('Não foi possível criar Subcategoria', 400)
@@ -114,11 +114,11 @@ class SubCategoriaTransacaoRepository implements ISubCategoriaTransacao {
   update = async ({
     nome,
     codigoUsuario,
-  }: ISubCategoriaTransacaoDTO, id: string): Promise<string[]> => {
+  }: ISubCategoriaTransacaoDTO, id: string): Promise<ISubCategoriaTransacaoResponse> => {
 
     try {
 
-      const venda = await this.prisma.subCategoriaTransacao.update({
+      const subCategoriaTransacao = await this.prisma.subCategoriaTransacao.update({
         data: {
           nome,
           codigoUsuario
@@ -128,29 +128,29 @@ class SubCategoriaTransacaoRepository implements ISubCategoriaTransacao {
         }
       })
 
-      if (!venda) {
+      if (!subCategoriaTransacao) {
         throw new Warning("Subcategoria não encontrada", 400)
       }
 
-      return ['Subcategoria atualizada com sucesso']
+      return subCategoriaTransacao
     } catch (error) {
       throw new Warning('Erro ao atualizar subcategoria', 400)
     }
   }
 
-  delete = async (id: string): Promise<string[]> => {
+  delete = async (id: string): Promise<ISubCategoriaTransacaoResponse> => {
 
-    const venda = await this.prisma.subCategoriaTransacao.delete({
+    const subCategoriaTransacao = await this.prisma.subCategoriaTransacao.delete({
       where: {
         id
       }
     })
 
-    if (!venda) {
+    if (!subCategoriaTransacao) {
       throw new Warning("Subcategoria não encontrada", 400)
     }
 
-    return ['Subcategoria excluída com sucesso']
+    return subCategoriaTransacao
   }
 
 }

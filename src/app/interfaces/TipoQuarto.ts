@@ -5,8 +5,8 @@ export interface ITipoQuarto {
   create(data: ITipoQuartoDTO): Promise<string[]>
   find(id: string): Promise<ITipoQuartoResponse | null>
   findAll(): Promise<ITipoQuartoResponse[]>
-  delete(id: string): Promise<string[]>
-  update(data: ITipoQuartoDTO, id: string): Promise<string[]>
+  delete(id: string): Promise<ITipoQuartoResponse>
+  update(data: ITipoQuartoDTO, id: string): Promise<ITipoQuartoResponse>
 }
 
 export interface ITipoQuartoDTO {

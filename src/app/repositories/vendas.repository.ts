@@ -74,7 +74,7 @@ class VendasRepository implements IVendas {
     codigoProduto = null,
     codigoExcursao = null,
     usuarioCadastro
-  }: IVendasDTO): Promise<string[]> => {
+  }: IVendasDTO): Promise<string> => {
 
     try {
 
@@ -95,7 +95,7 @@ class VendasRepository implements IVendas {
         }
       })
 
-      return ['Venda criada com sucesso']
+      return id
 
     } catch (error) {
       throw new Warning('Não foi possível criar venda', 400)
@@ -154,7 +154,7 @@ class VendasRepository implements IVendas {
     codigoProduto,
     codigoExcursao,
     usuarioCadastro
-  }: IVendasDTO, id: string): Promise<string[]> => {
+  }: IVendasDTO, id: string): Promise<IVendasResponse> => {
 
     try {
 
@@ -182,7 +182,7 @@ class VendasRepository implements IVendas {
         throw new Warning("Venda não encontrada", 400)
       }
 
-      return ['Venda atualizada com sucesso']
+      return venda
 
     } catch (error) {
       throw new Warning('Erro ao atualizar venda', 400)
@@ -190,7 +190,7 @@ class VendasRepository implements IVendas {
 
   }
 
-  delete = async (id: string): Promise<string[]> => {
+  delete = async (id: string): Promise<IVendasResponse> => {
 
     const venda = await this.prisma.vendas.delete({
       where: {
@@ -202,7 +202,7 @@ class VendasRepository implements IVendas {
       throw new Warning("Venda não encontrada", 400)
     }
 
-    return ['Venda excluída com sucesso']
+    return venda
   }
 
   efetivar = async (id: string): Promise<IVendasResponse> => {

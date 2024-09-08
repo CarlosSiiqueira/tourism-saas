@@ -44,7 +44,7 @@ const authenticateToken = async (request: Request, response: Response, next: Nex
 
   request.headers = {
     ...request.headers,
-    user: JSON.stringify(user)
+    user: JSON.stringify(user.user)
   }
 
   next()

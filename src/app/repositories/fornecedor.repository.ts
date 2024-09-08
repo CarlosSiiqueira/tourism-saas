@@ -110,7 +110,7 @@ class FornecedorRepository implements IFornecedor {
     telefoneContato = '',
     codigoEndereco,
     usuarioCadastro
-  }: IFornecedorDTO): Promise<string[]> => {
+  }: IFornecedorDTO): Promise<string> => {
 
     try {
 
@@ -133,7 +133,7 @@ class FornecedorRepository implements IFornecedor {
         }
       })
 
-      return ['Fornecedor incluído com sucesso']
+      return id
 
     } catch (error) {
       throw new Warning('Erro ao incluir fornecedor', 400)
@@ -188,7 +188,7 @@ class FornecedorRepository implements IFornecedor {
     telefoneContato,
     codigoEndereco,
     usuarioCadastro
-  }: IFornecedorDTO, id: string): Promise<string[]> => {
+  }: IFornecedorDTO, id: string): Promise<IFornecedorResponse> => {
 
     const fornecedor = await this.prisma.fornecedor.update({
       data: {
@@ -214,10 +214,10 @@ class FornecedorRepository implements IFornecedor {
       throw new Warning("Fornecedor não encontrado", 400)
     }
 
-    return ['Fornecedor atualizado com sucesso']
+    return fornecedor
   }
 
-  delete = async (id: string): Promise<string[]> => {
+  delete = async (id: string): Promise<IFornecedorResponse> => {
 
     const fornecedor = await this.prisma.fornecedor.update({
       data: {
@@ -232,7 +232,7 @@ class FornecedorRepository implements IFornecedor {
       throw new Warning("Fornecedor não encontrado", 400)
     }
 
-    return ['Fornecedor excluido com sucesso']
+    return fornecedor
   }
 
 }

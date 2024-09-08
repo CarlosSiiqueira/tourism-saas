@@ -3,13 +3,15 @@ import { inject, injectable } from "tsyringe"
 import { Request, Response } from 'express'
 import { AuthService } from '../services/auth.service'
 import { formatIndexFilters } from '../../shared/utils/filters'
+import { LogService } from '../services/log.service'
 
 @injectable()
 class UsuarioController {
   constructor(
     @inject("UsuarioRepository")
     private usuarioRepository: UsuarioRepository,
-    private authService: AuthService = new AuthService(usuarioRepository)
+    private authService: AuthService = new AuthService(usuarioRepository),
+    private logService: LogService
   ) { }
 
   index = async (request: Request, response: Response): Promise<void> => {
@@ -23,7 +25,17 @@ class UsuarioController {
 
   create = async (request: Request, response: Response): Promise<void> => {
 
+    let user = JSON.parse(request.headers.user as string);
+
     const res = await this.usuarioRepository.create(request.body)
+
+    await this.logService.create({
+      tipo: 'CREATE',
+      newData: JSON.stringify({ id: res, ...request.body }),
+      oldData: null,
+      rotina: 'Usuário',
+      usuariosId: user.id
+    })
 
     response.status(200).send(res)
   }
@@ -44,14 +56,37 @@ class UsuarioController {
 
   update = async (request: Request, response: Response): Promise<void> => {
 
+    let user = JSON.parse(request.headers.user as string);
+
+    const usuario = await this.usuarioRepository.find(request.params.id)
     const res = await this.usuarioRepository.update(request.body, request.params.id)
+
+    await this.logService.create({
+      tipo: 'UPDATE',
+      newData: JSON.stringify(res),
+      oldData: JSON.stringify(usuario),
+      rotina: 'Usuário',
+      usuariosId: user.id
+    })
 
     response.status(200).send(res)
   }
 
   delete = async (request: Request, response: Response): Promise<void> => {
 
+    let user = JSON.parse(request.headers.user as string);
+
     const res = await this.usuarioRepository.delete(request.params.id)
+
+    if (res) {
+      await this.logService.create({
+        tipo: 'DELETE',
+        newData: null,
+        oldData: JSON.stringify(res),
+        rotina: 'Usuário',
+        usuariosId: user.id
+      })
+    }
 
     response.status(200).send(res)
   }

@@ -209,7 +209,7 @@ class PacoteRepository implements IPacote {
     }
   }
 
-  delete = async (id: string): Promise<string[]> => {
+  delete = async (id: string): Promise<IPacoteResponse> => {
 
     try {
 
@@ -222,7 +222,7 @@ class PacoteRepository implements IPacote {
         }
       })
 
-      return ['Pacote excluido com sucesso']
+      return pacote
     } catch (error) {
       throw new Warning('Ocorreu um erro ao excluir pacote', 400)
     }

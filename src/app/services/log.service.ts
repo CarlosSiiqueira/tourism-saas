@@ -15,12 +15,14 @@ export class LogService {
     tipo,
     newData,
     oldData,
+    rotina,
     usuariosId }: ILogDTO): Promise<string[]> => {
 
     const log = await this.logRepository.create({
       tipo,
       newData,
       oldData,
+      rotina,
       usuariosId
     })
 

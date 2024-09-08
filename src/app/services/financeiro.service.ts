@@ -109,14 +109,14 @@ export class FinanceiroService {
     return financeiro
   }
 
-  update = async (data: IFinanceiroDTO, id: string): Promise<string[]> => {
+  update = async (data: IFinanceiroDTO, id: string): Promise<string> => {
 
     const financeiro = await this.financeiroRepository.update(data, id)
 
     return financeiro
   }
 
-  delete = async (id: string): Promise<string[]> => {
+  delete = async (id: string): Promise<string> => {
 
     const financeiro = await this.financeiroRepository.delete(id)
 

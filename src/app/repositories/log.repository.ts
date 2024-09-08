@@ -71,6 +71,7 @@ class LogRepository implements ILog {
     tipo,
     newData,
     oldData,
+    rotina,
     usuariosId }: ILogDTO): Promise<string[]> => {
 
     try {
@@ -83,6 +84,7 @@ class LogRepository implements ILog {
           tipo,
           newData: newData === null ? '' : newData,
           oldData: oldData === null ? '' : oldData,
+          rotina,
           usuariosId
         }
       })
@@ -145,6 +147,7 @@ class LogRepository implements ILog {
     tipo,
     newData,
     oldData,
+    rotina,
     usuariosId }: ILogDTO, id: string): Promise<string[]> => {
 
     const Log = await this.prisma.logs.update({
@@ -152,6 +155,7 @@ class LogRepository implements ILog {
         tipo,
         newData: newData === null ? '' : newData,
         oldData: oldData === null ? '' : oldData,
+        rotina,
         usuariosId
       },
       where: {

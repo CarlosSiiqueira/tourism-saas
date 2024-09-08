@@ -5,11 +5,11 @@ export interface IFornecedor {
     count: number
     rows: IFornecedorResponse[]
   }>
-  create(data: IFornecedorDTO): Promise<string[]>
+  create(data: IFornecedorDTO): Promise<string>
   find(id: string): Promise<IFornecedorResponse | null>
   findAll(): Promise<IFornecedorResponse[]>
-  delete(id: string): Promise<string[]>
-  update(data: IFornecedorDTO, id: string): Promise<string[]>
+  delete(id: string): Promise<IFornecedorResponse>
+  update(data: IFornecedorDTO, id: string): Promise<IFornecedorResponse>
 }
 
 export interface IFornecedorDTO {

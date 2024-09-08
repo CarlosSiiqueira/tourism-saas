@@ -17,6 +17,7 @@ export interface ILogDTO {
   tipo: string
   newData: JsonValue | null
   oldData: JsonValue | null
+  rotina: string
   usuariosId: string
 }
 

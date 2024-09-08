@@ -5,7 +5,7 @@ export interface IPassageiroEmbarque {
     count: number
     rows: IPassageiroEmbarqueResponse[]
   }>
-  create(data: IPassageiroEmbarqueDTO): Promise<string[]>
+  create(data: IPassageiroEmbarqueDTO): Promise<string>
   find(id: string): Promise<IPassageiroEmbarqueResponse>
   findAll(): Promise<IPassageiroEmbarqueResponse[]>
   findByExcursao(idExcursao: string): Promise<IPassageiroEmbarqueResponse[]>

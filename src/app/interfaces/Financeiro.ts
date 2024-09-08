@@ -5,8 +5,8 @@ export interface IFinanceiro {
   create(data: IFinanceiroDTO): Promise<string>
   find(id: string): Promise<IFinanceiroResponse>
   findAll(): Promise<IFinanceiroResponse[]>
-  delete(id: string): Promise<string[]>
-  update(data: IFinanceiroDTO, id: string): Promise<string[]>
+  delete(id: string): Promise<string>
+  update(data: IFinanceiroDTO, id: string): Promise<string>
   setVistoAdmin(visto: boolean, id: string): Promise<string[]>
   checkVistoAdmin(id: string): Promise<boolean>
   efetivaDesfetiva(id: string, acao: boolean): Promise<string[]>

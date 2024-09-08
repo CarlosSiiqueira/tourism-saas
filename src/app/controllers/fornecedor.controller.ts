@@ -4,6 +4,7 @@ import { FornecedorRepository } from "../repositories/fornecedor.repository"
 import { EnderecoRepository } from "../repositories/endereco.repository";
 import { EnderecoService } from "../services/endereco.service";
 import { formatIndexFilters } from "../../shared/utils/filters";
+import { LogService } from "../services/log.service";
 
 @injectable()
 class FornecedorController {
@@ -11,7 +12,8 @@ class FornecedorController {
   constructor(
     @inject("FornecedorRepository")
     private fornecedorRepository: FornecedorRepository,
-    private enderecoService: EnderecoService
+    private enderecoService: EnderecoService,
+    private logService: LogService
   ) { }
 
   index = async (request: Request, response: Response): Promise<void> => {
@@ -46,7 +48,17 @@ class FornecedorController {
       return;
     }
 
+    let user = JSON.parse(request.headers.user as string);
+
     const res = await this.fornecedorRepository.create(request.body)
+
+    await this.logService.create({
+      tipo: 'CREATE',
+      newData: JSON.stringify({ id: res, ...request.body }),
+      oldData: null,
+      rotina: 'Fornecedor',
+      usuariosId: user.id
+    })
 
     response.status(200).send(res)
   }
@@ -67,14 +79,37 @@ class FornecedorController {
 
   update = async (request: Request, response: Response): Promise<void> => {
 
-    const res = await this.fornecedorRepository.update(request.body, request.params.id)
+    let user = JSON.parse(request.headers.user as string);
 
-    response.status(200).send(res)
+    const oldFornecedor = await this.fornecedorRepository.find(request.params.id)
+    const fornecedor = await this.fornecedorRepository.update(request.body, request.params.id)
+
+    await this.logService.create({
+      tipo: 'UPDATE',
+      newData: JSON.stringify({ id: request.params.id, ...request.body }),
+      oldData: JSON.stringify(oldFornecedor),
+      rotina: 'Fornecedor',
+      usuariosId: user.id
+    })
+
+    response.status(200).send(fornecedor)
   }
 
   delete = async (request: Request, response: Response): Promise<void> => {
 
+    let user = JSON.parse(request.headers.user as string);
+
     const res = await this.fornecedorRepository.delete(request.params.id)
+
+    if (res) {
+      await this.logService.create({
+        tipo: 'DELETE',
+        newData: null,
+        oldData: JSON.stringify(res),
+        rotina: 'Fornecedor',
+        usuariosId: user.id
+      })
+    }
 
     response.status(200).send(res)
   }

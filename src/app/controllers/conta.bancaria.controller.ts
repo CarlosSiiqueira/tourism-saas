@@ -2,12 +2,14 @@ import { ContaBancariaRepository } from '../repositories/conta.bancaria.reposito
 import { inject, injectable } from "tsyringe"
 import { Request, Response } from "express"
 import { formatIndexFilters } from '../../shared/utils/filters'
+import { LogService } from '../services/log.service'
 
 @injectable()
 class ContaBancariaController {
   constructor(
     @inject("ContaBancariaRepository")
-    private contaBancariaRepository: ContaBancariaRepository
+    private contaBancariaRepository: ContaBancariaRepository,
+    private logService: LogService
   ) { }
 
   index = async (request: Request, response: Response): Promise<void> => {
@@ -21,7 +23,17 @@ class ContaBancariaController {
 
   create = async (request: Request, response: Response): Promise<void> => {
 
+    let user = JSON.parse(request.headers.user as string);
+
     const res = await this.contaBancariaRepository.create(request.body)
+
+    await this.logService.create({
+      tipo: 'CREATE',
+      newData: JSON.stringify({ id: res, ...request.body }),
+      oldData: null,
+      rotina: 'Conta Bancária',
+      usuariosId: user.id
+    })
 
     response.status(200).send(res)
   }
@@ -42,16 +54,41 @@ class ContaBancariaController {
 
   delete = async (request: Request, response: Response): Promise<void> => {
 
-    const res = await this.contaBancariaRepository.delete(request.params.id)
+    let user = JSON.parse(request.headers.user as string);
 
-    response.status(200).send(res)
+    const contaBancaria = await this.contaBancariaRepository.delete(request.params.id)
+
+    if (contaBancaria) {
+      await this.logService.create({
+        tipo: 'DELETE',
+        newData: null,
+        oldData: JSON.stringify(contaBancaria),
+        rotina: 'Conta Bancária',
+        usuariosId: user.id
+      })
+    }
+
+    response.status(200).send(contaBancaria)
   }
 
   update = async (request: Request, response: Response): Promise<void> => {
 
-    const res = await this.contaBancariaRepository.update(request.body, request.params.id)
+    let user = JSON.parse(request.headers.user as string);
 
-    response.status(200).send(res)
+    const oldContaBancaria = await this.contaBancariaRepository.find(request.params.id)
+    const contaBancaria = await this.contaBancariaRepository.update(request.body, request.params.id)
+
+    if (contaBancaria) {
+      await this.logService.create({
+        tipo: 'UPDATE',
+        newData: JSON.stringify({ id: request.params.id, ...request.body }),
+        oldData: JSON.stringify(oldContaBancaria),
+        rotina: 'Conta Bancária',
+        usuariosId: user.id
+      })
+    }
+
+    response.status(200).send(contaBancaria)
   }
 
 }

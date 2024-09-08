@@ -5,11 +5,11 @@ export interface IProduto {
     count: number
     rows: IProdutoResponse[]
   }>
-  create(data: IProdutoDTO): Promise<string[]>
+  create(data: IProdutoDTO): Promise<string>
   find(id: string): Promise<IProdutoResponse | null>
   findAll(): Promise<IProdutoResponse[]>
-  delete(id: string): Promise<string[]>
-  update(data: IProdutoDTO, id: string): Promise<string[]>
+  delete(id: string): Promise<IProdutoDeleteResponse>
+  update(data: IProdutoDTO, id: string): Promise<IProdutoDTO>
 }
 
 
@@ -48,4 +48,8 @@ export interface IProdutoResponse {
     codigoEndereco: string,
     usuarioCadastro: string
   }
+}
+
+export interface IProdutoDeleteResponse extends IProdutoDTO {
+  id: string
 }

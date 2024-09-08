@@ -54,7 +54,7 @@ class UsuarioRepository implements IUsuario {
     tipo,
     email,
     comissao = null,
-    meta = null }: IUsuarioDTO): Promise<string[]> => {
+    meta = null }: IUsuarioDTO): Promise<string> => {
 
     try {
 
@@ -74,7 +74,7 @@ class UsuarioRepository implements IUsuario {
         }
       })
 
-      return ['Usuario inserido com sucesso']
+      return id
 
     } catch (error) {
       throw new Warning('Erro ao inserir Usuario', 400)
@@ -121,7 +121,7 @@ class UsuarioRepository implements IUsuario {
     tipo,
     email,
     comissao,
-    meta }: IUsuarioDTO, id: string): Promise<string[]> => {
+    meta }: IUsuarioDTO, id: string): Promise<IUsuarioResponse> => {
 
     try {
 
@@ -142,14 +142,14 @@ class UsuarioRepository implements IUsuario {
         }
       })
 
-      return ['Usuário atualizado com sucesso']
+      return usuario
 
     } catch (error) {
       throw new Warning('Erro ao atualizar usuário', 400)
     }
   }
 
-  delete = async (id: string): Promise<string[]> => {
+  delete = async (id: string): Promise<IUsuarioResponse> => {
 
     const usuario = await this.prisma.usuarios.update({
       data: {
@@ -164,7 +164,7 @@ class UsuarioRepository implements IUsuario {
       throw new Warning('Não foi possível excluir o usuário', 400)
     }
 
-    return ['Usuário excluido com sucesso']
+    return usuario
   }
 
   login = async (username: string, password: string): Promise<IUsuarioResponse> => {

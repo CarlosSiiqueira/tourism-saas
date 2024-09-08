@@ -88,7 +88,7 @@ class ContaBancariaRepository implements IContaBancaria {
     nome,
     saldo = 0,
     usuarioCadastro
-  }: IContaBancariaDTO): Promise<string[]> => {
+  }: IContaBancariaDTO): Promise<string> => {
 
     try {
 
@@ -103,7 +103,7 @@ class ContaBancariaRepository implements IContaBancaria {
         }
       })
 
-      return ['Conta bancária cadastrada com sucesso!']
+      return id
 
     } catch (error) {
       throw new Warning('Erro ao criar conta bancária', 400)
@@ -146,7 +146,7 @@ class ContaBancariaRepository implements IContaBancaria {
     return contasBancarias
   }
 
-  delete = async (id: string): Promise<string> => {
+  delete = async (id: string): Promise<IContaBancariaResponse> => {
 
     const contaBancaria = await this.prisma.contaBancaria.delete({
       where: {
@@ -158,7 +158,7 @@ class ContaBancariaRepository implements IContaBancaria {
       throw new Warning('Registro não encontrado', 400)
     }
 
-    return id
+    return contaBancaria
   }
 
   update = async ({
@@ -166,7 +166,7 @@ class ContaBancariaRepository implements IContaBancaria {
     saldo,
     ativo,
     usuarioCadastro
-  }: IContaBancariaDTO, id: string): Promise<string[]> => {
+  }: IContaBancariaDTO, id: string): Promise<IContaBancariaResponse> => {
 
     const contaBancaria = await this.prisma.contaBancaria.update({
       data: {
@@ -185,7 +185,7 @@ class ContaBancariaRepository implements IContaBancaria {
       throw new Warning('Registro não encontrado', 400)
     }
 
-    return ['Registro Atualizado com sucesso'];
+    return contaBancaria
   }
 
   setSaldo = async (id: string, saldo: number): Promise<IContaBancariaResponse> => {

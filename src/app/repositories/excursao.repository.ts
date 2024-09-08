@@ -242,7 +242,7 @@ class ExcursaoRepository implements IExcursao {
     codigoPacote,
     usuarioCadastro,
     valor
-  }: IExcursaoDTO, id: string): Promise<string[]> => {
+  }: IExcursaoDTO, id: string): Promise<IExcursaoResponse> => {
 
     dataInicio = dateValidate(dataInicio)
     dataFim = dateValidate(dataFim)
@@ -269,7 +269,7 @@ class ExcursaoRepository implements IExcursao {
       throw new Warning('Registro não encontrado', 400)
     }
 
-    return ['Registro atualizado com sucesso']
+    return excursao
   }
 
   publish = async (id: string): Promise<IExcursaoResponse> => {
