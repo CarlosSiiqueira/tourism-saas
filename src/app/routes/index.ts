@@ -25,6 +25,7 @@ import { ranking } from "./ranking.clientes.routes"
 import { files } from "./files.routes"
 import { creditoCliente } from "./credito.cliente.routes"
 import { opcionais } from "./opcionais.routes"
+import { logs } from "./log.routes"
 
 const router = Router()
 
@@ -54,5 +55,6 @@ router.use('/ranking-clientes', ranking)
 router.use('/files', files)
 router.use('/credito-cliente', creditoCliente)
 router.use('/opcionais', opcionais)
+router.use('/log', logs)
 
 export { router }

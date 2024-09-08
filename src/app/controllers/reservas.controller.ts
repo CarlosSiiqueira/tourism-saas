@@ -39,17 +39,7 @@ class ReservaController {
 
     if (!passageiro.length) {
       let observacoes = ''
-      const reserva = await this.reservaRepository.create(request.body)
-
-      await this.logService.create({
-        tipo: 'CREATE',
-        newData: JSON.stringify({ id: reserva, ...request.body }),
-        oldData: null,
-        rotina: 'Rersevas',
-        usuariosId: user.id
-      })
-
-
+      const reserva = await this.reservaRepository.create(request.body) 
       const formaPagamento = await this.formaPagamentoService.find(request.body.codigoFormaPagamento)
 
       if (request.body.opcionais.length) {
@@ -69,6 +59,14 @@ class ReservaController {
         )
       }
 
+      await this.logService.create({
+        tipo: 'CREATE',
+        newData: JSON.stringify(await this.reservaRepository.find(reserva)),
+        oldData: null,
+        rotina: 'Reservas',
+        usuariosId: user.id
+      })
+
       request.body.idReserva = reserva || ''
       request.body.tipo = 2
       observacoes += request.body.criancasColo > 0 ? `${request.body.criancasColo}x crianças de colo nessa Reserva \n` : ''
@@ -83,9 +81,9 @@ class ReservaController {
 
       await this.logService.create({
         tipo: 'CREATE',
-        newData: JSON.stringify({ id: financeiro, ...request.body }),
+        newData: JSON.stringify(await this.financeiroService.find(financeiro)),
         oldData: null,
-        rotina: 'Rersevas/Financeiro',
+        rotina: 'Reservas/Financeiro',
         usuariosId: user.id
       })
 
@@ -136,7 +134,7 @@ class ReservaController {
       tipo: 'DELETE',
       newData: null,
       oldData: JSON.stringify(reserva),
-      rotina: 'Rersevas',
+      rotina: 'Reservas',
       usuariosId: user.id
     })
 
@@ -168,7 +166,7 @@ class ReservaController {
       tipo: 'DELETE',
       newData: null,
       oldData: JSON.stringify(reserva),
-      rotina: 'Rersevas/Cancelar',
+      rotina: 'Reservas/Cancelar',
       usuariosId: user.id
     })
 
@@ -202,7 +200,7 @@ class ReservaController {
       tipo: 'UPDATE',
       newData: JSON.stringify({ id: request.params.id, ...request.body }),
       oldData: JSON.stringify(currentReserva),
-      rotina: 'Rersevas',
+      rotina: 'Reservas',
       usuariosId: user.id
     })
 

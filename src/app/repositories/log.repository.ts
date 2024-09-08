@@ -64,7 +64,6 @@ class LogRepository implements ILog {
     ])
 
     return { count, rows }
-
   }
 
   create = async ({
