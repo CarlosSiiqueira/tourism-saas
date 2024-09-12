@@ -4,11 +4,11 @@ import "express-async-errors"
 import "dotenv/config"
 import "./shared/container"
 import { authenticateToken } from "./app/middlewares/authentication.middleware"
-import { router } from "../src/app/routes"
 import { warning } from "./app/middlewares/error.middleware"
 import cors from 'cors'
 import { connectKafka, createDefaultMailTopic } from './shared/kafka'
 import { processMailQueue } from './app/services/queue.consumer.service'
+import { router } from './app/routes'
 
 const app = express()
 const PORT = process.env.PORT
