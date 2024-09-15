@@ -54,6 +54,8 @@ import { IRankingCliente } from "../../app/interfaces/RankingCliente"
 import { ICreditoCliente } from "../../app/interfaces/CreditoCliente"
 import { IOpcionais } from "../../app/interfaces/Opcionais"
 import { ILog } from "../../app/interfaces/Log"
+import { IOpcionalEmbarque } from "../../app/interfaces/OpcionaisEmbarque"
+import { OpcionaisEmbarqueRepository } from "../../app/repositories/opcionais.embarque.repository"
 
 
 container.registerSingleton<IContaBancaria>(
@@ -179,4 +181,9 @@ container.registerSingleton<IOpcionais>(
 container.registerSingleton<ILog>(
   "LogRepository",
   LogRepository
+)
+
+container.registerSingleton<IOpcionalEmbarque>(
+  "OpcionaisEmbarqueRepository",
+  OpcionaisEmbarqueRepository
 )

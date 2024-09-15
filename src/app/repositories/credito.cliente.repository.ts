@@ -51,6 +51,12 @@ class CreditoClienteRepository implements ICreditoCliente {
             ]
           })
           break;
+
+        case 'idPessoa':
+          Object.assign(where, {
+            pessoasId: value
+          })
+          break;
       }
     })
 
@@ -65,7 +71,11 @@ class CreditoClienteRepository implements ICreditoCliente {
         where,
         include: {
           Cliente: true,
-          Reserva: true,
+          Reserva: {
+            include: {
+              Excursao: true
+            }
+          },
           Usuario: true
         }
       })
@@ -155,7 +165,7 @@ class CreditoClienteRepository implements ICreditoCliente {
     return credito
   }
 
-  delete = async (id: string): Promise<string> => {
+  delete = async (id: string): Promise<ICreditoClienteResponse> => {
 
     const creditoCliente = await this.prisma.creditoClientes.update({
       where: {
@@ -170,7 +180,7 @@ class CreditoClienteRepository implements ICreditoCliente {
       throw new Warning('Registro não encontrado', 400)
     }
 
-    return id
+    return creditoCliente
   }
 
   update = async ({

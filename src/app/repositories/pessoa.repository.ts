@@ -66,7 +66,11 @@ class PessoaRepository implements IPessoa {
         include: {
           Endereco: true,
           Ranking: true,
-          CreditoClientes: true
+          CreditoClientes: {
+            include: {
+              Reserva: true
+            }
+          }
         }
       })
     ])

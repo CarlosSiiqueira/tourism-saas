@@ -165,6 +165,8 @@ class ReservaController {
       return passageiro.id
     })
 
+    await this.excursaoQuartosService.deleteManyByIdPassageiro(idPassageiros, reserva.Excursao.id)
+    await this.excursaoOnibusService.deleteManyByIdPassageiro(idPassageiros, reserva.Excursao.id)
     await this.excursaoPassageiroService.deleteMultiple(idPassageiros, reserva.Excursao.id)
     const res = await this.reservaRepository.delete(request.params.id)
 

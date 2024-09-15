@@ -341,16 +341,17 @@ model ExcursaoPassageiros {
   id           String   @id @default(uuid())
   dataCadastro DateTime @default(now())
 
-  Reservas      Reservas          @relation(fields: [reserva], references: [id])
-  reserva       String
-  Excursao      Excursao          @relation(fields: [idExcursao], references: [id])
-  idExcursao    String
-  Pessoa        Pessoas           @relation(fields: [idPassageiro], references: [id])
-  idPassageiro  String
-  LocalEmbarque LocalEmbarque     @relation(fields: [localEmbarque], references: [id])
-  localEmbarque String
-  Quartos       ExcursaoQuartos[]
-  Onibus        ExcursaoOnibus[]
+  Reservas          Reservas            @relation(fields: [reserva], references: [id])
+  reserva           String
+  Excursao          Excursao            @relation(fields: [idExcursao], references: [id])
+  idExcursao        String
+  Pessoa            Pessoas             @relation(fields: [idPassageiro], references: [id])
+  idPassageiro      String
+  LocalEmbarque     LocalEmbarque       @relation(fields: [localEmbarque], references: [id])
+  localEmbarque     String
+  Quartos           ExcursaoQuartos[]
+  Onibus            ExcursaoOnibus[]
+  OpcionaisEmbarque OpcionaisEmbarque[]
 }
 
 model CategoriaTransacao {
@@ -439,12 +440,13 @@ model Opcionais {
   qtd          Int
   dataCadastro DateTime @default(now())
 
-  Reserva       Reservas @relation(fields: [idReserva], references: [id])
-  idReserva     String
-  Produto       Produtos @relation(fields: [idProduto], references: [id])
-  idProduto     String
-  Usuario       Usuarios @relation(fields: [codigoUsuario], references: [id])
-  codigoUsuario String
+  Reserva           Reservas            @relation(fields: [idReserva], references: [id])
+  idReserva         String
+  Produto           Produtos            @relation(fields: [idProduto], references: [id])
+  idProduto         String
+  Usuario           Usuarios            @relation(fields: [codigoUsuario], references: [id])
+  codigoUsuario     String
+  OpcionaisEmbarque OpcionaisEmbarque[]
 }
 
 model Logs {
@@ -457,4 +459,15 @@ model Logs {
 
   Usuario    Usuarios @relation(fields: [usuariosId], references: [id])
   usuariosId String
+}
+
+model OpcionaisEmbarque {
+  id       String   @id @default(uuid())
+  embarcou Boolean  @default(false)
+  data     DateTime
+
+  Opcional     Opcionais           @relation(fields: [idOpcional], references: [id])
+  idOpcional   String
+  Passageiro   ExcursaoPassageiros @relation(fields: [idPassageiro], references: [id])
+  idPassageiro String
 }

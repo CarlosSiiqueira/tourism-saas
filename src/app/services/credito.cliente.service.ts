@@ -26,7 +26,7 @@ export class CreditoClienteService {
     return credito
   }
 
-  delete = async (id: string): Promise<string> => {
+  delete = async (id: string): Promise<ICreditoClienteResponse> => {
 
     const credito = await this.creditoClienteRepository.delete(id)
 

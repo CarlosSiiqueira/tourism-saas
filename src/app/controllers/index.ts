@@ -30,6 +30,7 @@ import { FilesController } from "./files.controller"
 import { CreditoClienteController } from "./credito.cliente.controller"
 import { OpcionaisController } from "./opcionais.controller"
 import { LogController } from "./log.controller"
+import { OpcionaisEmbarqueController } from "./opcionais.embarque.controller"
 
 export const contaBancariaController = container.resolve(ContaBancariaController)
 export const excursaoController = container.resolve(ExcursaoController)
@@ -58,3 +59,4 @@ export const filesController = container.resolve(FilesController)
 export const creditoClienteController = container.resolve(CreditoClienteController)
 export const opcionaisController = container.resolve(OpcionaisController)
 export const logsController = container.resolve(LogController)
+export const opcionaisEmbarqueController = container.resolve(OpcionaisEmbarqueController)

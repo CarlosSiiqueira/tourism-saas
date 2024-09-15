@@ -11,6 +11,7 @@ export interface IExcursaoPassageiros {
   listPassageiros(idExcursao: string): Promise<any>
   findByIdPessoa(idsPassageiros: [string], idExcursao: string): Promise<IExcursaoPassageirosResponse[]>
   delete(idPassageiro: string, idExcursao: string): Promise<string[]>
+  deleteMultiple(idPassageiros: Array<string>, idExcursao: string): Promise<string[]>
 }
 
 export interface IExcursaoPassageirosDTO {

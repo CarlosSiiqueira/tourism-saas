@@ -482,7 +482,7 @@ class ExcursaoPassageirosRepository implements IExcursaoPassageiros {
 
     try {
 
-      const excursaoPassageiros = await this.prisma.excursaoPassageiros.deleteMany({
+      await this.prisma.excursaoPassageiros.deleteMany({
         where: {
           idPassageiro: {
             in: idPassageiros
