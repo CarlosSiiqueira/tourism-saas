@@ -297,17 +297,21 @@ class FinanceiroController {
 
     if (clonedTransaction) {
       const id = await this.financeiroRepository.create(clonedTransaction)
-      response.status(200).send(id)
-      return;
-    }
+      let tipoMovimentacao: string = clonedTransaction.tipo == 2 ? "D" : "C"
 
-    await this.logService.create({
-      tipo: 'CREATE',
-      newData: JSON.stringify({ id: request.params.id, transacaoClonada: clonedTransaction }),
-      oldData: null,
-      rotina: 'Financeiro/Clonar',
-      usuariosId: user.id
-    })
+      await this.contaBancariaService.movimentar(clonedTransaction.codigoContaBancaria || '', clonedTransaction.valor, tipoMovimentacao)
+
+      await this.logService.create({
+        tipo: 'CREATE',
+        newData: JSON.stringify({ id: request.params.id, transacaoClonada: clonedTransaction }),
+        oldData: null,
+        rotina: 'Financeiro/Clonar',
+        usuariosId: user.id
+      })
+
+      response.status(200).send(id)
+      return
+    }
 
     response.status(301).send('Não foi possivel realizar procedimento')
   }

@@ -14,11 +14,15 @@ export class ContaBancariaService {
 
     const conta = await this.contaBancariaRepository.find(id)
 
-    valor = tipoMovimentacao == 'C' ? conta.saldo + valor : conta.saldo - valor
+    if (conta) {
+      valor = tipoMovimentacao == 'C' ? conta.saldo + valor : conta.saldo - valor
 
-    const contaBancaria = await this.contaBancariaRepository.setSaldo(id, valor);
+      const contaBancaria = await this.contaBancariaRepository.setSaldo(id, valor);
 
-    return `Novo saldo: ${contaBancaria.saldo}`
+      return `Novo saldo: ${contaBancaria.saldo}`
+    }
+
+    return 'Conta não encontrada'
   }
 
 }
