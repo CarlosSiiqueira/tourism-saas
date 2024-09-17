@@ -5,6 +5,7 @@ import { IOpcionaisDTO, IOpcionaisGroupByResponse } from "../interfaces/Opcionai
 interface IOptionalSumary {
   sum: number,
   nome: string
+  id: string
 }
 
 @injectable()
@@ -33,7 +34,7 @@ export class OpcionaisService {
 
     const summary = await Promise.all(
       groupBy.map(async (value) => {
-        return { nome: (await this.opcionaisRepository.findByProduto(value.idProduto)).Produto.nome, sum: value._sum?.qtd || 0 }
+        return { ...(await this.opcionaisRepository.findByProduto(value.idProduto)).Produto, sum: value._sum?.qtd || 0 }
       })
     )
 

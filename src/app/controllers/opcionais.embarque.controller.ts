@@ -3,22 +3,44 @@ import { inject, injectable } from "tsyringe"
 import { Request, Response } from "express"
 import { formatIndexFilters } from '../../shared/utils/filters'
 import { LogService } from '../services/log.service'
+import { ExcursaoPassageiroService } from '../services/excursao.passageiro.service'
 
 @injectable()
 class OpcionaisEmbarqueController {
   constructor(
     @inject("OpcionaisEmbarqueRepository")
     private opcionaisEmbarqueRepository: OpcionaisEmbarqueRepository,
-    private logService: LogService
+    private logService: LogService,
+    private excursaoPassageiroService: ExcursaoPassageiroService
   ) { }
 
   index = async (request: Request, response: Response): Promise<void> => {
 
     const { orderBy, order, skip, take, filter } = formatIndexFilters(request)
 
-    const res = await this.opcionaisEmbarqueRepository.index({ orderBy, order, skip, take, filter })
+    const idExcursao = request.params.idExcursao
 
-    response.status(200).send(res)
+    const data = await this.opcionaisEmbarqueRepository.index({ orderBy, order, skip, take, filter }, request.params.id)
+
+    const passageirosId = data.rows.map((opt) => { return opt.Passageiro.Pessoa.id })
+
+    const passageiros = await this.excursaoPassageiroService.findByIdPessoa(passageirosId, idExcursao)
+
+    const opcionaisEmbarque = await Promise.all(
+      passageiros.map(async (passageiro) => {
+        const optEmbarque = await this.opcionaisEmbarqueRepository.findByPessoaExcursao(passageiro.id, idExcursao)
+
+        return {
+          ...passageiro,
+          embarcou: optEmbarque?.embarcou || false,
+          hasBoarded: optEmbarque?.id || '',
+          horaEmbarque: optEmbarque?.data || ''
+        }
+      })
+
+    )
+
+    response.status(200).send({ count: data.count, rows: opcionaisEmbarque })
   }
 
   create = async (request: Request, response: Response): Promise<void> => {

@@ -39,18 +39,21 @@ export interface IPassageiroEmbarqueIndexResponse extends IPassageiroEmbarqueRes
   },
   Passageiro: {
     id: string
-    nome: string
-    cpf: string
-    sexo: string
-    observacoes: string | null
-    telefone: string | null
-    telefoneWpp: string | null
-    email: string
-    contato: string | null
-    telefoneContato: string | null
-    ativo: boolean
-    dataNascimento: Date | null
-    usuarioCadastro: string
-    dataCadastro: Date
+    Pessoa: {
+      id: string
+      nome: string
+      cpf: string
+      sexo: string
+      observacoes: string | null
+      telefone: string | null
+      telefoneWpp: string | null
+      email: string
+      contato: string | null
+      telefoneContato: string | null
+      ativo: boolean
+      dataNascimento: Date | null
+      usuarioCadastro: string
+      dataCadastro: Date
+    }
   }
 }

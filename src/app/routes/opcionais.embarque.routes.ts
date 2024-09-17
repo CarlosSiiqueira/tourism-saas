@@ -3,7 +3,7 @@ import { opcionaisEmbarqueController } from "../controllers"
 
 const opcionalEmbarque = Router()
 
-opcionalEmbarque.get('/index', opcionaisEmbarqueController.index)
+opcionalEmbarque.get('/index/:id/:idExcursao', opcionaisEmbarqueController.index)
 opcionalEmbarque.post('/create', opcionaisEmbarqueController.create)
 opcionalEmbarque.get('/find/:id', opcionaisEmbarqueController.find)
 opcionalEmbarque.get('/findAll', opcionaisEmbarqueController.findAll)

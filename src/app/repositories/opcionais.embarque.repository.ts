@@ -8,11 +8,11 @@ class OpcionaisEmbarqueRepository implements IOpcionalEmbarque {
 
   private prisma = prismaManager.getPrisma()
 
-  index = async ({ orderBy, order, skip, take, filter }: IIndex): Promise<{ count: number, rows: IOpcionalEmbarqueResponse[] }> => {
+  index = async ({ orderBy, order, skip, take, filter }: IIndex, id: string): Promise<{ count: number, rows: IOpcionalEmbarqueResponse[] }> => {
 
     const where = {
-      NOT: {
-        id: undefined
+      Opcional: {
+        id
       }
     }
 
@@ -68,6 +68,7 @@ class OpcionaisEmbarqueRepository implements IOpcionalEmbarque {
           Opcional: true,
           Passageiro: {
             include: {
+              Pessoa: true,
               Reservas: true
             },
 
@@ -117,6 +118,7 @@ class OpcionaisEmbarqueRepository implements IOpcionalEmbarque {
         Opcional: true,
         Passageiro: {
           include: {
+            Pessoa: true,
             Reservas: true
           },
 
@@ -138,6 +140,37 @@ class OpcionaisEmbarqueRepository implements IOpcionalEmbarque {
         Opcional: true,
         Passageiro: {
           include: {
+            Pessoa: true,
+            Reservas: true
+          },
+
+        }
+      }
+    })
+
+    if (!opcionalEmbarque) {
+      throw new Warning("Sem Opcional Embarque cadastrados na base", 400)
+    }
+
+    return opcionalEmbarque
+  }
+
+  findByPessoaExcursao = async (idPassageiro: string, idExcursao: string): Promise<IOpcionalEmbarqueResponse> => {
+
+    const opcionalEmbarque = await this.prisma.opcionaisEmbarque.findFirst({
+      where: {
+        idPassageiro,
+        Passageiro: {
+          Excursao: {
+            id: idExcursao
+          }
+        }
+      },
+      include: {
+        Opcional: true,
+        Passageiro: {
+          include: {
+            Pessoa: true,
             Reservas: true
           },
 
@@ -157,6 +190,16 @@ class OpcionaisEmbarqueRepository implements IOpcionalEmbarque {
     const opcionalEmbarque = await this.prisma.opcionaisEmbarque.delete({
       where: {
         id: id
+      },
+      include: {
+        Opcional: true,
+        Passageiro: {
+          include: {
+            Pessoa: true,
+            Reservas: true
+          },
+
+        }
       }
     })
 
@@ -182,6 +225,16 @@ class OpcionaisEmbarqueRepository implements IOpcionalEmbarque {
       },
       where: {
         id: id
+      },
+      include: {
+        Opcional: true,
+        Passageiro: {
+          include: {
+            Pessoa: true,
+            Reservas: true
+          },
+
+        }
       }
     })
 

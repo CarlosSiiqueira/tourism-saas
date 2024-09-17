@@ -55,7 +55,11 @@ class PassageiroEmbarqueRepository implements IPassageiroEmbarque {
         where,
         include: {
           LocalEmbarque: true,
-          Passageiro: true
+          Passageiro: {
+            include: {
+              Pessoa: true
+            }
+          }
         }
       })
 

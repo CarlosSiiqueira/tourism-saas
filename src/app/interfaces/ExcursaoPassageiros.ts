@@ -9,7 +9,7 @@ export interface IExcursaoPassageiros {
   find(idExcursao: string): Promise<IExcursaoPassageirosResponse[]>
   findAll(): Promise<IExcursaoPassageirosResponse[]>
   listPassageiros(idExcursao: string): Promise<any>
-  findByIdPessoa(idsPassageiros: [string], idExcursao: string): Promise<IExcursaoPassageirosResponse[]>
+  findByIdPessoa(idsPassageiros: string[], idExcursao: string): Promise<IExcursaoPassageirosResponse[]>
   delete(idPassageiro: string, idExcursao: string): Promise<string[]>
   deleteMultiple(idPassageiros: Array<string>, idExcursao: string): Promise<string[]>
 }

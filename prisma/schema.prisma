@@ -46,7 +46,6 @@ model Pessoas {
   Ranking             RankingClientes?      @relation(fields: [rankingClientesId], references: [id])
   rankingClientesId   String?
   Endereco            Endereco[]
-  PassageiroEmbarque  PassageiroEmbarque[]
   Vendas              Vendas[]
   Transacoes          Transacoes[]
   ExcursaoPassageiros ExcursaoPassageiros[]
@@ -216,13 +215,13 @@ model PassageiroEmbarque {
   horaEmbarque String
   dataCadastro DateTime @default(now())
 
-  LocalEmbarque       LocalEmbarque @relation(fields: [codigoLocalEmbarque], references: [id])
+  LocalEmbarque       LocalEmbarque       @relation(fields: [codigoLocalEmbarque], references: [id])
   codigoLocalEmbarque String
-  Excursao            Excursao      @relation(fields: [codigoExcursao], references: [id])
+  Excursao            Excursao            @relation(fields: [codigoExcursao], references: [id])
   codigoExcursao      String
-  Passageiro          Pessoas       @relation(fields: [codigoPassageiro], references: [id])
+  Passageiro          ExcursaoPassageiros @relation(fields: [codigoPassageiro], references: [id])
   codigoPassageiro    String
-  Usuarios            Usuarios      @relation(fields: [usuarioCadastro], references: [id])
+  Usuarios            Usuarios            @relation(fields: [usuarioCadastro], references: [id])
   usuarioCadastro     String
 }
 
@@ -341,17 +340,18 @@ model ExcursaoPassageiros {
   id           String   @id @default(uuid())
   dataCadastro DateTime @default(now())
 
-  Reservas          Reservas            @relation(fields: [reserva], references: [id])
-  reserva           String
-  Excursao          Excursao            @relation(fields: [idExcursao], references: [id])
-  idExcursao        String
-  Pessoa            Pessoas             @relation(fields: [idPassageiro], references: [id])
-  idPassageiro      String
-  LocalEmbarque     LocalEmbarque       @relation(fields: [localEmbarque], references: [id])
-  localEmbarque     String
-  Quartos           ExcursaoQuartos[]
-  Onibus            ExcursaoOnibus[]
-  OpcionaisEmbarque OpcionaisEmbarque[]
+  Reservas           Reservas             @relation(fields: [reserva], references: [id])
+  reserva            String
+  Excursao           Excursao             @relation(fields: [idExcursao], references: [id])
+  idExcursao         String
+  Pessoa             Pessoas              @relation(fields: [idPassageiro], references: [id])
+  idPassageiro       String
+  LocalEmbarque      LocalEmbarque        @relation(fields: [localEmbarque], references: [id])
+  localEmbarque      String
+  Quartos            ExcursaoQuartos[]
+  Onibus             ExcursaoOnibus[]
+  OpcionaisEmbarque  OpcionaisEmbarque[]
+  PassageiroEmbarque PassageiroEmbarque[]
 }
 
 model CategoriaTransacao {
