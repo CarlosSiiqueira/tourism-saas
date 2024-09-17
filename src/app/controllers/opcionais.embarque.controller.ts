@@ -16,28 +16,26 @@ class OpcionaisEmbarqueController {
 
   index = async (request: Request, response: Response): Promise<void> => {
 
-    const { orderBy, order, skip, take, filter } = formatIndexFilters(request)
+    const { orderBy, order, skip, take, filter } = formatIndexFilters(request, 'data')
 
     const idExcursao = request.params.idExcursao
+    const opcionalId = request.params.id
 
-    const data = await this.opcionaisEmbarqueRepository.index({ orderBy, order, skip, take, filter }, request.params.id)
+    const data = await this.opcionaisEmbarqueRepository.index({ orderBy, order, skip, take, filter }, opcionalId)
 
-    const passageirosId = data.rows.map((opt) => { return opt.Passageiro.Pessoa.id })
-
-    const passageiros = await this.excursaoPassageiroService.findByIdPessoa(passageirosId, idExcursao)
+    const allPassageiros = await this.excursaoPassageiroService.find(idExcursao)
 
     const opcionaisEmbarque = await Promise.all(
-      passageiros.map(async (passageiro) => {
-        const optEmbarque = await this.opcionaisEmbarqueRepository.findByPessoaExcursao(passageiro.id, idExcursao)
+      allPassageiros.map(async (passageiro) => {
+        const optEmbarque = await this.opcionaisEmbarqueRepository.findByPessoaExcursao(passageiro.id, idExcursao, opcionalId)
 
         return {
           ...passageiro,
           embarcou: optEmbarque?.embarcou || false,
           hasBoarded: optEmbarque?.id || '',
-          horaEmbarque: optEmbarque?.data || ''
+          data: optEmbarque?.data || ''
         }
       })
-
     )
 
     response.status(200).send({ count: data.count, rows: opcionaisEmbarque })
@@ -78,39 +76,39 @@ class OpcionaisEmbarqueController {
 
     let user = JSON.parse(request.headers.user as string);
 
-    const contaBancaria = await this.opcionaisEmbarqueRepository.delete(request.params.id)
+    const opcionalEmbarque = await this.opcionaisEmbarqueRepository.delete(request.params.id)
 
-    if (contaBancaria) {
+    if (opcionalEmbarque) {
       await this.logService.create({
         tipo: 'DELETE',
         newData: null,
-        oldData: JSON.stringify(contaBancaria),
+        oldData: JSON.stringify(opcionalEmbarque),
         rotina: 'Opcionais Embarque',
         usuariosId: user.id
       })
     }
 
-    response.status(200).send(contaBancaria)
+    response.status(200).send(opcionalEmbarque)
   }
 
   update = async (request: Request, response: Response): Promise<void> => {
 
     let user = JSON.parse(request.headers.user as string);
 
-    const oldContaBancaria = await this.opcionaisEmbarqueRepository.find(request.params.id)
-    const contaBancaria = await this.opcionaisEmbarqueRepository.update(request.body, request.params.id)
+    const oldOpcionalEmbarque = await this.opcionaisEmbarqueRepository.find(request.params.id)
+    const opcionalEmbarque = await this.opcionaisEmbarqueRepository.update(request.body, request.params.id)
 
-    if (contaBancaria) {
+    if (opcionalEmbarque) {
       await this.logService.create({
         tipo: 'UPDATE',
         newData: JSON.stringify({ id: request.params.id, ...request.body }),
-        oldData: JSON.stringify(oldContaBancaria),
+        oldData: JSON.stringify(oldOpcionalEmbarque),
         rotina: 'Opcionais Embarque',
         usuariosId: user.id
       })
     }
 
-    response.status(200).send(contaBancaria)
+    response.status(200).send(opcionalEmbarque)
   }
 }
 

@@ -3,6 +3,7 @@ import { Warning } from "../errors"
 import { IOpcionalEmbarque, IOpcionalEmbarqueDTO, IOpcionalEmbarqueResponse } from "../interfaces/OpcionaisEmbarque"
 import { IIndex } from "../interfaces/Helper"
 import crypto from 'crypto';
+import { dateValidate } from "../../shared/helper/date";
 
 class OpcionaisEmbarqueRepository implements IOpcionalEmbarque {
 
@@ -12,7 +13,9 @@ class OpcionaisEmbarqueRepository implements IOpcionalEmbarque {
 
     const where = {
       Opcional: {
-        id
+        Produto: {
+          id
+        }
       }
     }
 
@@ -23,9 +26,13 @@ class OpcionaisEmbarqueRepository implements IOpcionalEmbarque {
           Object.assign(where, {
             OR: [
               {
-                nome: {
-                  contains: value,
-                  mode: "insensitive"
+                Passageiro: {
+                  Pessoa: {
+                    nome: {
+                      contains: value,
+                      mode: "insensitive"
+                    }
+                  }
                 }
               },
               {
@@ -91,6 +98,8 @@ class OpcionaisEmbarqueRepository implements IOpcionalEmbarque {
 
       const id = crypto.randomUUID()
 
+      data = dateValidate(data)
+
       await this.prisma.opcionaisEmbarque.create({
         data: {
           id,
@@ -155,7 +164,7 @@ class OpcionaisEmbarqueRepository implements IOpcionalEmbarque {
     return opcionalEmbarque
   }
 
-  findByPessoaExcursao = async (idPassageiro: string, idExcursao: string): Promise<IOpcionalEmbarqueResponse> => {
+  findByPessoaExcursao = async (idPassageiro: string, idExcursao: string, opcionalId: string): Promise<IOpcionalEmbarqueResponse | null> => {
 
     const opcionalEmbarque = await this.prisma.opcionaisEmbarque.findFirst({
       where: {
@@ -163,6 +172,11 @@ class OpcionaisEmbarqueRepository implements IOpcionalEmbarque {
         Passageiro: {
           Excursao: {
             id: idExcursao
+          }
+        },
+        Opcional: {
+          Produto: {
+            id: opcionalId
           }
         }
       },
@@ -177,10 +191,6 @@ class OpcionaisEmbarqueRepository implements IOpcionalEmbarque {
         }
       }
     })
-
-    if (!opcionalEmbarque) {
-      throw new Warning("Sem Opcional Embarque cadastrados na base", 400)
-    }
 
     return opcionalEmbarque
   }

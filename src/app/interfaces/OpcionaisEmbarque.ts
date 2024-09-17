@@ -10,7 +10,7 @@ export interface IOpcionalEmbarque {
   findAll(): Promise<IOpcionalEmbarqueResponse[]>
   delete(id: string): Promise<IOpcionalEmbarqueResponse>
   update(data: IOpcionalEmbarqueDTO, id: string): Promise<IOpcionalEmbarqueResponse>
-  findByPessoaExcursao(idPassageiro: string, idExcursao: string): Promise<IOpcionalEmbarqueResponse>
+  findByPessoaExcursao(idPassageiro: string, idExcursao: string, opcionalId: string): Promise<IOpcionalEmbarqueResponse | null>
 }
 
 export interface IOpcionalEmbarqueDTO {
