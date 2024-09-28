@@ -31,3 +31,22 @@ export interface IExcursaoDTO {
 export interface IExcursaoResponse extends IExcursaoDTO {
   id: string
 }
+
+export interface IExcursaoFilter {
+  nome?: {
+    contains: string,
+    mode: string
+  }
+  Pacotes?: {
+    nome: {
+      contains: string,
+      mode: string
+    }
+  }
+  dataInicio?: {
+    gte: Date
+  }
+  dataFim?: {
+    lte: Date,
+  }
+}

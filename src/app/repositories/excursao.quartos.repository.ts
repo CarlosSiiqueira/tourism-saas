@@ -24,9 +24,11 @@ class ExcursaoQuartosRepository implements IExcursaoQuartos {
             OR: [
               {
                 Passageiros: {
-                  nome: {
-                    contains: value,
-                    mode: "insensitive"
+                  Pessoa: {
+                    nome: {
+                      contains: value,
+                      mode: "insensitive"
+                    }
                   }
                 }
               }

@@ -24,3 +24,20 @@ export interface IContaBancariaDTO {
 export interface IContaBancariaResponse extends IContaBancariaDTO {
   id: string
 }
+
+export interface IContaBancariaFilter {
+  nome?: {
+    contains: string,
+    mode: string
+  }
+  Usuarios?: {
+    nome: {
+      contains: string,
+      mode: string
+    }
+  }
+  saldo?: {
+    equals: number
+  }
+  ativo?: boolean
+}

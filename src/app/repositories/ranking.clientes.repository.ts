@@ -33,14 +33,6 @@ class RankingClientesRepository implements IRankingCliente {
                   contains: value,
                   mode: "insensitive"
                 }
-              },
-              {
-                Fornecedor: {
-                  nome: {
-                    contains: value,
-                    mode: "insensitive"
-                  }
-                }
               }
             ]
           })

@@ -28,6 +28,16 @@ class SubCategoriaTransacaoRepository implements ISubCategoriaTransacao {
                 }
               },
               {
+                CategoriaTransacao: {
+                  every: {
+                    nome: {
+                      contains: value,
+                      mode: "insensitive"
+                    }
+                  }
+                }
+              },
+              {
                 Usuarios: {
                   nome: {
                     contains: value,
@@ -38,7 +48,6 @@ class SubCategoriaTransacaoRepository implements ISubCategoriaTransacao {
             ]
           })
           break;
-
       }
     })
 

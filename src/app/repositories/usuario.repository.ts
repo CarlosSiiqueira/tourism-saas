@@ -1,7 +1,7 @@
 import prismaManager from "../database/database"
 import { Warning } from "../errors"
 import { IIndex } from "../interfaces/Helper"
-import { IUsuario, IUsuarioDTO, IUsuarioResponse, IUsuarioLogin } from "../interfaces/Usuario"
+import { IUsuario, IUsuarioDTO, IUsuarioResponse, IUsuarioLogin, IUsuarioFilter } from "../interfaces/Usuario"
 
 class UsuarioRepository implements IUsuario {
 
@@ -13,23 +13,37 @@ class UsuarioRepository implements IUsuario {
       ativo: true
     }
 
+    let filterOR: IUsuarioFilter[] = []
+
     Object.entries(filter as { [key: string]: string }).map(([key, value]) => {
 
       switch (key) {
         case 'nome':
-          Object.assign(where, {
-            OR: [
-              {
-                nome: {
-                  contains: value,
-                  mode: "insensitive"
-                }
+          filterOR.push(
+            {
+              nome: {
+                contains: value,
+                mode: "insensitive"
               }
-            ]
-          })
+            }
+          )
           break;
+
+        case 'status':
+          if (value !== 'all') {
+            Object.assign(where, {
+              ativo: parseInt(value) == 1 ? true : false
+            })
+          }
+          break
       }
     })
+
+    if (filterOR.length) {
+      Object.assign(where, {
+        OR: filterOR
+      })
+    }
 
     const [count, rows] = await this.prisma.$transaction([
       this.prisma.usuarios.count({ where }),

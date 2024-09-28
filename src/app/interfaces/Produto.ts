@@ -53,3 +53,20 @@ export interface IProdutoResponse {
 export interface IProdutoDeleteResponse extends IProdutoDTO {
   id: string
 }
+
+export interface IProdutoFilter {
+  nome?: {
+    contains: string
+    mode: string
+  }
+
+  estoque?: {
+    equals: number
+  }
+  Fornecedor?: {
+    nome: {
+      contains: string
+      mode: string
+    }
+  }
+}

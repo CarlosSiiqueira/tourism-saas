@@ -1,4 +1,4 @@
-import { IFormaPagamentoDTO, IFormaPagamento, IFormaPagamentoResponse } from "../interfaces/FormaPagamento"
+import { IFormaPagamentoDTO, IFormaPagamento, IFormaPagamentoResponse, IFormaPagamentoFilter } from "../interfaces/FormaPagamento"
 import prismaManager from "../database/database"
 import { Warning } from "../errors"
 import { IIndex } from "../interfaces/Helper"
@@ -16,31 +16,54 @@ class FormaPagamentoRepository implements IFormaPagamento {
       }
     }
 
+    let filterOR: IFormaPagamentoFilter[] = []
+
     Object.entries(filter as { [key: string]: string }).map(([key, value]) => {
 
       switch (key) {
         case 'nome':
-          Object.assign(where, {
-            OR: [
-              {
+          filterOR.push(
+            {
+              nome: {
+                contains: value,
+                mode: "insensitive"
+              }
+            },
+            {
+              Usuarios: {
                 nome: {
                   contains: value,
                   mode: "insensitive"
                 }
-              },
-              {
-                Usuarios: {
-                  nome: {
-                    contains: value,
-                    mode: "insensitive"
-                  }
-                }
               }
-            ]
-          })
+            }
+          )
           break;
+
+        case 'status':
+          if (value !== 'all') {
+            Object.assign(where, {
+              ativo: parseInt(value) == 1 ? true : false
+            })
+          }
+          break;
+
+        case 'taxa':
+          filterOR.push(
+            {
+              taxa: {
+                equals: parseInt(value)
+              }
+            }
+          )
       }
     })
+
+    if (filterOR.length) {
+      Object.assign(where, {
+        OR: filterOR
+      })
+    }
 
     const [count, rows] = await this.prisma.$transaction([
       this.prisma.formaPagamento.count({ where }),

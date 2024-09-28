@@ -20,10 +20,12 @@ class ExcursaoOnibusRepository implements IExcursaoOnibus {
           Object.assign(where, {
             OR: [
               {
-                Pessoas: {
-                  nome: {
-                    contains: value,
-                    mode: "insensitive"
+                Passageiro: {
+                  Pessoas: {
+                    nome: {
+                      contains: value,
+                      mode: "insensitive"
+                    }
                   }
                 }
               },

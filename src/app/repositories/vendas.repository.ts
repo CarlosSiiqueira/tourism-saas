@@ -23,9 +23,19 @@ class VendasRepository implements IVendas {
           Object.assign(where, {
             OR: [
               {
-                nome: {
-                  contains: value,
-                  mode: "insensitive"
+                Pessoas: {
+                  nome: {
+                    contains: value,
+                    mode: "insensitive"
+                  }
+                }
+              },
+              {
+                FormaPagamento: {
+                  nome: {
+                    contains: value,
+                    mode: 'insenstive'
+                  }
                 }
               },
               {

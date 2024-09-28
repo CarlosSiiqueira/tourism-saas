@@ -91,3 +91,24 @@ export interface IPessoaReportResponse extends IPessoaResponse {
 export interface IPessoaDeleteResponse extends IPessoaDTO {
   id: string
 }
+
+export interface IPessoaFilter {
+  nome?: {
+    contains: string,
+    mode: string
+  }
+  Usuarios?: {
+    nome: {
+      contains: string,
+      mode: string
+    }
+  }
+  email?: {
+    contains: string,
+    mode: string
+  }
+  cpf?: {
+    contains: string,
+    mode: string
+  }
+}

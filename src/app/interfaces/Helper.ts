@@ -117,3 +117,20 @@ export interface IEmail {
   subject: string
   text: string | null
 }
+
+export interface IReservaFilter {
+  nome?: {
+    contains: string
+    mode: string
+  }
+  Usuario?: {
+    nome: {
+      contains: string
+      mode: string
+    }
+  }
+  reserva?: {
+    equals: number
+  }
+  status?: boolean
+}

@@ -1,6 +1,6 @@
 import crypto from 'crypto';
 import prismaManager from "../database/database";
-import { IPessoa, IPessoaDeleteResponse, IPessoaDTO, IPessoaReportResponse, IPessoaResponse } from "../interfaces/Pessoa";
+import { IPessoa, IPessoaDeleteResponse, IPessoaDTO, IPessoaFilter, IPessoaReportResponse, IPessoaResponse } from "../interfaces/Pessoa";
 import { dateValidate } from "../../shared/helper/date";
 import { Warning } from "../errors";
 import { IIndex } from "../interfaces/Helper";
@@ -15,44 +15,48 @@ class PessoaRepository implements IPessoa {
       ativo: true
     }
 
+    let filterOR: IPessoaFilter[] = []
+
     Object.entries(filter as { [key: string]: string }).map(([key, value]) => {
 
       switch (key) {
         case 'nome':
-          Object.assign(where, {
-            OR: [
-              {
-                nome: {
-                  contains: value,
-                  mode: "insensitive"
-                }
-              },
-              {
-                Usuarios: {
-                  nome: {
-                    contains: value,
-                    mode: "insensitive"
-                  }
-                }
+          filterOR.push(
+            {
+              nome: {
+                contains: value,
+                mode: "insensitive"
               }
-            ]
-          })
+            },            
+            {
+              email: {
+                contains: value,
+                mode: "insensitive"
+              }
+            },
+            {
+              cpf: {
+                contains: value,
+                mode: "insensitive"
+              }
+            }
+          )
           break;
 
-        case 'email':
-          Object.assign(where, {
-            OR: [
-              {
-                email: {
-                  contains: value,
-                  mode: "insensitive"
-                }
-              }
-            ]
-          })
-          break;
+        case 'status':
+          if (value !== 'all') {
+            Object.assign(where, {
+              ativo: parseInt(value) == 1 ? true : false
+            })
+          }
       }
     })
+
+    if (filterOR.length) {
+      Object.assign(where, {
+        OR: filterOR
+      })
+    }
 
     const [count, rows] = await this.prisma.$transaction([
       this.prisma.pessoas.count({ where }),

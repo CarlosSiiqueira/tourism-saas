@@ -1,6 +1,6 @@
 import prismaManager from "../database/database";
 import { Warning } from "../errors";
-import { IFornecedor, IFornecedorDTO, IFornecedorResponse } from "../interfaces/Fornecedor";
+import { IFornecedor, IFornecedorDTO, IFornecedorFilter, IFornecedorResponse } from "../interfaces/Fornecedor";
 import { IIndex } from "../interfaces/Helper";
 import crypto from 'crypto'
 
@@ -16,64 +16,55 @@ class FornecedorRepository implements IFornecedor {
       }
     }
 
+    let filterOR: IFornecedorFilter[] = []
+
     Object.entries(filter as { [key: string]: string }).map(([key, value]) => {
 
       switch (key) {
         case 'nome':
-        case 'fantasia':
-          Object.assign(where, {
-            OR: [
-              {
-                nome: {
-                  contains: value,
-                  mode: "insensitive"
-                }
-              },
-              {
-                fantasia: {
-                  contains: value,
-                  mode: "insensitive"
-                }
-              },
-              {
-                Usuarios: {
-                  nome: {
-                    contains: value,
-                    mode: "insensitive"
-                  }
-                }
+          filterOR.push(
+            {
+              nome: {
+                contains: value,
+                mode: "insensitive"
               }
-            ]
-          })
+            },
+            {
+              fantasia: {
+                contains: value,
+                mode: "insensitive"
+              }
+            },
+            {
+              cnpj: {
+                contains: value,
+                mode: "insensitive"
+              }
+            },
+            {
+              email: {
+                contains: value,
+                mode: "insensitive"
+              }
+            }
+          )
           break;
 
-        case 'cnpj':
-          Object.assign(where, {
-            OR: [
-              {
-                cnpj: {
-                  contains: value,
-                  mode: "insensitive"
-                }
-              }
-            ]
-          })
-          break;
-
-        case 'email':
-          Object.assign(where, {
-            OR: [
-              {
-                email: {
-                  contains: value,
-                  mode: "insensitive"
-                }
-              }
-            ]
-          })
-          break;
+        case 'status':
+          if (value !== 'all') {
+            Object.assign(where, {
+              ativo: parseInt(value) == 1 ? true : false
+            })
+          }
+          break
       }
     })
+
+    if (filterOR.length) {
+      Object.assign(where, {
+        OR: filterOR
+      })
+    }
 
     const [count, rows] = await this.prisma.$transaction([
       this.prisma.fornecedor.count({ where }),

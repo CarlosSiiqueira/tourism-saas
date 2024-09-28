@@ -1,7 +1,7 @@
 import prismaManager from "../database/database"
 import { Warning } from "../errors"
 import { IReserva, IReservaDTO, IReservaResponse } from "../interfaces/Reserva"
-import { IIndex } from "../interfaces/Helper"
+import { IIndex, IReservaFilter } from "../interfaces/Helper"
 import crypto from 'crypto'
 
 class ReservaRepository implements IReserva {
@@ -14,44 +14,50 @@ class ReservaRepository implements IReserva {
       excluida: false
     }
 
+    let filterOR: IReservaFilter[] = []
+
     Object.entries(filter as { [key: string]: string }).map(([key, value]) => {
 
       switch (key) {
         case 'nome':
-          Object.assign(where, {
-            OR: [
-              {
+          filterOR.push(
+            {
+              Usuario: {
                 nome: {
                   contains: value,
                   mode: "insensitive"
                 }
-              },
-              {
-                Usuarios: {
-                  nome: {
-                    contains: value,
-                    mode: "insensitive"
-                  }
-                }
               }
-            ]
-          })
+            }
+          )
           break;
 
-        case 'saldo':
-          Object.assign(where, {
-            OR: [
-              {
-                saldo: {
-                  equals: parseInt(value),
-                  // mode: "insensitive"
-                }
+        case 'reserva':
+          filterOR.push(
+            {
+              reserva: {
+                equals: parseInt(value),
               }
-            ]
-          })
+            }
+          )
           break;
+
+        case 'status':
+          Object.assign(where,
+            {
+              status: parseInt(value) == 1 ? true : false
+            }
+          )
+          break
+
       }
     })
+
+    if (filterOR.length) {
+      Object.assign(where, {
+        OR: filterOR
+      })
+    }
 
     const [count, rows] = await this.prisma.$transaction([
       this.prisma.reservas.count({ where }),

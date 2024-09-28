@@ -2,7 +2,7 @@ import { dateValidate } from "../../shared/helper/date"
 import prismaManager from "../database/database"
 import { Warning } from "../errors"
 import { IIndex } from "../interfaces/Helper"
-import { IProduto, IProdutoDeleteResponse, IProdutoDTO, IProdutoResponse } from "../interfaces/Produto"
+import { IProduto, IProdutoDeleteResponse, IProdutoDTO, IProdutoFilter, IProdutoResponse } from "../interfaces/Produto"
 import crypto from 'crypto'
 
 class ProdutoRepository implements IProduto {
@@ -20,44 +20,49 @@ class ProdutoRepository implements IProduto {
       ativo: true
     }
 
+    const filterOR: IProdutoFilter[] = []
+
     Object.entries(filter as { [key: string]: string }).map(([key, value]) => {
 
       switch (key) {
         case 'nome':
-          Object.assign(where, {
-            OR: [
-              {
+          filterOR.push(
+            {
+              nome: {
+                contains: value,
+                mode: "insensitive"
+              }
+            },
+            {
+              Fornecedor: {
                 nome: {
                   contains: value,
                   mode: "insensitive"
                 }
-              },
-              {
-                Fornecedor: {
-                  nome: {
-                    contains: value,
-                    mode: "insensitive"
-                  }
-                }
               }
-            ]
-          })
+            }
+          )
           break;
 
         case 'estoque':
-          Object.assign(where, {
-            AND: [
+          if (value) {
+            filterOR.push(
               {
                 estoque: {
-                  equals: parseInt(value),
-                  // mode: "insensitive"
+                  equals: parseInt(value)
                 }
               }
-            ]
-          })
+            )
+          }
           break;
       }
     })
+
+    if (filterOR.length) {
+      Object.assign(where, {
+        OR: filterOR
+      })
+    }
 
     const [count, rows] = await this.prisma.$transaction([
       this.prisma.produtos.count({ where }),

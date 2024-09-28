@@ -32,3 +32,20 @@ export interface IFormaPagamentoDTO {
 export interface IFormaPagamentoResponse extends IFormaPagamentoDTO {
   id: string
 }
+
+export interface IFormaPagamentoFilter {
+  ativo?: boolean
+  nome?: {
+    contains: string,
+    mode: string
+  }
+  Usuarios?: {
+    nome: {
+      contains: string,
+      mode: string
+    }
+  }
+  taxa?: {
+    equals: number
+  }
+}

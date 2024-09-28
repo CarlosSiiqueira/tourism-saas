@@ -1,14 +1,9 @@
-import { IExcursao, IExcursaoDTO, IExcursaoResponse } from "../interfaces/Excursao"
+import { IExcursao, IExcursaoDTO, IExcursaoFilter, IExcursaoResponse } from "../interfaces/Excursao"
 import { IIndex } from "../interfaces/Helper"
 import prismaManager from "../database/database"
 import { dateValidate } from "../../shared/helper/date"
 import { Warning } from "../errors"
 import crypto from 'crypto'
-
-interface where {
-  ativo: boolean
-  concluida?: boolean
-}
 
 class ExcursaoRepository implements IExcursao {
 
@@ -16,38 +11,80 @@ class ExcursaoRepository implements IExcursao {
 
   index = async ({ orderBy, order, skip, take, filter }: IIndex): Promise<{ count: number, rows: IExcursaoResponse[] }> => {
 
-    const where: where = {
-      ativo: true,
-      concluida: false
+    const where = {
+      NOT: {
+        id: undefined
+      }
     }
+
+    let filterOR: IExcursaoFilter[] = []
+    var dataIni: Date
+    var dataFim: Date
 
     Object.entries(filter as { [key: string]: string }).map(([key, value]) => {
 
       switch (key) {
         case 'nome':
-          Object.assign(where, {
-            OR: [
-              {
+          filterOR.push(
+            {
+              nome: {
+                contains: value,
+                mode: 'insensitive'
+              }
+            },
+            {
+              Pacotes: {
                 nome: {
                   contains: value,
                   mode: 'insensitive'
                 }
               }
-            ]
-          })
+            }
+          )
           break;
 
-        case 'concluida':
+        case 'status':
           if (value !== 'all') {
-            where.concluida = parseInt(value) == 1 ? true : false
+            Object.assign(where, {
+              concluida: parseInt(value) == 1 ? true : false
+            })
           }
+          break;
 
-          if (value == 'all') {
-            delete where.concluida
-          }
+        case 'dataInicio':
+          dataIni = dateValidate(value)
+          dataIni.setDate(dataIni.getDate() + 1)
+          dataIni.setHours(0)
+
+          Object.assign(where,
+            {
+              dataInicio: {
+                gte: dataIni
+              }
+            })
+          break;
+
+        case 'dataFim':
+          dataFim = dateValidate(value)
+          dataFim.setDate(dataFim.getDate() + 1)
+          dataFim.setHours(23)
+          dataFim.setMinutes(59)
+          dataFim.setSeconds(59)
+
+          Object.assign(where, {
+            dataFim: {
+              lte: dataFim
+            }
+          })
           break;
       }
     })
+
+    if (filterOR.length) {
+      Object.assign(where, {
+        OR: filterOR
+      })
+    }
 
     const [count, rows] = await this.prisma.$transaction([
       this.prisma.excursao.count({ where }),

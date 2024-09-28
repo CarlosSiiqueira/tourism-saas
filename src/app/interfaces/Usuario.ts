@@ -32,3 +32,11 @@ export interface IUsuarioLogin extends IUsuarioDTO {
   username: string
   password: string
 }
+
+export interface IUsuarioFilter {
+  nome?: {
+    contains: string,
+    mode: string
+  }
+  status?: boolean
+}

@@ -34,6 +34,14 @@ class CategoriaTransacaoRepository implements ICategoriaTransacao {
                     mode: "insensitive"
                   }
                 }
+              },
+              {
+                SubCategoria: {
+                  nome: {
+                    contains: value,
+                    mode: "insensitive"
+                  }
+                }
               }
             ]
           })

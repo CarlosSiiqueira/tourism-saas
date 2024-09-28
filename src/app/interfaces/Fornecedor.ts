@@ -31,3 +31,22 @@ export interface IFornecedorDTO {
 export interface IFornecedorResponse extends IFornecedorDTO {
   id: string
 }
+
+export interface IFornecedorFilter {
+  nome?: {
+    contains: string,
+    mode: string
+  }
+  fantasia?: {
+    contains: string,
+    mode: string
+  }
+  cnpj?: {
+    contains: string,
+    mode: string
+  }
+  email?: {
+    contains: string,
+    mode: string
+  }
+}

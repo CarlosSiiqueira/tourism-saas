@@ -1,6 +1,6 @@
 import prismaManager from "../database/database"
 import { Warning } from "../errors"
-import { IContaBancaria, IContaBancariaDTO, IContaBancariaResponse } from "../interfaces/ContaBancaria"
+import { IContaBancaria, IContaBancariaDTO, IContaBancariaFilter, IContaBancariaResponse } from "../interfaces/ContaBancaria"
 import { IIndex } from "../interfaces/Helper"
 import crypto from 'crypto';
 
@@ -16,44 +16,57 @@ class ContaBancariaRepository implements IContaBancaria {
       }
     }
 
+    let filterOR: IContaBancariaFilter[] = []
+
     Object.entries(filter as { [key: string]: string }).map(([key, value]) => {
 
       switch (key) {
         case 'nome':
-          Object.assign(where, {
-            OR: [
-              {
+          filterOR.push(
+            {
+              nome: {
+                contains: value,
+                mode: "insensitive"
+              }
+            },
+            {
+              Usuarios: {
                 nome: {
                   contains: value,
                   mode: "insensitive"
                 }
-              },
-              {
-                Usuarios: {
-                  nome: {
-                    contains: value,
-                    mode: "insensitive"
-                  }
-                }
               }
-            ]
-          })
+            }
+          )
           break;
 
         case 'saldo':
-          Object.assign(where, {
-            OR: [
+          if (value) {
+            filterOR.push(
               {
                 saldo: {
-                  equals: parseInt(value),
-                  // mode: "insensitive"
+                  equals: parseInt(value)
                 }
               }
-            ]
-          })
+            )
+          }
+          break;
+
+        case 'status':
+          if (value !== 'all') {
+            Object.assign(where, {
+              ativo: parseInt(value) == 1 ? true : false
+            })
+          }
           break;
       }
     })
+
+    if (filterOR.length) {
+      Object.assign(where, {
+        OR: filterOR
+      })
+    }
 
     const [count, rows] = await this.prisma.$transaction([
       this.prisma.contaBancaria.count({ where }),
