@@ -27,6 +27,8 @@ import { creditoCliente } from "./credito.cliente.routes"
 import { opcionais } from "./opcionais.routes"
 import { logs } from "./log.routes"
 import { opcionalEmbarque } from "./opcionais.embarque.routes"
+import { configuracao } from "./configuracoes.routes"
+import { comissao } from "./comissao.routes"
 
 const router = Router()
 
@@ -58,5 +60,7 @@ router.use('/credito-cliente', creditoCliente)
 router.use('/opcionais', opcionais)
 router.use('/log', logs)
 router.use('/opcional-embarque', opcionalEmbarque)
+router.use('/configuracoes', configuracao)
+router.use('/comissao', comissao)
 
 export { router }

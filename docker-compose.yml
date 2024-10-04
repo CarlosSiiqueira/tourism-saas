@@ -1,12 +1,5 @@
 version: '3.8'
 
-networks:
-  my-network:
-    driver: bridge
-    ipam:
-      config:
-      - subnet: 172.20.0.0/16
-
 services:
   api:
     build:
@@ -36,6 +29,12 @@ services:
       API_EVENT_WP_SECRET:
       API_EVENT_WP_TOKEN: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL3dlc3MuYmxvZyIsImlhdCI6MTcyMzI1MzUwOSwibmJmIjoxNzIzMjUzNTA5LCJleHAiOjE3MjM4NTgzMDksImRhdGEiOnsidXNlciI6eyJpZCI6IjIifX19.fC_H6mMyDCrhjMOiUrdYCBoEBr3edCG-wyix_Yx_9f8
       URL_LOGO_PRADOS: https://prados-web.vercel.app/images/prados/logopradosg.png
+    command: >
+      sh -c "
+      npx prisma migrate dev &&
+      npm run dev:debug
+      "
+
 
   kafka:
     image: wurstmeister/kafka:latest

@@ -2,6 +2,7 @@ import prismaManager from "../database/database"
 import { Warning } from "../errors"
 import { IIndex } from "../interfaces/Helper"
 import { IUsuario, IUsuarioDTO, IUsuarioResponse, IUsuarioLogin, IUsuarioFilter } from "../interfaces/Usuario"
+import crypto from 'crypto'
 
 class UsuarioRepository implements IUsuario {
 

@@ -87,6 +87,8 @@ model Usuarios {
   CreditoClientes       CreditoClientes[]
   Opcionais             Opcionais[]
   Logs                  Logs[]
+  Configuracoes         Configuracoes[]
+  Comissao              Comissao[]
 }
 
 model Pacotes {
@@ -312,6 +314,7 @@ model Transacoes {
   usuarioCadastro      String
   Reservas             Reservas?           @relation(fields: [idReserva], references: [id])
   idReserva            String?
+  Comissao             Comissao[]
 }
 
 model Fornecedor {
@@ -470,4 +473,26 @@ model OpcionaisEmbarque {
   idOpcional   String
   Passageiro   ExcursaoPassageiros @relation(fields: [idPassageiro], references: [id])
   idPassageiro String
+}
+
+model Configuracoes {
+  id           String   @id @default(uuid())
+  tipo         String
+  configuracao Json
+  dataCadastro DateTime @default(now())
+
+  Usuario   Usuarios @relation(fields: [idUsuario], references: [id])
+  idUsuario String
+}
+
+model Comissao {
+  id      String   @id @default(uuid())
+  periodo String
+  valor   Float
+  data    DateTime @default(now())
+
+  Financeiro  Transacoes @relation(fields: [idTransacao], references: [id])
+  idTransacao String
+  Usuario     Usuarios   @relation(fields: [usuariosId], references: [id])
+  usuariosId  String
 }

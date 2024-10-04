@@ -27,6 +27,9 @@ import { RankingClientesRepository } from "../../app/repositories/ranking.client
 import { LogRepository } from "../../app/repositories/log.repository"
 import { CreditoClienteRepository } from "../../app/repositories/credito.cliente.repository"
 import { OpcionaisRepository } from "../../app/repositories/opcionais.repository"
+import { OpcionaisEmbarqueRepository } from "../../app/repositories/opcionais.embarque.repository"
+import { ConfiguracoesRepository } from "../../app/repositories/configuracoes.repository"
+import { ComissaoRepository } from "../../app/repositories/comissao.repository"
 
 //interfaces
 import { IContaBancaria } from "../../app/interfaces/ContaBancaria"
@@ -55,8 +58,8 @@ import { ICreditoCliente } from "../../app/interfaces/CreditoCliente"
 import { IOpcionais } from "../../app/interfaces/Opcionais"
 import { ILog } from "../../app/interfaces/Log"
 import { IOpcionalEmbarque } from "../../app/interfaces/OpcionaisEmbarque"
-import { OpcionaisEmbarqueRepository } from "../../app/repositories/opcionais.embarque.repository"
-
+import { IConfiguracao } from "../../app/interfaces/Configuracoes"
+import { IComissao } from "../../app/interfaces/Comissao"
 
 container.registerSingleton<IContaBancaria>(
   "ContaBancariaRepository",
@@ -186,4 +189,14 @@ container.registerSingleton<ILog>(
 container.registerSingleton<IOpcionalEmbarque>(
   "OpcionaisEmbarqueRepository",
   OpcionaisEmbarqueRepository
+)
+
+container.registerSingleton<IConfiguracao>(
+  "ConfiguracoesRepository",
+  ConfiguracoesRepository
+)
+
+container.registerSingleton<IComissao>(
+  "ComissaoRepository",
+  ComissaoRepository
 )

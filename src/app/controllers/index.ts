@@ -31,6 +31,8 @@ import { CreditoClienteController } from "./credito.cliente.controller"
 import { OpcionaisController } from "./opcionais.controller"
 import { LogController } from "./log.controller"
 import { OpcionaisEmbarqueController } from "./opcionais.embarque.controller"
+import { ConfiguracoesController } from "./configuracoes.controller"
+import { ComissaoController } from "./comissao.controller"
 
 export const contaBancariaController = container.resolve(ContaBancariaController)
 export const excursaoController = container.resolve(ExcursaoController)
@@ -60,3 +62,5 @@ export const creditoClienteController = container.resolve(CreditoClienteControll
 export const opcionaisController = container.resolve(OpcionaisController)
 export const logsController = container.resolve(LogController)
 export const opcionaisEmbarqueController = container.resolve(OpcionaisEmbarqueController)
+export const configuracoesController = container.resolve(ConfiguracoesController)
+export const comissaoController = container.resolve(ComissaoController)
