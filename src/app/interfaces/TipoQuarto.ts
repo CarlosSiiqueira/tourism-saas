@@ -17,3 +17,10 @@ export interface ITipoQuartoDTO {
 export interface ITipoQuartoResponse extends ITipoQuartoDTO {
   id: string
 }
+
+export interface ITipoQuartoFilter {
+  nome?: {
+    contains: string
+    mode: string
+  }
+}

@@ -1,6 +1,6 @@
 import prismaManager from "../database/database"
 import { Warning } from "../errors"
-import { IPacote, IPacoteDTO, IPacoteResponse } from "../interfaces/Pacote"
+import { IPacote, IPacoteDTO, IPacoteFilter, IPacoteResponse } from "../interfaces/Pacote"
 import { IIndex } from "../interfaces/Helper"
 import crypto from 'crypto'
 
@@ -11,38 +11,60 @@ class PacoteRepository implements IPacote {
   index = async ({ orderBy, order, skip, take, filter }: IIndex): Promise<{ count: number, rows: IPacoteResponse[] }> => {
 
     const where = {
-      ativo: true
+      NOT: {
+        id: undefined
+      }
     }
+
+    let filterOR: IPacoteFilter[] = []
 
     Object.entries(filter as { [key: string]: string }).map(([key, value]) => {
 
       switch (key) {
         case 'nome':
-          Object.assign(where, {
-            OR: [
-              {
-                nome: {
-                  contains: value,
-                  mode: "insensitive"
-                }
-              },
-            ]
-          })
-          break;
-
-        case 'valor':
-          Object.assign(where, {
-            OR: [
-              {
-                valor: {
-                  equals: parseFloat(value),
+          filterOR.push(
+            {
+              nome: {
+                contains: value,
+                mode: "insensitive"
+              }
+            },
+            {
+              Produto: {
+                some: {
+                  nome: {
+                    contains: value,
+                    mode: "insensitive"
+                  }
                 }
               }
-            ]
-          })
+            }
+          )
           break;
+
+        case 'status':
+          if (value !== 'all') {
+            Object.assign(where, {
+              ativo: parseInt(value) == 1 ? true : false
+            })
+          }
+          break
+
+        case 'origem':
+          if (value !== 'all') {
+            Object.assign(where, {
+              origem: parseInt(value)
+            })
+          }
+          break
       }
     })
+
+    if (filterOR.length) {
+      Object.assign(where, {
+        OR: filterOR
+      })
+    }
 
     const [count, rows] = await this.prisma.$transaction([
       this.prisma.pacotes.count({ where }),

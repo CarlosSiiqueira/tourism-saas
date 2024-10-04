@@ -8,6 +8,6 @@ passageiroEmbarque.get('/find/:id', passageiroEmbarqueController.find)
 passageiroEmbarque.get('/findAll', passageiroEmbarqueController.findAll)
 passageiroEmbarque.get('/findByExcursao/:idExcursao', passageiroEmbarqueController.findByExcursao)
 passageiroEmbarque.put('/embarcou', passageiroEmbarqueController.embarqueDesembarque)
-passageiroEmbarque.put('/embarque-qrcode', passageiroEmbarqueController.embarqueQRCode)
+passageiroEmbarque.get('/embarque-qrcode/:idPassageiro/:idExcursao', passageiroEmbarqueController.embarqueQRCode)
 
 export { passageiroEmbarque }

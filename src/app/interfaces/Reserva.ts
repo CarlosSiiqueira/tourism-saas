@@ -69,4 +69,37 @@ export interface IReservaResponse {
       nome: string
     }
   }[]
+  ExcursaoPassageiros: {
+    id: string
+    idExcursao: string
+    idPassageiro: string
+    localEmbarque: string
+    reserva: string
+    dataCadastro: Date
+    Pessoa: {
+      nome: string
+      cpf: string
+      sexo: string
+      observacoes: string | null
+      telefone: string | null
+      telefoneWpp: string | null
+      email: string
+      contato: string | null
+      telefoneContato: string | null
+      dataNascimento: Date | null
+      usuarioCadastro: string
+      rg: string | null
+      emissor: string | null
+      rankingClientesId?: string | null
+    }
+    LocalEmbarque: {
+      nome: string
+      observacoes: string | null
+      horaEmbarque: string
+      dataCadastro: Date
+      codigoEndereco: string
+      usuarioCadastro: string
+      ativo: boolean
+    }
+  }[]
 }

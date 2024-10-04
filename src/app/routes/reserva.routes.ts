@@ -10,5 +10,6 @@ reserva.get('/findAll', reservaController.findAll)
 reserva.put('/update/:id', reservaController.update)
 reserva.patch('/delete/:id', reservaController.delete)
 reserva.post('/cancelar/:id', reservaController.cancelar)
+reserva.get('/send-ticket-mail/:id', reservaController.sendTicketMail)
 
 export { reserva }

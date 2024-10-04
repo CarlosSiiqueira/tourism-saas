@@ -78,7 +78,7 @@ class PassageiroEmbarqueController {
 
   embarqueQRCode = async (request: Request, response: Response): Promise<void> => {
 
-    const res = await this.passageiroEmbarqueRepository.embarqueQRCode(request.body, request.params.id)
+    const res = await this.passageiroEmbarqueRepository.embarqueQRCode(request.params.idPassageiro, request.params.idExcursao)
 
     response.status(200).send(res)
   }

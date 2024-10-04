@@ -158,7 +158,7 @@ class PassageiroEmbarqueRepository implements IPassageiroEmbarque {
     return data.embarcou ? ['Embarque registrado com sucesso'] : ['Desembarque registrado com sucesso']
   }
 
-  embarqueQRCode = async (data: IPassageiroEmbarqueDTO, id: string): Promise<string[]> => {
+  embarqueQRCode = async (id: string, idExcursao: string): Promise<string[]> => {
 
     const passageiroEmbarque = await this.prisma.passageiroEmbarque.findFirst({
       where: {
@@ -166,7 +166,7 @@ class PassageiroEmbarqueRepository implements IPassageiroEmbarque {
           id: id
         },
         Excursao: {
-          id: data.codigoExcursao
+          id: idExcursao
         }
       }
     })
@@ -195,7 +195,7 @@ class PassageiroEmbarqueRepository implements IPassageiroEmbarque {
         horaEmbarque: new Date().toISOString(),
         usuarioCadastro: '1',
         codigoLocalEmbarque: '1',
-        codigoExcursao: data.codigoExcursao,
+        codigoExcursao: idExcursao,
         codigoPassageiro: '1'
       }
     })

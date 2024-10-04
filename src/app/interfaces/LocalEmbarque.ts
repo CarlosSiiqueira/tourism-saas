@@ -20,3 +20,14 @@ export interface ILocalEmbarqueDTO {
 export interface ILocalEmbarqueResponse extends ILocalEmbarqueDTO {
   id: string
 }
+
+export interface ILocalEmbarqueFilter {
+  nome?: {
+    contains: string,
+    mode: string
+  }
+
+  status?: {
+    ativo: boolean
+  }
+}

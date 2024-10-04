@@ -32,3 +32,18 @@ export interface IPacoteDTO {
 export interface IPacoteResponse extends IPacoteDTO {
   id: string
 }
+
+export interface IPacoteFilter {
+  nome?: {
+    contains: string,
+    mode: string
+  }
+  Produto?: {
+    some: {
+      nome: {
+        contains: string
+        mode: string
+      }
+    }
+  }
+}

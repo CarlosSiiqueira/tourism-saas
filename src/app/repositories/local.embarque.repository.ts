@@ -1,7 +1,7 @@
 import prismaManager from "../database/database"
 import { Warning } from "../errors"
 import { IIndex } from "../interfaces/Helper"
-import { ILocalEmbarque, ILocalEmbarqueDTO, ILocalEmbarqueResponse } from "../interfaces/LocalEmbarque"
+import { ILocalEmbarque, ILocalEmbarqueDTO, ILocalEmbarqueFilter, ILocalEmbarqueResponse } from "../interfaces/LocalEmbarque"
 import crypto from 'crypto'
 
 class LocalEmbarqueRepository implements ILocalEmbarque {
@@ -14,31 +14,36 @@ class LocalEmbarqueRepository implements ILocalEmbarque {
       ativo: true
     }
 
+    let filterOR: ILocalEmbarqueFilter[] = []
+
     Object.entries(filter as { [key: string]: string }).map(([key, value]) => {
 
       switch (key) {
         case 'nome':
-          Object.assign(where, {
-            OR: [
-              {
-                nome: {
-                  contains: value,
-                  mode: "insensitive"
-                }
-              },
-              {
-                Usuarios: {
-                  nome: {
-                    contains: value,
-                    mode: "insensitive"
-                  }
-                }
+          filterOR.push(
+            {
+              nome: {
+                contains: value,
+                mode: "insensitive"
               }
-            ]
-          })
+            })
           break;
+
+        case 'status':
+          if (value !== 'all') {
+            Object.assign(where, {
+              ativo: parseInt(value) == 1 ? true : false
+            })
+          }
+          break
       }
     })
+
+    if (filterOR.length) {
+      Object.assign(where, {
+        OR: filterOR
+      })
+    }
 
     const [count, rows] = await this.prisma.$transaction([
       this.prisma.localEmbarque.count({ where }),

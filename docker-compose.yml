@@ -35,9 +35,7 @@ services:
       API_EVENT_WP_USER:
       API_EVENT_WP_SECRET:
       API_EVENT_WP_TOKEN: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL3dlc3MuYmxvZyIsImlhdCI6MTcyMzI1MzUwOSwibmJmIjoxNzIzMjUzNTA5LCJleHAiOjE3MjM4NTgzMDksImRhdGEiOnsidXNlciI6eyJpZCI6IjIifX19.fC_H6mMyDCrhjMOiUrdYCBoEBr3edCG-wyix_Yx_9f8
-    networks:
-      my-network:
-        ipv4_address: 172.20.0.10
+      URL_LOGO_PRADOS: https://prados-web.vercel.app/images/prados/logopradosg.png
 
   kafka:
     image: wurstmeister/kafka:latest
@@ -55,9 +53,6 @@ services:
     depends_on:
       zookeeper:
         condition: service_healthy
-    networks:
-      my-network:
-        ipv4_address: 172.20.0.11
 
   zookeeper:
     image: wurstmeister/zookeeper:latest
@@ -68,6 +63,3 @@ services:
       interval: 10s
       timeout: 5s
       retries: 3
-    networks:
-      my-network:
-        ipv4_address: 172.20.0.12

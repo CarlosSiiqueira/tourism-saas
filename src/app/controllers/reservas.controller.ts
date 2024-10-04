@@ -10,6 +10,10 @@ import { OpcionaisService } from '../services/opcionais.service'
 import { LogService } from '../services/log.service'
 import { ExcursaoQuartosService } from '../services/excursao.quarto.service'
 import { ExcursaoOnibusService } from '../services/excursao.onibus.service'
+import { PdfService } from '../services/pdf.service'
+import { htmlTicket } from '../../shared/helper/html'
+import { EmailService } from '../services/mail.service'
+import { formattingDate } from '../../shared/helper/date'
 
 @injectable()
 class ReservaController {
@@ -23,7 +27,9 @@ class ReservaController {
     private opcionaisService: OpcionaisService,
     private logService: LogService,
     private excursaoQuartosService: ExcursaoQuartosService,
-    private excursaoOnibusService: ExcursaoOnibusService
+    private excursaoOnibusService: ExcursaoOnibusService,
+    private pdfService: PdfService,
+    private emailService: EmailService
   ) { }
 
   index = async (request: Request, response: Response): Promise<void> => {
@@ -253,6 +259,45 @@ class ReservaController {
     }
 
     response.status(200).send(reserva)
+  }
+
+  sendTicketMail = async (request: Request, response: Response): Promise<void> => {
+
+    let user = JSON.parse(request.headers.user as string);
+    const reserva = await this.reservaRepository.find(request.params.id)
+    let excursaoNome = `${reserva.Excursao.nome} - ${formattingDate(reserva.Excursao.dataInicio.toDateString())} à ${formattingDate(reserva.Excursao.dataFim.toDateString())}`
+
+    const html = await htmlTicket(reserva);
+    const pdf = await this.pdfService.generatePdf(html)
+
+    // reserva.Pessoa.map((passageiro) => {
+    // 1 email por passageiro
+
+    this.emailService.sendEmail('carlooos.siqueira@gmail.com',
+      `Ticket Excursão: ${excursaoNome}`,
+      `Olá segue em anexo ou seu voucher de embarque para a Excursão: \n
+       ${excursaoNome}`,
+      3,
+      [
+        {
+          filename: 'voucher.pdf',
+          content: pdf,
+          contentType: 'application/pdf'
+
+        }
+      ])
+
+    // })
+
+    await this.logService.create({
+      tipo: 'CREATE',
+      newData: null,
+      oldData: null,
+      rotina: 'Reservas/Envio de email-voucher',
+      usuariosId: user.id
+    })
+
+    response.send('Email enviado').status(200)
   }
 }
 

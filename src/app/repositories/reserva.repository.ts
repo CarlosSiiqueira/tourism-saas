@@ -135,6 +135,12 @@ class ReservaRepository implements IReserva {
                 }
               }
             }
+          },
+          ExcursaoPassageiros: {
+            include: {
+              Pessoa: true,
+              LocalEmbarque:true            
+            }
           }
         },
         where
@@ -181,7 +187,7 @@ class ReservaRepository implements IReserva {
 
   find = async (id: string): Promise<IReservaResponse> => {
 
-    const Reserva = await this.prisma.reservas.findUnique({
+    const reserva = await this.prisma.reservas.findUnique({
       where: {
         id
       },
@@ -199,15 +205,21 @@ class ReservaRepository implements IReserva {
           include: {
             Produto: true
           }
+        },
+        ExcursaoPassageiros: {
+          include: {
+            Pessoa: true,
+            LocalEmbarque:true            
+          }
         }
       }
     })
 
-    if (!Reserva) {
+    if (!reserva) {
       throw new Warning("Reserva não encontrada", 400);
     }
 
-    return Reserva
+    return reserva
   }
 
   findAll = async (): Promise<IReservaResponse[]> => {
@@ -227,6 +239,12 @@ class ReservaRepository implements IReserva {
         Opcionais: {
           include: {
             Produto: true
+          }
+        },
+        ExcursaoPassageiros: {
+          include: {
+            Pessoa: true,
+            LocalEmbarque:true            
           }
         }
       }
