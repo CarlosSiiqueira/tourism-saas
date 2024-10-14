@@ -2,6 +2,7 @@ version: '3.8'
 
 services:
   api:
+    image: alisson446/api-prado-turismo
     build:
       context: .
       dockerfile: Dockerfile
@@ -15,6 +16,7 @@ services:
       kafka:
         condition: service_healthy
     restart: on-failure
+    command: sh -c "npx prisma migrate deploy && npm run dev:debug"
     environment:
       KAFKA_BROKER: kafka:9092
       PORT: 8000
@@ -29,12 +31,6 @@ services:
       API_EVENT_WP_SECRET:
       API_EVENT_WP_TOKEN: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL3dlc3MuYmxvZyIsImlhdCI6MTcyMzI1MzUwOSwibmJmIjoxNzIzMjUzNTA5LCJleHAiOjE3MjM4NTgzMDksImRhdGEiOnsidXNlciI6eyJpZCI6IjIifX19.fC_H6mMyDCrhjMOiUrdYCBoEBr3edCG-wyix_Yx_9f8
       URL_LOGO_PRADOS: https://prados-web.vercel.app/images/prados/logopradosg.png
-    command: >
-      sh -c "
-      npx prisma migrate dev &&
-      npm run dev:debug
-      "
-
 
   kafka:
     image: wurstmeister/kafka:latest

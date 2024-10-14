@@ -1,16 +1,21 @@
 import { IIndex } from "./Helper"
 
 export interface IFinanceiro {
-  index(data: IIndex): Promise<{ count: number, rows: IFinanceiroResponse[] }>
-  create(data: IFinanceiroDTO): Promise<string>
-  find(id: string): Promise<IFinanceiroResponse>
-  findAll(): Promise<IFinanceiroResponse[]>
-  delete(id: string): Promise<string>
-  update(data: IFinanceiroDTO, id: string): Promise<string>
-  setVistoAdmin(visto: boolean, id: string): Promise<string[]>
-  checkVistoAdmin(id: string): Promise<boolean>
-  efetivaDesfetiva(id: string, acao: boolean): Promise<string[]>
-  relatorioFinanceiroCliente({ orderBy, order, skip, take, filter }: IIndex, idCliente: string): Promise<{ sum: number, count: number, rows: IFinanceiroResponse[] }>
+  index (data: IIndex): Promise<{ count: number, rows: IFinanceiroResponse[] }>
+  create (data: IFinanceiroDTO): Promise<string>
+  find (id: string): Promise<IFinanceiroResponse>
+  findAll (): Promise<IFinanceiroResponse[]>
+  delete (id: string): Promise<string>
+  update (data: IFinanceiroDTO, id: string): Promise<string>
+  setVistoAdmin (visto: boolean, id: string): Promise<string[]>
+  checkVistoAdmin (id: string): Promise<boolean>
+  efetivaDesfetiva (id: string, acao: boolean): Promise<string[]>
+  relatorioFinanceiroCliente (data: IIndex, idCliente: string): Promise<{ sum: number, count: number, rows: IFinanceiroResponse[] }>
+  relatorioFinanceiroCategoria (data: IIndex): Promise<{ count: number, rows: IFinanceiroResponse[], receitas: number, despesas: number }>
+  relatorioFinanceiroExcursoes (data: IIndex): Promise<{ count: number, rows: IFinanceiroResponse[], receitas: number, despesas: number }>
+  relatorioFinanceiroFornecedor (data: IIndex): Promise<{ count: number, rows: IFinanceiroResponse[], despesas: number }>
+  relatorioFinanceiroPacote (data: IIndex): Promise<{ count: number, rows: IFinanceiroResponse[], receitas: number, despesas: number }>
+  relatorioFinanceiroVenda (data: IIndex): Promise<{ count: number, rows: IFinanceiroResponse[], vendas: number }>
 }
 
 export interface IFinanceiroDTO {

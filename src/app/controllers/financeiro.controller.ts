@@ -15,7 +15,7 @@ import { LogService } from '../services/log.service'
 
 @injectable()
 class FinanceiroController {
-  constructor(
+  constructor (
     @inject("FinanceiroRepository")
     private financeiroRepository: FinanceiroRepository,
     private financeiroService: FinanceiroService,
@@ -185,6 +185,10 @@ class FinanceiroController {
     if (res && request.body.efetivado) {
       let tipoMovimentacao = request.body.tipo == 2 ? "C" : "D"
       await this.contaBancariaService.movimentar(request.body.codigoContaBancaria, request.body.valor, tipoMovimentacao)
+
+      if (request.body.idReserva) {
+        await this.reservaService.confirmaReserva(request.body.idReserva)
+      }
     }
 
     await this.logService.create({

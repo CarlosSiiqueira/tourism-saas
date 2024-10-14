@@ -9,7 +9,7 @@ import { IPacoteResponse } from "../interfaces/Pacote";
 @injectable()
 export class FinanceiroService {
 
-  constructor(
+  constructor (
     @inject("FinanceiroRepository")
     private financeiroRepository: FinanceiroRepository
   ) { }
@@ -100,6 +100,26 @@ export class FinanceiroService {
     const { sum, count, rows } = await this.financeiroRepository.relatorioFinanceiroCliente(params, idCliente)
 
     return { sum, count, rows }
+  }
+
+  relatorioFinanceiroCategoria = async (params: IIndex): Promise<{ count: number, rows: IFinanceiroResponse[], receitas: number, despesas: number }> => {
+    return await this.financeiroRepository.relatorioFinanceiroCategoria(params)
+  }
+
+  relatorioFinanceiroExcursoes = async (params: IIndex): Promise<{ count: number, rows: IFinanceiroResponse[], receitas: number, despesas: number }> => {
+    return await this.financeiroRepository.relatorioFinanceiroExcursoes(params)
+  }
+
+  relatorioFinanceiroFornecedor = async (params: IIndex): Promise<{ count: number, rows: IFinanceiroResponse[], despesas: number }> => {
+    return await this.financeiroRepository.relatorioFinanceiroFornecedor(params)
+  }
+
+  relatorioFinanceiroPacote = async (params: IIndex): Promise<{ count: number, rows: IFinanceiroResponse[], despesas: number }> => {
+    return await this.financeiroRepository.relatorioFinanceiroPacote(params)
+  }
+
+  relatorioFinanceiroVenda = async (params: IIndex): Promise<{ count: number, rows: IFinanceiroResponse[], vendas: number }> => {
+    return await this.financeiroRepository.relatorioFinanceiroVenda(params)
   }
 
   find = async (id: string): Promise<IFinanceiroResponse> => {

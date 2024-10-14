@@ -621,10 +621,13 @@ class FinanceiroRepository implements IFinanceiro {
           },
           efetivado: true,
           AND: {
-            NOT: {
-              codigoExcursao: null,
+            NOT: [{
+              codigoExcursao: null
+
+            },
+            {
               codigoPacote: null
-            }
+            }]
           }
         }
       }),
@@ -640,10 +643,13 @@ class FinanceiroRepository implements IFinanceiro {
           },
           efetivado: true,
           AND: {
-            NOT: {
-              codigoExcursao: null,
+            NOT: [{
+              codigoExcursao: null
+
+            },
+            {
               codigoPacote: null
-            }
+            }]
           }
         }
       }),
@@ -664,10 +670,13 @@ class FinanceiroRepository implements IFinanceiro {
           },
           efetivado: true,
           AND: {
-            NOT: {
-              codigoExcursao: null,
+            NOT: [{
+              codigoExcursao: null
+
+            },
+            {
               codigoPacote: null
-            }
+            }]
           }
         },
         include: {
@@ -690,6 +699,567 @@ class FinanceiroRepository implements IFinanceiro {
     ])
 
     return { sum: sum._sum.valor || 0, count, rows }
+  }
+
+  relatorioFinanceiroCategoria = async ({
+    orderBy,
+    order,
+    skip,
+    take,
+    filter }: IIndex
+  ): Promise<{ count: number, rows: IFinanceiroResponse[], receitas: number, despesas: number }> => {
+
+    const where = {
+      ativo: true,
+      data: {},
+      AND: {
+        NOT: [{
+          codigoCategoria: null
+        },
+        {
+          codigoContaBancaria: null
+        }]
+      }
+    }
+
+    Object.entries(filter as {
+      [key: string]: string
+    }).map(([key, value]) => {
+
+      switch (key) {
+        case 'codigoCategoria':
+          Object.assign(where, {
+            codigoCategoria: value
+          })
+          break;
+
+        case 'codigoSubCategoria':
+          Object.assign(where, {
+            CategoriaTransacao: {
+              codigoSubCategoria: value
+            }
+          })
+          break;
+
+        case 'dataInicio':
+          const dataIni = dateValidate(value)
+          dataIni.setDate(dataIni.getDate() + 1)
+          dataIni.setHours(0, 0, 0, 0)
+          Object.assign(where.data, {
+            gte: dataIni,
+          })
+          break;
+
+        case 'dataFim':
+          const dataFim = dateValidate(value)
+          dataFim.setDate(dataFim.getDate() + 1)
+          dataFim.setHours(23, 59, 59, 999)
+          Object.assign(where.data, {
+            lte: dataFim
+          })
+          break;
+
+        default:
+          Object.assign(where, {
+            [key]: {
+              contains: value,
+              mode: "insensitive"
+            }
+          })
+          break;
+      }
+    })
+
+    const [count, rows, somaTipo1, somaTipo2] = await this.prisma.$transaction([
+      this.prisma.transacoes.count({ where }),
+      this.prisma.transacoes.findMany({
+        skip,
+        take,
+        orderBy: {
+          [orderBy as string]: order
+        },
+        where,
+        include: {
+          Pessoas: true,
+          Fornecedor: true,
+          Excursao: {
+            include: {
+              Pacotes: true
+            }
+          },
+          Usuarios: true,
+          Produtos: true,
+          FormaPagamento: true,
+          ContaBancaria: true,
+          CategoriaTransacao: {
+            include: {
+              SubCategoria: true
+            }
+          },
+          Reservas: true
+        }
+      }),
+      this.prisma.transacoes.aggregate({
+        _sum: {
+          valor: true
+        },
+        where: {
+          ...where,
+          tipo: 1
+        }
+      }),
+      this.prisma.transacoes.aggregate({
+        _sum: {
+          valor: true
+        },
+        where: {
+          ...where,
+          tipo: 2
+        }
+      })
+    ]);
+
+    return {
+      count,
+      rows,
+      despesas: somaTipo1._sum.valor || 0,
+      receitas: somaTipo2._sum.valor || 0
+    };
+
+  }
+
+  relatorioFinanceiroExcursoes = async ({
+    orderBy,
+    order,
+    skip,
+    take,
+    filter
+  }: IIndex): Promise<{ count: number, rows: IFinanceiroResponse[], receitas: number, despesas: number }> => {
+
+    const where = {
+      ativo: true,
+      data: {},
+      AND: {
+        NOT: [{
+          codigoExcursao: null,
+        },
+        {
+          codigoContaBancaria: null
+        }]
+      }
+    }
+
+    Object.entries(filter as {
+      [key: string]: string
+    }).map(([key, value]) => {
+
+      switch (key) {
+        case 'codigoExcursao':
+          Object.assign(where, {
+            codigoExcursao: value
+          })
+          break;
+
+        case 'dataInicio':
+          const dataIni = dateValidate(value)
+          dataIni.setDate(dataIni.getDate() + 1)
+          dataIni.setHours(0, 0, 0, 0)
+          Object.assign(where.data, {
+            gte: dataIni,
+          })
+          break;
+
+        case 'dataFim':
+          const dataFim = dateValidate(value)
+          dataFim.setDate(dataFim.getDate() + 1)
+          dataFim.setHours(23, 59, 59, 999)
+          Object.assign(where.data, {
+            lte: dataFim
+          })
+          break;
+
+        default:
+          Object.assign(where, {
+            [key]: {
+              contains: value,
+              mode: "insensitive"
+            }
+          })
+          break;
+      }
+    })
+
+    const [count, rows, summaryDebit, summaryCredit] = await this.prisma.$transaction([
+      this.prisma.transacoes.count({ where }),
+      this.prisma.transacoes.findMany({
+        skip,
+        take,
+        orderBy: {
+          [orderBy as string]: order
+        },
+        where,
+        include: {
+          FormaPagamento: true,
+          ContaBancaria: true,
+          CategoriaTransacao: {
+            include: {
+              SubCategoria: true
+            }
+          },
+          Reservas: true,
+          Usuarios: true,
+          Excursao: {
+            include: {
+              Pacotes: true
+            }
+          }
+        }
+      }),
+      this.prisma.transacoes.aggregate({
+        where: {
+          ...where,
+          tipo: 1
+        },
+        _sum: {
+          valor: true
+        }
+      }),
+      this.prisma.transacoes.aggregate({
+        where: {
+          ...where,
+          tipo: 2
+        },
+        _sum: {
+          valor: true
+        }
+      })
+    ])
+
+    return {
+      count,
+      rows,
+      despesas: summaryDebit._sum.valor || 0,
+      receitas: summaryCredit._sum.valor || 0
+    }
+  }
+
+  relatorioFinanceiroFornecedor = async ({
+    orderBy,
+    order,
+    skip,
+    take,
+    filter
+  }: IIndex): Promise<{ count: number, rows: IFinanceiroResponse[], despesas: number }> => {
+
+    const where = {
+      ativo: true,
+      data: {},
+      AND: {
+        tipo: 1,
+        NOT: [{
+          codigoFornecedor: null
+        },
+        {
+          codigoContaBancaria: null
+        }]
+      }
+    }
+
+    Object.entries(filter as {
+      [key: string]: string
+    }).map(([key, value]) => {
+
+      switch (key) {
+        case 'codigoFornecedor':
+          Object.assign(where, {
+            codigoFornecedor: value
+          })
+          break;
+
+        case 'dataInicio':
+          const dataIni = dateValidate(value)
+          dataIni.setDate(dataIni.getDate() + 1)
+          dataIni.setHours(0, 0, 0, 0)
+          Object.assign(where.data, {
+            gte: dataIni,
+          })
+          break;
+
+        case 'dataFim':
+          const dataFim = dateValidate(value)
+          dataFim.setDate(dataFim.getDate() + 1)
+          dataFim.setHours(23, 59, 59, 999)
+          Object.assign(where.data, {
+            lte: dataFim
+          })
+          break;
+
+        default:
+          Object.assign(where, {
+            [key]: {
+              contains: value,
+              mode: "insensitive"
+            }
+          })
+          break;
+      }
+    })
+
+    const [count, rows, summaryDebit] = await this.prisma.$transaction([
+      this.prisma.transacoes.count({ where }),
+      this.prisma.transacoes.findMany({
+        skip,
+        take,
+        orderBy: {
+          [orderBy as string]: order
+        },
+        where,
+        include: {
+          FormaPagamento: true,
+          ContaBancaria: true,
+          CategoriaTransacao: {
+            include: {
+              SubCategoria: true
+            }
+          },
+          Reservas: true,
+          Usuarios: true,
+          Fornecedor: true
+        }
+      }),
+      this.prisma.transacoes.aggregate({
+        where,
+        _sum: {
+          valor: true
+        }
+      })
+    ])
+
+    return {
+      count,
+      rows,
+      despesas: summaryDebit._sum.valor || 0
+    }
+  }
+
+  relatorioFinanceiroPacote = async ({
+    orderBy,
+    order,
+    skip,
+    take,
+    filter
+  }: IIndex): Promise<{ count: number, rows: IFinanceiroResponse[], receitas: number, despesas: number }> => {
+
+    const where = {
+      ativo: true,
+      data: {},
+      AND: {
+        NOT: [{
+          codigoPacote: null
+        },
+        {
+          codigoContaBancaria: null
+        }]
+      }
+    }
+
+    Object.entries(filter as {
+      [key: string]: string
+    }).map(([key, value]) => {
+
+      switch (key) {
+        case 'codigoPacote':
+          Object.assign(where, {
+            codigoPacote: value
+          })
+          break;
+
+        case 'dataInicio':
+          const dataIni = dateValidate(value)
+          dataIni.setDate(dataIni.getDate() + 1)
+          dataIni.setHours(0, 0, 0, 0)
+          Object.assign(where.data, {
+            gte: dataIni,
+          })
+          break;
+
+        case 'dataFim':
+          const dataFim = dateValidate(value)
+          dataFim.setDate(dataFim.getDate() + 1)
+          dataFim.setHours(23, 59, 59, 999)
+          Object.assign(where.data, {
+            lte: dataFim
+          })
+          break;
+
+        default:
+          Object.assign(where, {
+            [key]: {
+              contains: value,
+              mode: "insensitive"
+            }
+          })
+          break;
+      }
+    })
+
+    const [count, rows, summaryDebit, summaryCredit] = await this.prisma.$transaction([
+      this.prisma.transacoes.count({ where }),
+      this.prisma.transacoes.findMany({
+        skip,
+        take,
+        orderBy: {
+          [orderBy as string]: order
+        },
+        where,
+        include: {
+          FormaPagamento: true,
+          ContaBancaria: true,
+          CategoriaTransacao: {
+            include: {
+              SubCategoria: true
+            }
+          },
+          Reservas: true,
+          Usuarios: true,
+          Fornecedor: true,
+          Pacotes: true
+        }
+      }),
+      this.prisma.transacoes.aggregate({
+        where: {
+          ...where,
+          tipo: 1
+        },
+        _sum: {
+          valor: true
+        }
+      }),
+      this.prisma.transacoes.aggregate({
+        where: {
+          ...where,
+          tipo: 2
+        },
+        _sum: {
+          valor: true
+        }
+      })
+    ])
+
+    return {
+      count,
+      rows,
+      despesas: summaryDebit._sum.valor || 0,
+      receitas: summaryCredit._sum.valor || 0
+    }
+  }
+
+  relatorioFinanceiroVenda = async ({
+    orderBy,
+    order,
+    skip,
+    take,
+    filter
+  }: IIndex): Promise<{ count: number, rows: IFinanceiroResponse[], vendas: number }> => {
+
+    const where = {
+      ativo: true,
+      tipo: 2,
+      data: {},
+      AND: {
+        NOT: [{
+          idReserva: null
+        },
+        {
+          codigoContaBancaria: null
+        }]
+      }
+    }
+
+    Object.entries(filter as {
+      [key: string]: string
+    }).map(([key, value]) => {
+
+      switch (key) {
+        case 'codigoUsuario':
+          Object.assign(where, {
+            Reservas: {
+              codigoUsuario: {
+                equals: value
+              }
+            }
+          })
+          break;
+
+        case 'dataInicio':
+          const dataIni = dateValidate(value)
+          dataIni.setDate(dataIni.getDate() + 1)
+          dataIni.setHours(0, 0, 0, 0)
+          Object.assign(where.data, {
+            gte: dataIni,
+          })
+          break;
+
+        case 'dataFim':
+          const dataFim = dateValidate(value)
+          dataFim.setDate(dataFim.getDate() + 1)
+          dataFim.setHours(23, 59, 59, 999)
+          Object.assign(where.data, {
+            lte: dataFim
+          })
+          break;
+
+        default:
+          Object.assign(where, {
+            [key]: {
+              contains: value,
+              mode: "insensitive"
+            }
+          })
+          break;
+      }
+    })
+
+    const [count, rows, summaryVendas] = await this.prisma.$transaction([
+      this.prisma.transacoes.count({ where }),
+      this.prisma.transacoes.findMany({
+        skip,
+        take,
+        orderBy: {
+          [orderBy as string]: order
+        },
+        where,
+        include: {
+          FormaPagamento: true,
+          ContaBancaria: true,
+          CategoriaTransacao: {
+            include: {
+              SubCategoria: true
+            }
+          },
+          Reservas: {
+            include: {
+              Usuario: true
+            }
+          },
+          Excursao: true,
+          Usuarios: true,
+          Fornecedor: true,
+        }
+      }),
+      this.prisma.transacoes.aggregate({
+        where,
+        _sum: {
+          valor: true
+        }
+      })
+    ])
+
+    return {
+      count,
+      rows,
+      vendas: summaryVendas._sum.valor || 0
+    }
   }
 }
 

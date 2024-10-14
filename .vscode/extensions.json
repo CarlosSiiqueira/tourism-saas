@@ -1,0 +1,14 @@
+{
+  "recommendations": [
+    // ESLint
+    "dbaeumer.vscode-eslint",
+    // EditorConfig
+    "EditorConfig.EditorConfig",
+    // Git History
+    "donjayamanne.githistory",
+    // GitLens
+    "eamodio.gitlens",
+    // Auto Import
+    "steoates.autoimport"
+  ],
+}

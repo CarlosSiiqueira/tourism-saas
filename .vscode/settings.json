@@ -1,0 +1,21 @@
+{
+  "files.eol": "\n",
+  "editor.tabSize": 2,
+  "editor.formatOnSave": true,
+  "editor.formatOnPaste": true,
+  "editor.formatOnType": true,
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": "never",
+    "source.fixAll": "explicit",
+    "source.fixAll.eslint": "explicit"
+  },
+  "editor.rulers": [
+    100,
+    120
+  ],
+  "extensions.ignoreRecommendations": false,
+  "typescript.updateImportsOnFileMove.enabled": "prompt",
+  "typescript.format.insertSpaceBeforeFunctionParenthesis": true,
+  "typescript.format.insertSpaceAfterConstructor": true,
+  "typescript.tsdk": "node_modules/typescript/lib"
+}
