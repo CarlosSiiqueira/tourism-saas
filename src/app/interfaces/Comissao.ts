@@ -2,15 +2,16 @@ import { JsonValue } from "@prisma/client/runtime/library"
 import { IIndex } from "./Helper"
 
 export interface IComissao {
-  index(data: IIndex): Promise<{
+  index (data: IIndex): Promise<{
     count: number
     rows: IComissaoResponse[]
   }>
-  create(data: IComissaoDTO): Promise<string>
-  find(id: string): Promise<IComissaoResponse>
-  findAll(): Promise<IComissaoResponse[]>
-  delete(id: string): Promise<IComissaoResponse>
-  update(data: IComissaoDTO, id: string): Promise<IComissaoResponse>
+  create (data: IComissaoDTO): Promise<string>
+  find (id: string): Promise<IComissaoResponse>
+  findAll (): Promise<IComissaoResponse[]>
+  delete (id: string): Promise<IComissaoResponse>
+  update (data: IComissaoDTO, id: string): Promise<IComissaoResponse>
+  findByFinanceiro (idFinanceiro: string): Promise<IComissaoResponse | null>
 }
 
 export interface IComissaoDTO {

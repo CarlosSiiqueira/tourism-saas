@@ -176,6 +176,17 @@ class ComissaoRepository implements IComissao {
 
     return comissao
   }
+
+  findByFinanceiro = async (idTransacao: string): Promise<IComissaoResponse | null> => {
+
+    const comissao = await this.prisma.comissao.findFirst({
+      where: {
+        idTransacao
+      }
+    })
+
+    return comissao;
+  }
 }
 
 export { ComissaoRepository }

@@ -12,6 +12,7 @@ import { PessoaService } from '../services/pessoa.service'
 import { ExcursaoPassageiroService } from '../services/excursao.passageiro.service'
 import { ContaBancariaService } from '../services/conta.bancaria.service'
 import { LogService } from '../services/log.service'
+import { ComissaoService } from '../services/comissao.service'
 
 @injectable()
 class FinanceiroController {
@@ -26,7 +27,8 @@ class FinanceiroController {
     private enderecoService: EnderecoService,
     private excursaoPassageiroService: ExcursaoPassageiroService,
     private contaBancariaService: ContaBancariaService,
-    private logService: LogService
+    private logService: LogService,
+    private comissaoService: ComissaoService
   ) { }
 
   index = async (request: Request, response: Response): Promise<void> => {
@@ -211,6 +213,12 @@ class FinanceiroController {
     if (financeiro && financeiro.efetivado) {
       let tipoMovimentacao = financeiro.tipo == 2 ? "D" : "C"
       await this.contaBancariaService.movimentar(financeiro.codigoContaBancaria || '', financeiro.valor, tipoMovimentacao)
+    }
+
+    let comissao = await this.comissaoService.findByFinanceiro(request.params.id)
+
+    if (comissao) {
+      await this.comissaoService.delete(comissao.id)
     }
 
     const res = await this.financeiroRepository.delete(request.params.id)
