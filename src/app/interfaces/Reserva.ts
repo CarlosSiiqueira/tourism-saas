@@ -1,17 +1,17 @@
 import { IIndex } from "./Helper"
 
 export interface IReserva {
-  index(data: IIndex): Promise<{
+  index (data: IIndex): Promise<{
     count: number
     rows: IReservaResponse[]
   }>
-  create(data: IReservaDTO): Promise<string>
-  find(id: string): Promise<IReservaResponse>
-  findAll(): Promise<IReservaResponse[]>
-  delete(id: string): Promise<string>
-  update(data: IReservaDTO, id: string): Promise<string[]>
-  setConfirm(id: string, status: boolean): Promise<string>
-  setOpcionais(opcionais: string[], id: string): Promise<string[]>
+  create (data: IReservaDTO): Promise<string>
+  find (id: string): Promise<IReservaResponse>
+  findAll (): Promise<IReservaResponse[]>
+  delete (id: string): Promise<string>
+  update (data: IReservaDTO, id: string): Promise<string[]>
+  setConfirm (id: string, status: boolean): Promise<string>
+  setOpcionais (opcionais: string[], id: string): Promise<string[]>
 }
 
 export interface IReservaDTO {
@@ -32,11 +32,13 @@ export interface IReservaResponse {
   codigoUsuario: string | null,
   desconto: number
   plataforma: number
+  dataCadastro: Date
   Pessoa: {
     id: string,
     nome: string,
     cpf: string,
     rg: string | null
+    email: string
   }[],
   Excursao: {
     id: string,

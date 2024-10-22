@@ -82,7 +82,8 @@ class ReservaRepository implements IReserva {
               id: true,
               nome: true,
               cpf: true,
-              rg: true
+              rg: true,
+              email: true
             }
           },
           Excursao: {
@@ -139,7 +140,7 @@ class ReservaRepository implements IReserva {
           ExcursaoPassageiros: {
             include: {
               Pessoa: true,
-              LocalEmbarque:true            
+              LocalEmbarque: true
             }
           }
         },
@@ -209,7 +210,7 @@ class ReservaRepository implements IReserva {
         ExcursaoPassageiros: {
           include: {
             Pessoa: true,
-            LocalEmbarque:true            
+            LocalEmbarque: true
           }
         }
       }
@@ -244,7 +245,7 @@ class ReservaRepository implements IReserva {
         ExcursaoPassageiros: {
           include: {
             Pessoa: true,
-            LocalEmbarque:true            
+            LocalEmbarque: true
           }
         }
       }

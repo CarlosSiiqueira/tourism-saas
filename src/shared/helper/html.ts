@@ -1,27 +1,27 @@
 import QRCode from 'qrcode';
 import { IReservaResponse } from '../../app/interfaces/Reserva';
 import { formattingDate } from './date';
-import { cpfMask, phoneMask } from './fieldMask';
+import { cpfMask, currencyBRLFormat, phoneMask } from './fieldMask';
 
 export const htmlTicket = async (data: IReservaResponse): Promise<string> => {
 
-  let qrCodeUrl = ''
-  let ticketHtml = ''
-  let opcionaisHtml = 'Sem Opcionais'
+    let qrCodeUrl = ''
+    let ticketHtml = ''
+    let opcionaisHtml = 'Sem Opcionais'
 
-  if (data.Opcionais.length) {
-    opcionaisHtml = '<br>'
-    data.Opcionais.map((opcional) => {
-      opcionaisHtml += `${opcional.Produto.nome} <br>`
-    })
-  }
+    if (data.Opcionais.length) {
+        opcionaisHtml = '<br>'
+        data.Opcionais.map((opcional) => {
+            opcionaisHtml += `${opcional.Produto.nome} <br>`
+        })
+    }
 
-  ticketHtml += await Promise.all(
-    data.ExcursaoPassageiros.map(async (passageiro) => {
+    ticketHtml += await Promise.all(
+        data.ExcursaoPassageiros.map(async (passageiro) => {
 
-      qrCodeUrl = await QRCode.toDataURL(`http://127.0.0.1:8000/passageiro-embarque/embarque-qrcode/${passageiro.id}/${data.Excursao.id}`);
+            qrCodeUrl = await QRCode.toDataURL(`http://127.0.0.1:8000/passageiro-embarque/embarque-qrcode/${passageiro.id}/${data.Excursao.id}`);
 
-      return `<div class="ticket-info">
+            return `<div class="ticket-info">
                       <h3>Excursão para ${data.Excursao.nome}</h3>
 
                       <div class="details">
@@ -47,10 +47,10 @@ export const htmlTicket = async (data: IReservaResponse): Promise<string> => {
                           <img src="${qrCodeUrl}" alt="QR Code">
                       </div>
                   </div>`
-    })
-  )
+        })
+    )
 
-  return `<!DOCTYPE html>
+    return `<!DOCTYPE html>
               <html lang="en">
               <head>
                   <meta charset="UTF-8">
@@ -146,4 +146,182 @@ export const htmlTicket = async (data: IReservaResponse): Promise<string> => {
               </div>
               </body>
           </html>`
+}
+
+export const htmlEmailReserva = async (
+    data: IReservaResponse,
+    passageiro: { id: string, cpf: string, rg: string | null, nome: string, email: string }
+): Promise<string> => {
+
+    const excursaoNome = `${data.Excursao.nome} - ${formattingDate(data.Excursao.dataInicio.toDateString())} à ${formattingDate(data.Excursao.dataFim.toDateString())}`
+    const valor = data.Transacoes?.reduce((previousValue, currentValue) => previousValue + currentValue.valor, 0) || 0
+    const qtd = data.ExcursaoPassageiros.length
+    const valorTotal = valor * qtd
+    const formaPagamento = data.Transacoes?.map((financeiro) => { financeiro.FormaPagamento.nome })
+    const valorLiquido = valorTotal - data.desconto
+
+    return `<!DOCTYPE html>
+            <html lang="pt-BR">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <style>
+                    body {
+                        font-family: Arial, sans-serif;
+                        background-color: #f4f4f4;
+                        margin: 0;
+                        padding: 0;
+                    }
+
+                    .container {
+                        width: 100%;
+                        max-width: 600px;
+                        margin: 0 auto;
+                        background-color: #ffffff;
+                        border-radius: 10px;
+                        overflow: hidden;
+                        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+                    }
+
+                    .header {
+                        background-color: #202020;
+                        padding: 20px;
+                        color: white;
+                        text-align: left;
+                    }
+
+                    .header img {
+                        max-height: 40px;
+                    }
+
+                    .header .right {
+                        text-align: right;
+                        font-size: 12px;
+                    }
+
+                    .content {
+                        padding: 20px;
+                    }
+
+                    .content h1 {
+                        color: #28a745;
+                    }
+
+                    .content p {
+                        font-size: 16px;
+                        line-height: 1.5;
+                        color: #333;
+                    }
+
+                    .cta-button {
+                        background-color: #000;
+                        color: white;
+                        text-align: center;
+                        padding: 15px;
+                        border-radius: 5px;
+                        display: block;
+                        width: 100%;
+                        text-decoration: none;
+                        margin: 20px 0;
+                    }
+
+                    .cta-button:hover {
+                        background-color: #333;
+                    }
+
+                    .footer {
+                        background-color: #f4f4f4;
+                        padding: 20px;
+                        text-align: center;
+                        font-size: 14px;
+                        color: #555;
+                    }
+
+                    .footer a {
+                        color: #000;
+                        text-decoration: none;
+                    }
+
+                    .footer img {
+                        max-width: 30px;
+                        margin: 0 10px;
+                    }
+
+                    table {
+                        width: 100%;
+                        border-collapse: collapse;
+                        margin: 20px 0;
+                    }
+
+                    table, th, td {
+                        border: 1px solid #ddd;
+                    }
+
+                    th, td {
+                        padding: 10px;
+                        text-align: left;
+                    }
+
+                    th {
+                        background-color: #f4f4f4;
+                    }
+                </style>
+            </head>
+
+            <body>
+                <div class="container">
+                    <div class="header">
+                        <div class="left">
+                            <img src="${process.env.URL_LOGO_PRADOS}" alt="Prados Turismo">
+                        </div>
+                        <div class="right">
+                            <p>Recebemos sua reserva<br> Data: ${formattingDate(data.dataCadastro.toDateString())} | Horário: ${formattingDate(data.dataCadastro.toDateString()).split(' ')[1]}</p>
+                            <p><strong>Voucher anexado no final do e-mail</strong></p>
+                        </div>
+                    </div>
+
+                    <div class="content">
+                        <h1>Aprovada</h1>
+                        <p>Oi, <strong>${passageiro.nome}</strong></p>
+                        <p>Informamos que a sua reserva <strong>#${data.reserva}</strong> foi recebida com sucesso. Abaixo segue os dados de acesso à sua área de cliente para visualização da sua reserva e impressão de seu(s) voucher(s).</p>
+                        
+                        <h2>Acesse a área do cliente</h2>
+                        <p>Acesse sua reserva utilizando os dados abaixo:</p>
+                        <p><strong>Email:</strong> <a href="mailto:${passageiro.email}">${passageiro.email}</a><br>
+                        <strong>CPF:</strong> ${cpfMask(passageiro.cpf)}</p>
+                        <a href="#" class="cta-button">Acessar área do cliente</a>
+
+                        <h2>Itens da reserva</h2>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Item</th>
+                                    <th>Unit</th>
+                                    <th>Qtde</th>
+                                    <th>Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>${excursaoNome}</td>
+                                    <td>${currencyBRLFormat(valor)}</td>
+                                    <td>${qtd}</td>
+                                    <td>${currencyBRLFormat(valorTotal)}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <h2>Forma de pagamento</h2>
+                        <p><strong>${formaPagamento}</strong><br> Valor: ${currencyBRLFormat(valorLiquido)}</p>
+                    </div>
+
+                    <div class="footer">
+                        <p>WhatsApp: (85) 9 9746-0786<br> <a href="mailto:financeiro@pradosturismo.com.br">financeiro@pradosturismo.com.br</a></p>
+                        <p>Fortaleza, Ceará</p>
+                        <a href="https://www.facebook.com/pradosturismo" target="_blank"><img src="https://upload.wikimedia.org/wikipedia/commons/5/51/Facebook_f_logo_%282019%29.svg" alt="Facebook"></a>
+                        <a href="https://www.instagram.com/pradosturismo/" target="_blank"><img src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png" alt="Instagram"></a>
+                    </div>
+                </div>
+            </body>
+        </html>`;
 }

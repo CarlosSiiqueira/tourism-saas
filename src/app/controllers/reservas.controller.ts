@@ -11,13 +11,13 @@ import { LogService } from '../services/log.service'
 import { ExcursaoQuartosService } from '../services/excursao.quarto.service'
 import { ExcursaoOnibusService } from '../services/excursao.onibus.service'
 import { PdfService } from '../services/pdf.service'
-import { htmlTicket } from '../../shared/helper/html'
+import { htmlEmailReserva, htmlTicket } from '../../shared/helper/html'
 import { EmailService } from '../services/mail.service'
 import { formattingDate } from '../../shared/helper/date'
 
 @injectable()
 class ReservaController {
-  constructor(
+  constructor (
     @inject("ReservaRepository")
     private reservaRepository: ReservaRepository,
     private financeiroService: FinanceiroService,
@@ -270,24 +270,23 @@ class ReservaController {
     const html = await htmlTicket(reserva);
     const pdf = await this.pdfService.generatePdf(html)
 
-    // reserva.Pessoa.map((passageiro) => {
-    // 1 email por passageiro
+    reserva.Pessoa.map(async (passageiro) => {
 
-    this.emailService.sendEmail('carlooos.siqueira@gmail.com',
-      `Ticket Excursão: ${excursaoNome}`,
-      `Olá segue em anexo ou seu voucher de embarque para a Excursão: \n
-       ${excursaoNome}`,
-      3,
-      [
-        {
-          filename: 'voucher.pdf',
-          content: pdf,
-          contentType: 'application/pdf'
+      let htmlEmail = await htmlEmailReserva(reserva, passageiro)
 
-        }
-      ])
+      this.emailService.sendEmail('carlooos.siqueira@gmail.com',
+        excursaoNome,
+        htmlEmail,
+        3,
+        [
+          {
+            filename: 'voucher.pdf',
+            content: pdf,
+            contentType: 'application/pdf'
 
-    // })
+          }
+        ])
+    })
 
     await this.logService.create({
       tipo: 'CREATE',
