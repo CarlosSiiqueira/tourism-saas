@@ -6,7 +6,7 @@ import { IIndex } from "../interfaces/Helper";
 @injectable()
 export class PessoaService {
 
-  constructor(
+  constructor (
     @inject("PessoaRepository")
     private pessoaRepository: PessoaRepository
   ) { }
@@ -67,5 +67,9 @@ export class PessoaService {
     const pessoas = await this.pessoaRepository.findAll()
 
     return pessoas
+  }
+
+  updateRank = async (id: string, idRank: string): Promise<string> => {
+    return await this.pessoaRepository.updateRank(id, idRank)
   }
 }

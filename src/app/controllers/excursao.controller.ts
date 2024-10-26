@@ -3,21 +3,25 @@ import { inject, injectable } from "tsyringe"
 import { Request, Response } from 'express'
 import { formatIndexFilters } from '../../shared/utils/filters'
 import { PacoteService } from '../services/pacote.service'
-import { PacoteRepository } from '../repositories/pacote.repository'
 import { FinanceiroService } from '../services/financeiro.service'
-import { FormaPagamentoService } from '../services/forma.pagamento.service'
 import { dateValidate } from '../../shared/helper/date'
 import { LogService } from '../services/log.service'
+import { RankingClientesService } from '../services/ranking.clientes.service'
+import { ExcursaoPassageiroService } from '../services/excursao.passageiro.service'
+import { PessoaService } from '../services/pessoa.service'
 
 @injectable()
 class ExcursaoController {
 
-  constructor(
+  constructor (
     @inject("ExcursaoRepository")
     private excursaoRepository: ExcursaoRepository,
     private pacoteService: PacoteService,
     private financeiroService: FinanceiroService,
-    private logService: LogService
+    private logService: LogService,
+    private rankingClientesService: RankingClientesService,
+    private excursaoPassageiroService: ExcursaoPassageiroService,
+    private pessoaService: PessoaService
   ) { }
 
   index = async (request: Request, response: Response): Promise<void> => {
@@ -47,7 +51,7 @@ class ExcursaoController {
         request.body.codigoFormaPagamento = item.codigoFormaPagamento
         request.body.codigoFornecedor = item.idFornecedor
 
-        const financeiro = await this.financeiroService.create(request.body)
+        await this.financeiroService.create(request.body)
       })
     )
 
@@ -143,8 +147,22 @@ class ExcursaoController {
   concluir = async (request: Request, response: Response): Promise<void> => {
 
     let user = JSON.parse(request.headers.user as string);
+    const id = request.params.id
 
-    const excursao = await this.excursaoRepository.concluir(request.params.id)
+    const excursao = await this.excursaoRepository.concluir(id)
+
+    const passageiros = await this.excursaoPassageiroService.find(id)
+
+    await Promise.all(
+      passageiros.map(async (passageiro) => {
+        let totalTrips = await this.excursaoPassageiroService.countTripsByPassenger(passageiro.Pessoa.id)
+        let rankUp = await this.rankingClientesService.rankUp(totalTrips, passageiro.Pessoa.rankingClientesId || '')
+
+        if (rankUp.rankUp) {
+          await this.pessoaService.updateRank(passageiro.Pessoa.id, rankUp.rank?.id || '')
+        }
+      })
+    )
 
     await this.logService.create({
       tipo: 'UPDATE',
@@ -156,7 +174,6 @@ class ExcursaoController {
 
     response.status(200).send('Excursão concluída com sucesso')
   }
-
 }
 
 export { ExcursaoController }

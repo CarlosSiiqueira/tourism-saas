@@ -177,6 +177,7 @@ class ExcursaoPassageirosRepository implements IExcursaoPassageiros {
         reserva: true,
         Pessoa: {
           select: {
+            id: true,
             nome: true,
             cpf: true,
             sexo: true,
@@ -189,7 +190,10 @@ class ExcursaoPassageirosRepository implements IExcursaoPassageiros {
             telefoneContato: true,
             ativo: true,
             dataNascimento: true,
-            usuarioCadastro: true
+            usuarioCadastro: true,
+            rankingClientesId: true,
+            rg: true,
+            emissor: true
           }
         },
         LocalEmbarque: {
@@ -262,6 +266,7 @@ class ExcursaoPassageirosRepository implements IExcursaoPassageiros {
         reserva: true,
         Pessoa: {
           select: {
+            id: true,
             nome: true,
             cpf: true,
             sexo: true,
@@ -385,6 +390,7 @@ class ExcursaoPassageirosRepository implements IExcursaoPassageiros {
         reserva: true,
         Pessoa: {
           select: {
+            id: true,
             nome: true,
             cpf: true,
             sexo: true,
@@ -495,6 +501,22 @@ class ExcursaoPassageirosRepository implements IExcursaoPassageiros {
     } catch (error) {
       throw new Warning("Houve um erro ao realizar exclusao de passageiro", 400)
     }
+  }
+
+  countTripsByPassenger = async (idPessoa: string): Promise<number> => {
+
+    const count = await this.prisma.excursaoPassageiros.count({
+      where: {
+        Pessoa: {
+          id: idPessoa
+        },
+        Excursao: {
+          concluida: true
+        }
+      }
+    })
+
+    return count
   }
 }
 

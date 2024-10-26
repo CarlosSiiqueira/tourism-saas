@@ -1,17 +1,18 @@
 import { IIndex } from "./Helper"
 
 export interface IExcursaoPassageiros {
-  index(data: IIndex, idExcursao: string): Promise<{
+  index (data: IIndex, idExcursao: string): Promise<{
     count: number,
     rows: IExcursaoPassageirosResponse[]
   }>
-  create(data: IExcursaoPassageirosDTO): Promise<string[]>
-  find(idExcursao: string): Promise<IExcursaoPassageirosResponse[]>
-  findAll(): Promise<IExcursaoPassageirosResponse[]>
-  listPassageiros(idExcursao: string): Promise<any>
-  findByIdPessoa(idsPassageiros: string[], idExcursao: string): Promise<IExcursaoPassageirosResponse[]>
-  delete(idPassageiro: string, idExcursao: string): Promise<string[]>
-  deleteMultiple(idPassageiros: Array<string>, idExcursao: string): Promise<string[]>
+  create (data: IExcursaoPassageirosDTO): Promise<string[]>
+  find (idExcursao: string): Promise<IExcursaoPassageirosResponse[]>
+  findAll (): Promise<IExcursaoPassageirosResponse[]>
+  listPassageiros (idExcursao: string): Promise<any>
+  findByIdPessoa (idsPassageiros: string[], idExcursao: string): Promise<IExcursaoPassageirosResponse[]>
+  delete (idPassageiro: string, idExcursao: string): Promise<string[]>
+  deleteMultiple (idPassageiros: Array<string>, idExcursao: string): Promise<string[]>
+  countTripsByPassenger (idPessoa: string): Promise<number>
 }
 
 export interface IExcursaoPassageirosDTO {
@@ -33,6 +34,7 @@ export interface IExcursaoPassageirosResponse extends IExcursaoPassageirosDTO {
     ativo: boolean
   },
   Pessoa: {
+    id: string,
     nome: string
     cpf: string
     sexo: string
@@ -46,6 +48,9 @@ export interface IExcursaoPassageirosResponse extends IExcursaoPassageirosDTO {
     ativo: boolean
     dataNascimento: Date | null
     usuarioCadastro: string
+    rankingClientesId?: string | null
+    rg?: string | null
+    emissor?: string | null
   },
   Excursao: {
     nome: string

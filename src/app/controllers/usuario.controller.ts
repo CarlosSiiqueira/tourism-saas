@@ -7,7 +7,7 @@ import { LogService } from '../services/log.service'
 
 @injectable()
 class UsuarioController {
-  constructor(
+  constructor (
     @inject("UsuarioRepository")
     private usuarioRepository: UsuarioRepository,
     private authService: AuthService = new AuthService(usuarioRepository),
@@ -100,6 +100,27 @@ class UsuarioController {
 
   auth = async (request: Request, response: Response): Promise<void> => {
     const res = await this.authService.authenticate(request.body.username, request.body.password)
+
+    response.status(200).send(res)
+  }
+
+  changePassword = async (request: Request, response: Response): Promise<void> => {
+
+    const { body, params, headers } = request
+    const { id } = params
+
+    let user = JSON.parse(headers.user as string);
+
+    const usuario = await this.usuarioRepository.find(id)
+    const res = await this.usuarioRepository.changePassword(id, body)
+
+    await this.logService.create({
+      tipo: 'UPDATE',
+      newData: JSON.stringify(res),
+      oldData: JSON.stringify(usuario),
+      rotina: 'Usuário/Alterar Senha',
+      usuariosId: user.id
+    })
 
     response.status(200).send(res)
   }

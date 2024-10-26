@@ -12,7 +12,7 @@ interface summary {
 @injectable()
 export class ExcursaoPassageiroService {
 
-  constructor(
+  constructor (
     @inject("ExcursaoPassageirosRepository")
     private excursaoPassageiroRepository: ExcursaoPassageirosRepository
   ) { }
@@ -53,5 +53,9 @@ export class ExcursaoPassageiroService {
     const passageiros = await this.excursaoPassageiroRepository.deleteMultiple(idsPassageiros, idExcursao)
 
     return passageiros
+  }
+
+  countTripsByPassenger = async (idPassageiro: string): Promise<number> => {
+    return await this.excursaoPassageiroRepository.countTripsByPassenger(idPassageiro)
   }
 }

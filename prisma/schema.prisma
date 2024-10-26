@@ -58,6 +58,7 @@ model Usuarios {
   nome            String
   username        String   @unique
   password        String
+  salt            String?
   dataCadastro    DateTime @default(now())
   usuarioCadastro String?
   tipo            Int

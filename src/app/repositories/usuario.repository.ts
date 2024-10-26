@@ -1,7 +1,8 @@
+import { generatePassword, verifyPassword } from "../../shared/utils/encrypt"
 import prismaManager from "../database/database"
 import { Warning } from "../errors"
 import { IIndex } from "../interfaces/Helper"
-import { IUsuario, IUsuarioDTO, IUsuarioResponse, IUsuarioLogin, IUsuarioFilter } from "../interfaces/Usuario"
+import { IUsuario, IUsuarioDTO, IUsuarioResponse, IUsuarioLogin, IUsuarioFilter, IUsuarioChangePassword } from "../interfaces/Usuario"
 import crypto from 'crypto'
 
 class UsuarioRepository implements IUsuario {
@@ -75,12 +76,15 @@ class UsuarioRepository implements IUsuario {
 
       const id = crypto.randomUUID()
 
-      const usuario = await this.prisma.usuarios.create({
+      const pass = generatePassword(password)
+
+      await this.prisma.usuarios.create({
         data: {
           id,
           nome,
           username,
-          password,
+          password: pass.password,
+          salt: pass.salt,
           usuarioCadastro,
           tipo,
           email,
@@ -184,10 +188,9 @@ class UsuarioRepository implements IUsuario {
 
   login = async (username: string, password: string): Promise<IUsuarioResponse> => {
 
-    const usuario = await this.prisma.usuarios.findFirst({
+    const usuario = await this.prisma.usuarios.findUnique({
       where: {
-        username: username,
-        password: password
+        username
       }
     })
 
@@ -195,8 +198,45 @@ class UsuarioRepository implements IUsuario {
       throw new Warning("Login ou senha incorretos", 401)
     }
 
+    const passwordVerified = verifyPassword(password, usuario.salt || "", usuario.password)
+
+    if (!passwordVerified) {
+      throw new Warning("Login ou senha incorretos", 401)
+    }
+
     return usuario
   }
+
+  changePassword = async (id: string, data: IUsuarioChangePassword): Promise<IUsuarioResponse> => {
+    const { password, confirmationPassword } = data
+
+    if (password !== confirmationPassword) {
+      throw new Warning("Senha e confirme a senha estão diferentes")
+    }
+
+    const usuario = await this.prisma.usuarios.findUnique({
+      where: {
+        id
+      }
+    })
+
+    if (!usuario) {
+      throw new Warning("Usuário não encontrado", 401)
+    }
+
+    const pass = generatePassword(password)
+
+    return await this.prisma.usuarios.update({
+      data: {
+        password: pass.password,
+        salt: pass.salt
+      },
+      where: {
+        id
+      }
+    })
+  }
+
 }
 
 export { UsuarioRepository }

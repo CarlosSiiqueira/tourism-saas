@@ -81,7 +81,7 @@ class RankingClientesRepository implements IRankingCliente {
     }
   }
 
-  find = async (id: string): Promise<IRankingClienteResponse | null> => {
+  find = async (id: string): Promise<IRankingClienteResponse> => {
 
     const ranking = await this.prisma.rankingClientes.findUnique({
       where: {
@@ -129,7 +129,7 @@ class RankingClientesRepository implements IRankingCliente {
 
       return ranking
     } catch (error) {
-      throw new Warning('Erro ao atualizar produto', 400)
+      throw new Warning('Erro ao atualizar ranking', 400)
     }
   }
 
@@ -142,8 +142,21 @@ class RankingClientesRepository implements IRankingCliente {
     })
 
     if (!ranking) {
-      throw new Warning('Não foi possível excluir o produto', 400)
+      throw new Warning('Não foi possível excluir o ranking', 400)
     }
+
+    return ranking
+  }
+
+  findByTrips = async (totalTrips: number): Promise<IRankingClienteResponse | null> => {
+
+    const ranking = await this.prisma.rankingClientes.findFirst({
+      where: {
+        qtdMinViagens: {
+          gte: totalTrips
+        }
+      }
+    })
 
     return ranking
   }

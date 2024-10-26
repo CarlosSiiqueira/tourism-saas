@@ -1,13 +1,14 @@
 import { IIndex } from "./Helper"
 
 export interface IPessoa {
-  index(data: IIndex): Promise<{ count: number, rows: IPessoaResponse[] }>
-  create(data: IPessoaDTO, codigoEndereco: string): Promise<string>
-  find(id: string): Promise<IPessoaResponse | null>
-  findAll(): Promise<IPessoaResponse[]>
-  findByCpf(cpf: string): Promise<IPessoaResponse | null>
-  delete(id: string): Promise<IPessoaDeleteResponse>
-  update(data: IPessoaDTO, id: string, codigoEndereco: string): Promise<IPessoaResponse>
+  index (data: IIndex): Promise<{ count: number, rows: IPessoaResponse[] }>
+  create (data: IPessoaDTO, codigoEndereco: string): Promise<string>
+  find (id: string): Promise<IPessoaResponse | null>
+  findAll (): Promise<IPessoaResponse[]>
+  findByCpf (cpf: string): Promise<IPessoaResponse | null>
+  delete (id: string): Promise<IPessoaDeleteResponse>
+  update (data: IPessoaDTO, id: string, codigoEndereco: string): Promise<IPessoaResponse>
+  updateRank (id: string, idRank: string): Promise<string>
 }
 
 export interface IPessoaDTO {

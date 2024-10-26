@@ -12,5 +12,6 @@ usuario.put('/update/:id', usuarioController.update)
 usuario.patch('/delete/:id', usuarioController.delete)
 usuario.post('/login', usuarioController.login)
 usuario.post('/auth', usuarioController.auth)
+usuario.patch('/change-password/:id', usuarioController.changePassword)
 
 export { usuario }

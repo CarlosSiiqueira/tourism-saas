@@ -1,13 +1,14 @@
 import { IIndex } from "./Helper"
 
 export interface IUsuario {
-  index(data: IIndex): Promise<{ count: number, rows: IUsuarioResponse[] }>
-  create(data: IUsuarioDTO): Promise<string>
-  find(id: string): Promise<IUsuarioResponse | null>
-  findAll(): Promise<IUsuarioResponse[]>
-  delete(id: string): Promise<IUsuarioResponse>
-  update(data: IUsuarioDTO, id: string): Promise<IUsuarioResponse>
-  login(username: string, password: string): Promise<IUsuarioResponse>
+  index (data: IIndex): Promise<{ count: number, rows: IUsuarioResponse[] }>
+  create (data: IUsuarioDTO): Promise<string>
+  find (id: string): Promise<IUsuarioResponse | null>
+  findAll (): Promise<IUsuarioResponse[]>
+  delete (id: string): Promise<IUsuarioResponse>
+  update (data: IUsuarioDTO, id: string): Promise<IUsuarioResponse>
+  login (username: string, password: string): Promise<IUsuarioResponse>
+  changePassword (id: string, data: IUsuarioChangePassword): Promise<IUsuarioResponse>
 }
 
 
@@ -39,4 +40,9 @@ export interface IUsuarioFilter {
     mode: string
   }
   status?: boolean
+}
+
+export interface IUsuarioChangePassword {
+  password: string
+  confirmationPassword: string
 }

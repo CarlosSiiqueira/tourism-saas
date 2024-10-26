@@ -27,7 +27,7 @@ class PessoaRepository implements IPessoa {
                 contains: value,
                 mode: "insensitive"
               }
-            },            
+            },
             {
               email: {
                 contains: value,
@@ -278,6 +278,24 @@ class PessoaRepository implements IPessoa {
     }
 
     return pessoa
+  }
+
+  updateRank = async (id: string, idRank: string): Promise<string> => {
+
+    const pessoa = await this.prisma.pessoas.update({
+      data: {
+        rankingClientesId: idRank
+      },
+      where: {
+        id
+      }
+    })
+
+    if (!pessoa) {
+      throw new Warning('Não foi possível alterar rank do cliente', 400)
+    }
+
+    return 'Rank alterado com sucesso'
   }
 }
 
