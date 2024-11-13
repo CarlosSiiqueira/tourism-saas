@@ -203,13 +203,15 @@ model LocalEmbarque {
   dataCadastro DateTime @default(now())
   ativo        Boolean  @default(true)
 
-  Endereco            Endereco              @relation(fields: [codigoEndereco], references: [id])
-  codigoEndereco      String
-  Usuarios            Usuarios              @relation(fields: [usuarioCadastro], references: [id])
-  usuarioCadastro     String
-  PassageiroEmbarque  PassageiroEmbarque[]
-  ExcursaoPassageiros ExcursaoPassageiros[]
-  Reservas            Reservas[]
+  Endereco                Endereco               @relation(fields: [codigoEndereco], references: [id])
+  codigoEndereco          String
+  Usuarios                Usuarios               @relation(fields: [usuarioCadastro], references: [id])
+  usuarioCadastro         String
+  PassageiroEmbarque      PassageiroEmbarque[]
+  ExcursaoPassageiros     ExcursaoPassageiros[]
+  Reservas                Reservas[]
+  ExcursaoLocalEmbarque   ExcursaoLocalEmbarque? @relation(fields: [excursaoLocalEmbarqueId], references: [id])
+  excursaoLocalEmbarqueId String?
 }
 
 model PassageiroEmbarque {
@@ -242,17 +244,18 @@ model Excursao {
   publicadoSite   Boolean  @default(false)
   concluida       Boolean  @default(false)
 
-  Pacotes             Pacotes               @relation(fields: [codigoPacote], references: [id])
-  codigoPacote        String
-  Usuarios            Usuarios              @relation(fields: [usuarioCadastro], references: [id])
-  usuarioCadastro     String
-  ExcursaoQuartos     ExcursaoQuartos[]
-  ExcursaoOnibus      ExcursaoOnibus[]
-  PassageiroEmbarque  PassageiroEmbarque[]
-  Transacoes          Transacoes[]
-  ExcursaoPassageiros ExcursaoPassageiros[]
-  Reservas            Reservas[]
-  Vendas              Vendas[]
+  Pacotes               Pacotes                 @relation(fields: [codigoPacote], references: [id])
+  codigoPacote          String
+  Usuarios              Usuarios                @relation(fields: [usuarioCadastro], references: [id])
+  usuarioCadastro       String
+  ExcursaoQuartos       ExcursaoQuartos[]
+  ExcursaoOnibus        ExcursaoOnibus[]
+  PassageiroEmbarque    PassageiroEmbarque[]
+  Transacoes            Transacoes[]
+  ExcursaoPassageiros   ExcursaoPassageiros[]
+  Reservas              Reservas[]
+  Vendas                Vendas[]
+  ExcursaoLocalEmbarque ExcursaoLocalEmbarque[]
 }
 
 model Vendas {
@@ -496,4 +499,13 @@ model Comissao {
   idTransacao String
   Usuario     Usuarios   @relation(fields: [usuariosId], references: [id])
   usuariosId  String
+}
+
+model ExcursaoLocalEmbarque {
+  id           String   @id @default(uuid())
+  dataCadastro DateTime @default(now())
+
+  Excursao      Excursao        @relation(fields: [idExcursao], references: [id])
+  idExcursao    String
+  LocalEmbarque LocalEmbarque[]
 }

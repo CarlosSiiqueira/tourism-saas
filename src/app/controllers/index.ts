@@ -33,6 +33,7 @@ import { LogController } from "./log.controller"
 import { OpcionaisEmbarqueController } from "./opcionais.embarque.controller"
 import { ConfiguracoesController } from "./configuracoes.controller"
 import { ComissaoController } from "./comissao.controller"
+import { ExcursaoLocalEmbarqueController } from "./excursao.local.embarque"
 
 export const contaBancariaController = container.resolve(ContaBancariaController)
 export const excursaoController = container.resolve(ExcursaoController)
@@ -64,3 +65,4 @@ export const logsController = container.resolve(LogController)
 export const opcionaisEmbarqueController = container.resolve(OpcionaisEmbarqueController)
 export const configuracoesController = container.resolve(ConfiguracoesController)
 export const comissaoController = container.resolve(ComissaoController)
+export const excursaoLocalEmbarqueController = container.resolve(ExcursaoLocalEmbarqueController)

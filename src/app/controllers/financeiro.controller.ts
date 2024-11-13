@@ -60,7 +60,7 @@ class FinanceiroController {
     }
 
     await this.logService.create({
-      tipo: 'Create',
+      tipo: 'CREATE',
       newData: JSON.stringify({ id: res, ...request.body }),
       oldData: null,
       rotina: 'Financeiro',

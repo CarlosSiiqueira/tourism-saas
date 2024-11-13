@@ -21,25 +21,25 @@ class LogRepository implements ILog {
       switch (key) {
         case 'tipo':
           Object.assign(where, {
-            OR: [
-              {
-                tipo: {
-                  contains: value,
-                  mode: "insensitive"
-                }
-              }]
+            tipo: value
           })
           break;
 
-        case 'usuario':
+        case 'descricao':
           Object.assign(where, {
             OR: [
               {
-                Usuarios: {
+                Usuario: {
                   nome: {
                     contains: value,
-                    mode: "insensitive"
+                    mode: 'insensitive'
                   }
+                }
+              },
+              {
+                rotina: {
+                  contains: value,
+                  mode: 'insensitive'
                 }
               }
             ]

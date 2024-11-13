@@ -2,15 +2,15 @@ import { JsonValue } from "@prisma/client/runtime/library"
 import { IIndex } from "./Helper"
 
 export interface ILog {
-  index(data: IIndex): Promise<{
+  index (data: IIndex): Promise<{
     count: number
     rows: ILogResponse[]
   }>
-  create(data: ILogDTO): Promise<string[]>
-  find(id: string): Promise<ILogResponse>
-  findAll(): Promise<ILogResponse[]>
-  delete(id: string): Promise<string>
-  update(data: ILogDTO, id: string): Promise<string[]>
+  create (data: ILogDTO): Promise<string[]>
+  find (id: string): Promise<ILogResponse>
+  findAll (): Promise<ILogResponse[]>
+  delete (id: string): Promise<string>
+  update (data: ILogDTO, id: string): Promise<string[]>
 }
 
 export interface ILogDTO {

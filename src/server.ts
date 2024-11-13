@@ -22,7 +22,7 @@ app.use(cors({
   origin: [
     /http?:\/\/localhost:\d+/,
     'http://127.0.0.1:3000',
-    'https://prados-web.vercel.app'
+    'https://reactjs-five-lovat.vercel.app'
   ]
 }))
 
