@@ -8,6 +8,7 @@ export interface IUsuario {
   delete (id: string): Promise<IUsuarioResponse>
   update (data: IUsuarioDTO, id: string): Promise<IUsuarioResponse>
   login (username: string, password: string): Promise<IUsuarioResponse>
+  loginUserClient (username: string, password: string): Promise<IUsuarioResponse>
   changePassword (id: string, data: IUsuarioChangePassword): Promise<IUsuarioResponse>
 }
 
@@ -16,7 +17,6 @@ export interface IUsuarioDTO {
   nome: string
   username: string
   password: string
-  dataCadastro: Date
   usuarioCadastro: string | null
   tipo: number
   email: string

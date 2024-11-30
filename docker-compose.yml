@@ -12,6 +12,7 @@ services:
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules
+      - ./public/images:/usr/src/app/public/images
     depends_on:
       kafka:
         condition: service_healthy

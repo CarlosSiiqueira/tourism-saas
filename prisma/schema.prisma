@@ -90,6 +90,7 @@ model Usuarios {
   Logs                  Logs[]
   Configuracoes         Configuracoes[]
   Comissao              Comissao[]
+  Imagens               Imagens[]
 }
 
 model Pacotes {
@@ -100,11 +101,13 @@ model Pacotes {
   dataCadastro   DateTime @default(now())
   origem         Int      @default(1)
   tipoTransporte Int      @default(1)
-  urlImagem      String?
-  urlImgEsgotado String?
   idWP           Int?
   categoria      Int?
 
+  Imagem          Imagens?     @relation(fields: [urlImagem], references: [id], name: "imagem")
+  urlImagem       String?
+  ImagemBloqueado Imagens?     @relation(fields: [urlImgEsgotado], references: [id], name: "imagemBloqueado")
+  urlImgEsgotado  String?
   Usuarios        Usuarios     @relation(fields: [usuarioCadastro], references: [id])
   usuarioCadastro String
   Excursao        Excursao[]
@@ -203,15 +206,14 @@ model LocalEmbarque {
   dataCadastro DateTime @default(now())
   ativo        Boolean  @default(true)
 
-  Endereco                Endereco               @relation(fields: [codigoEndereco], references: [id])
-  codigoEndereco          String
-  Usuarios                Usuarios               @relation(fields: [usuarioCadastro], references: [id])
-  usuarioCadastro         String
-  PassageiroEmbarque      PassageiroEmbarque[]
-  ExcursaoPassageiros     ExcursaoPassageiros[]
-  Reservas                Reservas[]
-  ExcursaoLocalEmbarque   ExcursaoLocalEmbarque? @relation(fields: [excursaoLocalEmbarqueId], references: [id])
-  excursaoLocalEmbarqueId String?
+  Endereco            Endereco              @relation(fields: [codigoEndereco], references: [id])
+  codigoEndereco      String
+  Usuarios            Usuarios              @relation(fields: [usuarioCadastro], references: [id])
+  usuarioCadastro     String
+  PassageiroEmbarque  PassageiroEmbarque[]
+  ExcursaoPassageiros ExcursaoPassageiros[]
+  Reservas            Reservas[]
+  Excursao            Excursao[]
 }
 
 model PassageiroEmbarque {
@@ -243,19 +245,20 @@ model Excursao {
   valor           Float
   publicadoSite   Boolean  @default(false)
   concluida       Boolean  @default(false)
+  qtdMinVendas    Int      @default(0)
 
-  Pacotes               Pacotes                 @relation(fields: [codigoPacote], references: [id])
-  codigoPacote          String
-  Usuarios              Usuarios                @relation(fields: [usuarioCadastro], references: [id])
-  usuarioCadastro       String
-  ExcursaoQuartos       ExcursaoQuartos[]
-  ExcursaoOnibus        ExcursaoOnibus[]
-  PassageiroEmbarque    PassageiroEmbarque[]
-  Transacoes            Transacoes[]
-  ExcursaoPassageiros   ExcursaoPassageiros[]
-  Reservas              Reservas[]
-  Vendas                Vendas[]
-  ExcursaoLocalEmbarque ExcursaoLocalEmbarque[]
+  Pacotes             Pacotes               @relation(fields: [codigoPacote], references: [id])
+  codigoPacote        String
+  Usuarios            Usuarios              @relation(fields: [usuarioCadastro], references: [id])
+  usuarioCadastro     String
+  ExcursaoQuartos     ExcursaoQuartos[]
+  ExcursaoOnibus      ExcursaoOnibus[]
+  PassageiroEmbarque  PassageiroEmbarque[]
+  Transacoes          Transacoes[]
+  ExcursaoPassageiros ExcursaoPassageiros[]
+  Reservas            Reservas[]
+  Vendas              Vendas[]
+  LocalEmbarque       LocalEmbarque[]
 }
 
 model Vendas {
@@ -501,11 +504,14 @@ model Comissao {
   usuariosId  String
 }
 
-model ExcursaoLocalEmbarque {
-  id           String   @id @default(uuid())
-  dataCadastro DateTime @default(now())
+model Imagens {
+  id         String   @id @default(uuid())
+  nome       String
+  url        String
+  dataUpload DateTime @default(now())
 
-  Excursao      Excursao        @relation(fields: [idExcursao], references: [id])
-  idExcursao    String
-  LocalEmbarque LocalEmbarque[]
+  Usuario                Usuarios  @relation(fields: [userId], references: [id])
+  userId                 String
+  PacotesImagem          Pacotes[] @relation("imagem")
+  PacotesImagemBloqueado Pacotes[] @relation("imagemBloqueado")
 }

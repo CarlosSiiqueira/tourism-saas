@@ -10,6 +10,7 @@ const authenticateToken = async (request: Request, response: Response, next: Nex
   const noAuthRoutes = [
     "/usuarios/login",
     "/usuarios/auth",
+    "/usuarios/login-user-client",
     "/passageiro-embarque/embarque-qrcode"
   ]
 
@@ -24,6 +25,10 @@ const authenticateToken = async (request: Request, response: Response, next: Nex
     noAuthRoutes.map(path => {
 
       if (request.path == path) {
+        access = true
+      }
+
+      if (request.path.includes('images')) {
         access = true
       }
 

@@ -101,6 +101,8 @@ class ExcursaoQuartosRepository implements IExcursaoQuartos {
               codigoPacote: true,
               usuarioCadastro: true,
               valor: true,
+              qtdMinVendas: true,
+              LocalEmbarque: {}
             }
           }
         }
@@ -170,7 +172,11 @@ class ExcursaoQuartosRepository implements IExcursaoQuartos {
           }
         },
         usuarioCadastro: true,
-        Excursao: true,
+        Excursao: {
+          include: {
+            LocalEmbarque: true
+          }
+        },
         TipoQuarto: {
           select: {
             id: true,
@@ -235,6 +241,8 @@ class ExcursaoQuartosRepository implements IExcursaoQuartos {
             codigoPacote: true,
             usuarioCadastro: true,
             valor: true,
+            qtdMinVendas: true,
+            LocalEmbarque: {}
           }
         }
       }

@@ -77,6 +77,12 @@ class ExcursaoRepository implements IExcursao {
             }
           })
           break;
+
+        case 'origem':
+          Object.assign(where, {
+            origem: value
+          })
+          break;
       }
     })
 
@@ -110,6 +116,7 @@ class ExcursaoRepository implements IExcursao {
           valor: true,
           publicadoSite: true,
           concluida: true,
+          qtdMinVendas: true,
           ExcursaoPassageiros: {
             include: {
               Pessoa: true,
@@ -117,6 +124,7 @@ class ExcursaoRepository implements IExcursao {
             }
           },
           Pacotes: {},
+          LocalEmbarque: {}
         }
       })
     ])
@@ -139,6 +147,8 @@ class ExcursaoRepository implements IExcursao {
     valor,
     codigoPacote,
     usuarioCadastro,
+    localEmbarque,
+    qtdMinVendas
   }: IExcursaoDTO): Promise<string> => {
 
     try {
@@ -159,7 +169,11 @@ class ExcursaoRepository implements IExcursao {
           vagas: vagas,
           codigoPacote: codigoPacote,
           usuarioCadastro: usuarioCadastro,
-          valor
+          valor,
+          qtdMinVendas,
+          LocalEmbarque: {
+            connect: localEmbarque.map((localEmbarqueId) => ({ id: localEmbarqueId }))
+          }
         }
       })
 
@@ -188,6 +202,7 @@ class ExcursaoRepository implements IExcursao {
         codigoPacote: true,
         usuarioCadastro: true,
         valor: true,
+        qtdMinVendas: true,
         ExcursaoPassageiros: {
           include: {
             Pessoa: true,
@@ -198,7 +213,8 @@ class ExcursaoRepository implements IExcursao {
           include: {
             Produto: true
           }
-        }
+        },
+        LocalEmbarque: {}
       }
     })
 
@@ -229,6 +245,7 @@ class ExcursaoRepository implements IExcursao {
         codigoPacote: true,
         usuarioCadastro: true,
         valor: true,
+        qtdMinVendas: true,
         ExcursaoPassageiros: {
           include: {
             Pessoa: true,
@@ -236,6 +253,7 @@ class ExcursaoRepository implements IExcursao {
           }
         },
         Pacotes: {},
+        LocalEmbarque: {}
       }
     })
 
@@ -278,11 +296,24 @@ class ExcursaoRepository implements IExcursao {
     vagas,
     codigoPacote,
     usuarioCadastro,
-    valor
+    valor,
+    localEmbarque,
+    qtdMinVendas
   }: IExcursaoDTO, id: string): Promise<IExcursaoResponse> => {
 
     dataInicio = dateValidate(dataInicio)
     dataFim = dateValidate(dataFim)
+
+    await this.prisma.excursao.update({
+      where: {
+        id
+      },
+      data: {
+        LocalEmbarque: {
+          connect: []
+        }
+      }
+    })
 
     const excursao = await this.prisma.excursao.update({
       data: {
@@ -295,10 +326,17 @@ class ExcursaoRepository implements IExcursao {
         vagas: vagas,
         codigoPacote: codigoPacote,
         usuarioCadastro: usuarioCadastro,
-        valor: valor
+        valor: valor,
+        qtdMinVendas,
+        LocalEmbarque: {
+          connect: localEmbarque.map((localEmbarqueId) => ({ id: localEmbarqueId }))
+        }
       },
       where: {
         id: id
+      },
+      include: {
+        LocalEmbarque: true
       }
     })
 
@@ -317,6 +355,9 @@ class ExcursaoRepository implements IExcursao {
       },
       where: {
         id
+      },
+      include: {
+        LocalEmbarque: true
       }
     })
 
@@ -335,6 +376,9 @@ class ExcursaoRepository implements IExcursao {
       },
       data: {
         concluida: true
+      },
+      include: {
+        LocalEmbarque: true
       }
     })
 

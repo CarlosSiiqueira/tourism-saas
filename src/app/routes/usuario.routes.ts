@@ -3,7 +3,6 @@ import { usuarioController } from "../controllers"
 
 const usuario = Router()
 
-
 usuario.get('/index', usuarioController.index)
 usuario.get('/find/:id', usuarioController.find)
 usuario.get('/findAll', usuarioController.findAll)
@@ -13,5 +12,7 @@ usuario.patch('/delete/:id', usuarioController.delete)
 usuario.post('/login', usuarioController.login)
 usuario.post('/auth', usuarioController.auth)
 usuario.patch('/change-password/:id', usuarioController.changePassword)
+usuario.post('/register-user-client', usuarioController.registerUserClient)
+usuario.post('/login-user-client', usuarioController.loginUserClient)
 
 export { usuario }

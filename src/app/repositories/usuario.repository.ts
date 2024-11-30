@@ -190,7 +190,10 @@ class UsuarioRepository implements IUsuario {
 
     const usuario = await this.prisma.usuarios.findUnique({
       where: {
-        username
+        username,
+        tipo: {
+          in: [1, 2]
+        }
       }
     })
 
@@ -205,6 +208,28 @@ class UsuarioRepository implements IUsuario {
     }
 
     return usuario
+  }
+
+  loginUserClient = async (username: string, password: string): Promise<IUsuarioResponse> => {
+
+    const user = await this.prisma.usuarios.findUnique({
+      where: {
+        username,
+        tipo: 3
+      }
+    })
+
+    if (!user) {
+      throw new Warning("Login ou senha incorretos", 401)
+    }
+
+    const passwordVerified = verifyPassword(password, user.salt || "", user.password)
+
+    if (!passwordVerified) {
+      throw new Warning("Login ou senha incorretos", 401)
+    }
+
+    return user
   }
 
   changePassword = async (id: string, data: IUsuarioChangePassword): Promise<IUsuarioResponse> => {

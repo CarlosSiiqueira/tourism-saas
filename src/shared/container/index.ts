@@ -30,7 +30,7 @@ import { OpcionaisRepository } from "../../app/repositories/opcionais.repository
 import { OpcionaisEmbarqueRepository } from "../../app/repositories/opcionais.embarque.repository"
 import { ConfiguracoesRepository } from "../../app/repositories/configuracoes.repository"
 import { ComissaoRepository } from "../../app/repositories/comissao.repository"
-import { ExcursaoLocalEmbarqueRepository } from "../../app/repositories/excursao.local.embarque.repository"
+import { ImagensRepository } from "../../app/repositories/imagens.repository"
 
 //interfaces
 import { IContaBancaria } from "../../app/interfaces/ContaBancaria"
@@ -61,7 +61,7 @@ import { ILog } from "../../app/interfaces/Log"
 import { IOpcionalEmbarque } from "../../app/interfaces/OpcionaisEmbarque"
 import { IConfiguracao } from "../../app/interfaces/Configuracoes"
 import { IComissao } from "../../app/interfaces/Comissao"
-import { IExcursaoLocalEmbarque } from "../../app/interfaces/ExcursaoLocalEmbarque"
+import { IImagem } from "../../app/interfaces/Imagem"
 
 container.registerSingleton<IContaBancaria>(
   "ContaBancariaRepository",
@@ -203,7 +203,7 @@ container.registerSingleton<IComissao>(
   ComissaoRepository
 )
 
-container.registerSingleton<IExcursaoLocalEmbarque>(
-  "ExcursaoLocalEmbarqueRepository",
-  ExcursaoLocalEmbarqueRepository
+container.registerSingleton<IImagem>(
+  "ImagensRepository",
+  ImagensRepository
 )

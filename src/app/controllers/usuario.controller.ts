@@ -4,6 +4,8 @@ import { Request, Response } from 'express'
 import { AuthService } from '../services/auth.service'
 import { formatIndexFilters } from '../../shared/utils/filters'
 import { LogService } from '../services/log.service'
+import { generateRandomString } from '../../shared/utils/encrypt'
+import { EmailService } from '../services/mail.service'
 
 @injectable()
 class UsuarioController {
@@ -11,7 +13,8 @@ class UsuarioController {
     @inject("UsuarioRepository")
     private usuarioRepository: UsuarioRepository,
     private authService: AuthService = new AuthService(usuarioRepository),
-    private logService: LogService
+    private logService: LogService,
+    private emailService: EmailService
   ) { }
 
   index = async (request: Request, response: Response): Promise<void> => {
@@ -121,6 +124,43 @@ class UsuarioController {
       rotina: 'Usuário/Alterar Senha',
       usuariosId: user.id
     })
+
+    response.status(200).send(res)
+  }
+
+  registerUserClient = async (request: Request, response: Response): Promise<void> => {
+
+    const { body, headers } = request
+    let user: string = JSON.parse(headers.user as string)?.id
+    const userName: string = body.email
+    const password = generateRandomString(8)
+    const subject: string = 'Seu cadastro na Prados Turismo'
+    const textEmail: string = `
+                    Holá seu cadastro foi efetuado com sucesso na prados!
+                    segue seus dados de acesso:
+                    Login: ${userName}
+                    senha: ${password}`
+
+    const userClient = await this.usuarioRepository.create({
+      nome: userName,
+      username: userName,
+      usuarioCadastro: user,
+      tipo: 3,
+      email: userName,
+      password,
+      ativo: true,
+      meta: null,
+      comissao: null
+    })
+
+    await this.emailService.sendEmail(userName, subject, textEmail, 3)
+
+    response.status(200).send(userClient)
+  }
+
+  loginUserClient = async (request: Request, response: Response): Promise<void> => {
+
+    const res = await this.usuarioRepository.loginUserClient(request.body.username, request.body.password)
 
     response.status(200).send(res)
   }

@@ -22,11 +22,12 @@ app.use(cors({
   origin: [
     /http?:\/\/localhost:\d+/,
     'http://127.0.0.1:3000',
+    'http://127.0.0.1:5000',
     'https://reactjs-five-lovat.vercel.app'
   ]
 }))
 
-app.use(express.json())
+app.use(express.json({ limit: "50mb" }))
 app.use(authenticateToken)
 app.use(router)
 app.use(warning)

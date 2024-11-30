@@ -1,4 +1,5 @@
-import { Router } from "express"
+import express, { Router } from "express"
+import path from "path"
 import { contaBancaria } from "../routes/conta.bancaria.routes"
 import { excursao } from "../routes/excursao.routes"
 import { financeiro } from "../routes/financeiro.routes"
@@ -29,7 +30,7 @@ import { logs } from "./log.routes"
 import { opcionalEmbarque } from "./opcionais.embarque.routes"
 import { configuracao } from "./configuracoes.routes"
 import { comissao } from "./comissao.routes"
-import { excursaoLocalEmbarque } from "./excursao.local.embarque.routes"
+import { imagens } from "./imagens.routes"
 
 const router = Router()
 
@@ -63,6 +64,7 @@ router.use('/log', logs)
 router.use('/opcional-embarque', opcionalEmbarque)
 router.use('/configuracoes', configuracao)
 router.use('/comissao', comissao)
-router.use('/excursao-local-embarque', excursaoLocalEmbarque)
+router.use('/imagens', imagens)
+router.use("/images", express.static(path.join(__dirname, "../../../public/images")));
 
 export { router }

@@ -77,7 +77,9 @@ class PacoteRepository implements IPacote {
         where,
         include: {
           Excursao: true,
-          Produto: true
+          Produto: true,
+          Imagem: true,
+          ImagemBloqueado: true
         }
       })
     ])
@@ -141,7 +143,9 @@ class PacoteRepository implements IPacote {
         id
       },
       include: {
-        Produto: true
+        Produto: true,
+        Imagem: true,
+        ImagemBloqueado: true
       }
     })
 
@@ -156,7 +160,9 @@ class PacoteRepository implements IPacote {
 
     const pacotes = await this.prisma.pacotes.findMany({
       include: {
-        Produto: true
+        Produto: true,
+        Imagem: true,
+        ImagemBloqueado: true
       }
     })
 
