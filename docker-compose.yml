@@ -2,7 +2,7 @@ version: "3.8"
 
 services:
   api:
-    image: alisson446/api-prado-turismo
+    image: carlossiqueira/prados-turismo:latest
     build:
       context: .
       dockerfile: Dockerfile
@@ -20,8 +20,8 @@ services:
     command: sh -c "npx prisma migrate deploy && npx prisma migrate dev && npm run dev:debug"
     environment:
       KAFKA_BROKER: kafka:9092
-      PORT: 8000
-      JWT_SECRET_KEY: 99eb92b3b4e6905ed5c03332314cfa629d51d2939f08769e9bd2f86028aa092b
+      PORT: ${PORT}
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
       DATABASE_URL: postgresql://${DATABASE_USER}:${DATABASE_PASSWORD}@host.docker.internal/pradosturismo?schema=public
       URL_LOGO_PRADOS: https://prados-web.vercel.app/images/prados/logopradosg.png
 
