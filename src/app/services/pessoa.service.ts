@@ -32,7 +32,7 @@ export class PessoaService {
     dataNascimento,
     usuarioCadastro,
     rg,
-    emissor }: IPessoaDTO, codigoEndereco: string): Promise<string> => {
+    emissor }: IPessoaDTO, codigoEndereco: string | null): Promise<string> => {
 
     const pessoa = await this.pessoaRepository.create({
       nome,

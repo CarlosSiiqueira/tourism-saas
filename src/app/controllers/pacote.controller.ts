@@ -8,7 +8,7 @@ import { LogService } from '../services/log.service'
 @injectable()
 class PacoteController {
 
-  constructor(
+  constructor (
     @inject("PacoteRepository")
     private pacoteRepository: PacoteRepository,
     private pacoteService: PacoteService,
@@ -90,13 +90,6 @@ class PacoteController {
         usuariosId: user.id
       })
     }
-
-    response.status(200).send(res)
-  }
-
-  listImagesPacote = async (request: Request, response: Response): Promise<void> => {
-
-    const res = await this.pacoteService.listImagesPacote(request.params.search)
 
     response.status(200).send(res)
   }

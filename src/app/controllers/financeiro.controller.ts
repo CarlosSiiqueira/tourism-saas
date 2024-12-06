@@ -3,7 +3,6 @@ import { inject, injectable } from "tsyringe"
 import { Request, Response } from 'express'
 import { FinanceiroService } from '../services/financeiro.service'
 import { formatIndexFilters } from '../../shared/utils/filters'
-import { proccessPacotesId } from '../../shared/utils/webHookBody'
 import { FormaPagamentoService } from '../services/forma.pagamento.service'
 import { PacoteService } from '../services/pacote.service'
 import { ReservaService } from '../services/reserva.service'
@@ -13,6 +12,8 @@ import { ExcursaoPassageiroService } from '../services/excursao.passageiro.servi
 import { ContaBancariaService } from '../services/conta.bancaria.service'
 import { LogService } from '../services/log.service'
 import { ComissaoService } from '../services/comissao.service'
+import { IPessoaDTO } from '../interfaces/Pessoa'
+import { ConfiguracaoService } from '../services/configuracoes.service'
 
 @injectable()
 class FinanceiroController {
@@ -28,7 +29,8 @@ class FinanceiroController {
     private excursaoPassageiroService: ExcursaoPassageiroService,
     private contaBancariaService: ContaBancariaService,
     private logService: LogService,
-    private comissaoService: ComissaoService
+    private comissaoService: ComissaoService,
+    private configService: ConfiguracaoService
   ) { }
 
   index = async (request: Request, response: Response): Promise<void> => {
@@ -70,91 +72,88 @@ class FinanceiroController {
     response.status(200).send(res)
   }
 
-  createByHook = async (request: Request, response: Response): Promise<void> => {
+  shopping = async (request: Request, response: Response): Promise<void> => {
 
-    const formaPagamento = await this.formaPagamentoService.findByName(request.body.payment_method_title)
-    let dataCliente = request.body.billing
+    const localEmbarque: string = request.body.localEmbarque
+    const excursaoId: string = request.body.excursaoId
+    let dataCliente: IPessoaDTO[] = request.body.clients
+    let clients: string[];
 
-    request.body.dataPrevistaRecebimento = await this.financeiroService.setDataPrevistaPagamento(formaPagamento.qtdDiasRecebimento)
+    const config = (await this.configService.findByType('default-user')).configuracao
+    let defaultUser = config ? JSON.parse(config.toString()).id : '1'
 
-    const pessoa = await this.pessoaService.findByCpf(request.body.billing.cpf)
-    let codigoCliente = pessoa?.id || ''
+    const formaPagamento = await this.formaPagamentoService.find(request.body.payment_method)
+    const dataPrevistaRecebimento = await this.financeiroService.setDataPrevistaPagamento(formaPagamento.qtdDiasRecebimento)
 
-    if (!pessoa) {
-      const endereco = await this.enderecoService.findByCepAndNumber(dataCliente.postcode, dataCliente.number);
-      let codigoEndereco = endereco?.id || ''
+    clients = await Promise.all(
+      dataCliente.map(async (customer) => {
 
-      if (!endereco) {
-        const newEndereco = await this.enderecoService.create({
-          logradouro: `${dataCliente.address_1} ${dataCliente.address_2}` || '',
-          numero: dataCliente.number || '',
-          complemento: '',
-          cep: dataCliente.postcode || '',
-          cidade: dataCliente.city || '',
-          bairro: dataCliente.neighborhood || '',
-          uf: dataCliente.state || ''
-        })
-        codigoEndereco = newEndereco
-      }
+        const pessoa = await this.pessoaService.findByCpf(customer.cpf)
+        let codigoCliente = pessoa?.id || ''
 
-      const cliente = await this.pessoaService.create({
-        nome: `${dataCliente.first_name} ${dataCliente.last_name}`,
-        cpf: dataCliente.cpf,
-        sexo: dataCliente.gender ? dataCliente.gender : 'M',
-        email: dataCliente.email,
-        telefone: dataCliente.phone,
-        dataNascimento: dataCliente.birthdate || null,
-        observacoes: 'cadastrado via compra site',
-        telefoneWpp: null,
-        contato: null,
-        telefoneContato: null,
-        usuarioCadastro: '1',
-        rg: dataCliente.rg,
-        emissor: dataCliente.orgaoEmissor || null
-      }, codigoEndereco)
+        if (!pessoa) {
 
-      codigoCliente = cliente
+          const cliente = await this.pessoaService.create({
+            nome: `${customer.nome}`,
+            cpf: customer.cpf,
+            sexo: 'M',
+            email: customer.email,
+            telefone: customer.telefone,
+            dataNascimento: customer.dataNascimento || null,
+            observacoes: 'cadastrado via compra no site',
+            telefoneWpp: null,
+            contato: null,
+            telefoneContato: null,
+            usuarioCadastro: '1',
+            rg: customer.rg,
+            emissor: customer.emissor || null
+          }, null)
+
+          codigoCliente = cliente
+        }
+
+        return codigoCliente
+      })
+
+    )
+
+    if (clients.length) {
+
+      const reserva = await this.reservaService.create({
+        idExcursao: excursaoId,
+        passageiros: clients,
+        codigoUsuario: defaultUser,
+        desconto: 0,
+        localEmbarqueId: localEmbarque,
+        criancasColo: 0
+      })
+
+      await Promise.all(
+        clients.map(async (customer) => {
+          const passageiro = await this.excursaoPassageiroService.create({
+            idExcursao: excursaoId,
+            idPassageiro: customer,
+            localEmbarque: localEmbarque,
+            reserva: reserva
+          })
+        }))
+
+      const financeiro = await this.financeiroRepository.create({
+        tipo: 2,
+        valor: parseFloat(request.body.total),
+        vistoAdmin: false,
+        efetivado: false,
+        observacao: '',
+        ativo: true,
+        idReserva: reserva,
+        codigoExcursao: excursaoId,
+        data: dataPrevistaRecebimento,
+        usuarioCadastro: defaultUser,
+        codigoFormaPagamento: formaPagamento.id
+      })
     }
 
-    request.body.tipo = 2
-    request.body.valor = parseFloat(request.body.total)
-    request.body.vistoAdmin = false
-    request.body.efetivado = false
-    request.body.observacao = 'teste'
-    request.body.ativo = true
-    request.body.numeroComprovanteBancario = null
-    // request.body.idWP = request.body.transaction_id
-    request.body.idWP = 1
-    request.body.codigoPessoa = codigoCliente
-    request.body.codigoFornecedor = null
-    request.body.codigoExcursao = '608b47ea-b5d4-484e-ab20-802db35d699f'
-    request.body.codigoProduto = null
-    request.body.codigoPacote = '351c992b-64f7-49a3-9ce7-0b606a2616a0'
-    request.body.codigoFormaPagamento = formaPagamento.id
-    request.body.codigoContaBancaria = null
-    request.body.codigoCategoria = '1'
-    request.body.usuarioCadastro = '1'
-    request.body.data = new Date()
-
-    const reserva = await this.reservaService.create({
-      idExcursao: request.body.codigoExcursao,
-      passageiros: [codigoCliente],
-      codigoUsuario: '1',
-      desconto: 0,
-      localEmbarqueId: '1',
-      criancasColo: 0
-    })
-
-    request.body.reserva = reserva
-    const financeiro = await this.financeiroRepository.create(request.body)
-    const passageiro = await this.excursaoPassageiroService.create({
-      idExcursao: '608b47ea-b5d4-484e-ab20-802db35d699f',
-      idPassageiro: codigoCliente,
-      localEmbarque: '1',
-      reserva: reserva
-    })
-
-    response.status(200).send(reserva)
+    response.status(200).send('reserva registrada com sucesso')
   }
 
   find = async (request: Request, response: Response): Promise<void> => {

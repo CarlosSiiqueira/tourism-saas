@@ -96,14 +96,25 @@ class PessoaRepository implements IPessoa {
     usuarioCadastro,
     rg,
     emissor,
-    rankingClientesId }: IPessoaDTO, codigoEndereco: string): Promise<string> => {
+    rankingClientesId }: IPessoaDTO, codigoEndereco: string | null): Promise<string> => {
 
     try {
 
       const id = crypto.randomUUID()
+      let addressConnect = {}
 
       if (dataNascimento) {
         dataNascimento = dateValidate(dataNascimento)
+      }
+
+      if (codigoEndereco) {
+        addressConnect = {
+          Endereco: {
+            connect: {
+              id: codigoEndereco
+            }
+          }
+        }
       }
 
       const pessoa = await this.prisma.pessoas.create({
@@ -124,11 +135,7 @@ class PessoaRepository implements IPessoa {
           rg,
           emissor,
           rankingClientesId,
-          Endereco: {
-            connect: {
-              id: codigoEndereco
-            }
-          }
+          ...addressConnect
         }
       })
 

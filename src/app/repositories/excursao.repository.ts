@@ -83,6 +83,11 @@ class ExcursaoRepository implements IExcursao {
             origem: value
           })
           break;
+
+        case 'publicado':
+          Object.assign(where, {
+            publicadoSite: parseInt(value) == 1 ? true : false
+          })
       }
     })
 

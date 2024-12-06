@@ -23,14 +23,6 @@ services:
       PORT: 8000
       JWT_SECRET_KEY: 99eb92b3b4e6905ed5c03332314cfa629d51d2939f08769e9bd2f86028aa092b
       DATABASE_URL: postgresql://${DATABASE_USER}:${DATABASE_PASSWORD}@host.docker.internal/pradosturismo?schema=public
-      API_WP_USER_WOO: ck_41f6233b7d754bb35d46ee751281563efd788c5f
-      API_WP_SECRET_WOO: cs_4de2e57db4f6031333805c20f24f68c87afb16cf
-      URL_WORDPRESS: https://wess.blog
-      WEBHOOK_SECRET: f058e12caa3fee587c7b3671c0c8b3a0364aeacad4cbd4c64c0db80a6b3368b8
-      USERPADRAOWEBHOOK: 0692ca23-a6e2-492b-96e8-90dc421ec471
-      API_EVENT_WP_USER:
-      API_EVENT_WP_SECRET:
-      API_EVENT_WP_TOKEN: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL3dlc3MuYmxvZyIsImlhdCI6MTcyMzI1MzUwOSwibmJmIjoxNzIzMjUzNTA5LCJleHAiOjE3MjM4NTgzMDksImRhdGEiOnsidXNlciI6eyJpZCI6IjIifX19.fC_H6mMyDCrhjMOiUrdYCBoEBr3edCG-wyix_Yx_9f8
       URL_LOGO_PRADOS: https://prados-web.vercel.app/images/prados/logopradosg.png
 
   kafka:

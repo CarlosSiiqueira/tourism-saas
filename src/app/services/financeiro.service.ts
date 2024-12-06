@@ -1,7 +1,6 @@
 import { inject, injectable } from "tsyringe";
 import { FinanceiroRepository } from "../repositories/financeiro.repository";
 import { IFinanceiroDTO, IFinanceiroResponse } from "../interfaces/Financeiro";
-import { wooCommerce } from "../api/woocommerce";
 import { IFinanceiroHookArgs, IIndex } from "../interfaces/Helper";
 import { proccessFinanceiroData } from "../../shared/utils/webHookBody";
 import { IPacoteResponse } from "../interfaces/Pacote";
@@ -55,20 +54,6 @@ export class FinanceiroService {
     data.setDate(data.getDate() + qtdDiasRecebimento)
 
     return data
-  }
-
-  confirmaPagamentoWoo = async (id: string): Promise<void> => {
-
-    const data = {
-      status: "completed"
-    }
-
-    const financeiro = await this.financeiroRepository.find(id)
-    let idWP = financeiro?.idWP
-
-    if (idWP) {
-      const woo = await wooCommerce.put(`orders/${idWP}`, data)
-    }
   }
 
   proccessCreateTransaction = async (dados: IFinanceiroHookArgs, pacote: IPacoteResponse[]): Promise<void> => {

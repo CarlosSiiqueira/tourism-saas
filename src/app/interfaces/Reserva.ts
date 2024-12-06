@@ -17,7 +17,7 @@ export interface IReserva {
 export interface IReservaDTO {
   reserva?: number
   codigoUsuario: string | null
-  passageiros: [string]
+  passageiros: string[]
   idExcursao: string
   desconto: number
   plataforma?: number
