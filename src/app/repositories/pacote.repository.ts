@@ -79,7 +79,8 @@ class PacoteRepository implements IPacote {
           Excursao: true,
           Produto: true,
           Imagem: true,
-          ImagemBloqueado: true
+          ImagemBloqueado: true,
+          Galeria: true
         }
       })
     ])
@@ -96,19 +97,31 @@ class PacoteRepository implements IPacote {
     urlImgEsgotado,
     categoria,
     usuarioCadastro,
-    opcionais }: IPacoteDTO): Promise<{ 'pacote': IPacoteResponse, 'success': boolean }> => {
+    opcionais,
+    galeria }: IPacoteDTO): Promise<{ 'pacote': IPacoteResponse, 'success': boolean }> => {
 
     try {
 
       const id = crypto.randomUUID()
 
       const opcional = {}
+      const galeriaFotos = {}
 
       if (opcionais) {
         Object.assign(opcional,
           {
             Produto: {
               connect: opcionais.map((opt) => { return { id: opt } })
+            }
+          }
+        )
+      }
+
+      if (galeria) {
+        Object.assign(galeriaFotos,
+          {
+            Galeria: {
+              connect: galeria.map((img) => { return { id: img } })
             }
           }
         )
@@ -125,7 +138,8 @@ class PacoteRepository implements IPacote {
           tipoTransporte,
           categoria,
           usuarioCadastro,
-          ...opcional
+          ...opcional,
+          ...galeriaFotos
         }
       })
 
@@ -184,11 +198,13 @@ class PacoteRepository implements IPacote {
     origem,
     tipoTransporte,
     usuarioCadastro,
-    opcionais }: IPacoteDTO, id: string): Promise<{ 'pacote': IPacoteResponse, 'success': boolean }> => {
+    opcionais,
+    galeria }: IPacoteDTO, id: string): Promise<{ 'pacote': IPacoteResponse, 'success': boolean }> => {
 
     try {
 
       const opcional = {}
+      const galeriaFotos = {}
 
       await this.prisma.pacotes.update({
         where: {
@@ -196,6 +212,9 @@ class PacoteRepository implements IPacote {
         },
         data: {
           Produto: {
+            set: []
+          },
+          Galeria: {
             set: []
           }
         }
@@ -206,6 +225,16 @@ class PacoteRepository implements IPacote {
           {
             Produto: {
               connect: opcionais.map((opt) => { return { id: opt } })
+            }
+          }
+        )
+      }
+
+      if (galeria) {
+        Object.assign(galeriaFotos,
+          {
+            Galeria: {
+              connect: galeria.map((img) => { return { id: img } })
             }
           }
         )
@@ -223,7 +252,8 @@ class PacoteRepository implements IPacote {
           origem,
           tipoTransporte,
           usuarioCadastro,
-          ...opcional
+          ...opcional,
+          ...galeriaFotos
         },
         where: {
           id

@@ -110,6 +110,7 @@ model Pacotes {
   urlImgEsgotado  String?
   Usuarios        Usuarios     @relation(fields: [usuarioCadastro], references: [id])
   usuarioCadastro String
+  Galeria         Imagens[]
   Excursao        Excursao[]
   Transacoes      Transacoes[]
   Produto         Produtos[]
@@ -514,4 +515,6 @@ model Imagens {
   userId                 String
   PacotesImagem          Pacotes[] @relation("imagem")
   PacotesImagemBloqueado Pacotes[] @relation("imagemBloqueado")
+  Pacotes                Pacotes?  @relation(fields: [pacotesId], references: [id])
+  pacotesId              String?
 }

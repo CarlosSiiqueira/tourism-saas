@@ -132,7 +132,8 @@ class ExcursaoRepository implements IExcursao {
             include: {
               Imagem: true,
               ImagemBloqueado: true,
-              Produto: true
+              Produto: true,
+              Galeria: true
             }
           },
           LocalEmbarque: {}
@@ -222,7 +223,10 @@ class ExcursaoRepository implements IExcursao {
         },
         Pacotes: {
           include: {
-            Produto: true
+            Produto: true,
+            Galeria: true,
+            Imagem: true,
+            ImagemBloqueado: true
           }
         },
         LocalEmbarque: {}
@@ -263,7 +267,14 @@ class ExcursaoRepository implements IExcursao {
             LocalEmbarque: true
           }
         },
-        Pacotes: {},
+        Pacotes: {
+          include: {
+            Produto: true,
+            Galeria: true,
+            Imagem: true,
+            ImagemBloqueado: true
+          }
+        },
         LocalEmbarque: {}
       }
     })

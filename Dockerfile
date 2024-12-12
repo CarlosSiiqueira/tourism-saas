@@ -7,6 +7,7 @@ RUN apk add --no-cache \
     freetype \
     fontconfig \
     ttf-freefont \
+    openssl \
     && apk add --no-cache --virtual .build-deps \
     build-base \
     python3
