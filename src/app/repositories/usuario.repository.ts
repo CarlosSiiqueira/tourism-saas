@@ -144,11 +144,14 @@ class UsuarioRepository implements IUsuario {
 
     try {
 
+      const pass = generatePassword(password)
+
       const usuario = await this.prisma.usuarios.update({
         data: {
           nome,
           username,
-          password,
+          password: pass.password,
+          salt: pass.salt,
           dataCadastro: new Date(),
           usuarioCadastro,
           tipo,
