@@ -90,14 +90,15 @@ class ExcursaoRepository implements IExcursao {
           Object.assign(where, {
             publicadoSite: parseInt(value) == 1 ? true : false
           })
+          break;
 
-        case 'pacoteId': {
+        case 'pacoteId':
           Object.assign(where, {
             Pacotes: {
               id: value
             }
           })
-        }
+          break;
       }
     })
 
