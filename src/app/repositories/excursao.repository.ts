@@ -80,7 +80,9 @@ class ExcursaoRepository implements IExcursao {
 
         case 'origem':
           Object.assign(where, {
-            origem: value
+            Pacotes: {
+              origem: value
+            }
           })
           break;
 
