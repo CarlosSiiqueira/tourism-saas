@@ -1164,6 +1164,7 @@ class FinanceiroRepository implements IFinanceiro {
 
     const where = {
       ativo: true,
+      efetivado: true,
       tipo: 2,
       data: {},
       AND: {
