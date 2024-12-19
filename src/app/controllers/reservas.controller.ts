@@ -11,7 +11,7 @@ import { LogService } from '../services/log.service'
 import { ExcursaoQuartosService } from '../services/excursao.quarto.service'
 import { ExcursaoOnibusService } from '../services/excursao.onibus.service'
 import { PdfService } from '../services/pdf.service'
-import { htmlEmailReserva, htmlTicket } from '../../shared/helper/html'
+import { htmlEmailCredito, htmlEmailReserva, htmlTicket } from '../../shared/helper/html'
 import { EmailService } from '../services/mail.service'
 import { formattingDate } from '../../shared/helper/date'
 
@@ -187,12 +187,25 @@ class ReservaController {
     if (reserva.status) {
       await Promise.all(
         reserva.Pessoa.map(async (person) => {
-          return await this.creditoClienteService.create({
-            valor: request.body.valor / reserva.Pessoa.length,
+
+          let valor = request.body.valor / reserva.Pessoa.length
+
+          await this.creditoClienteService.create({
+            valor,
             pessoasId: person.id,
             idReserva: reserva.id,
             usuariosId: request.body.codigoUsuario
           })
+
+          let textEmail = htmlEmailCredito(`#${reserva.reserva}`, person.nome, valor)
+
+          await this.emailService.sendEmail(
+            person.email,
+            "Prados Turismo - Geramos um crédito pra você",
+            textEmail,
+            3
+          )
+
         })
       )
     }

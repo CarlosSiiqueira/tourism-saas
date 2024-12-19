@@ -3,16 +3,13 @@ import { inject, injectable } from "tsyringe"
 import { Request, Response } from "express"
 import { formatIndexFilters } from '../../shared/utils/filters'
 import { LogService } from '../services/log.service'
-import { FinanceiroService } from '../services/financeiro.service'
-import { IFinanceiroDTO } from '../interfaces/Financeiro'
 
 @injectable()
 class CreditoClienteController {
-  constructor(
+  constructor (
     @inject("CreditoClienteRepository")
     private creditoClienteRepository: CreditoClienteRepository,
-    private logService: LogService,
-    private financeiroService: FinanceiroService
+    private logService: LogService
   ) { }
 
   index = async (request: Request, response: Response): Promise<void> => {
@@ -69,18 +66,6 @@ class CreditoClienteController {
         rotina: 'Crédito Cliente',
         usuariosId: user.id
       })
-
-      // var financeiro: IFinanceiroDTO = {
-      //   idReserva: creditoCliente.idReserva,
-      //   tipo: 1,
-      //   valor: creditoCliente.valor,
-      //   data: new Date(),
-      //   ativo: true,
-      //   usuarioCadastro: user.id,
-      //   codigoFormaPagamento: ''
-      // }
-
-      // await this.financeiroService.create(financeiro)
     }
 
     response.status(200).send(creditoCliente)
