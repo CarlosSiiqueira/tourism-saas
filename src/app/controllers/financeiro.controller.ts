@@ -86,9 +86,19 @@ class FinanceiroController {
     let clients: { codigoCliente: string, localEmbarque: string }[];
 
     const config = (await this.configService.findByType('default-user')).configuracao
+    const paymentConfig = (await this.configService.findByType('default-forma-pagamento')).configuracao
     let defaultUser = config ? JSON.parse(config.toString()).id : '1'
+    let defaultPayment = paymentConfig ? JSON.parse(paymentConfig.toString()).id : null
 
-    const formaPagamento = await this.formaPagamentoService.find('64d767e3-1a24-446b-8040-77a01ad25b54')
+    if (!defaultPayment) {
+      response.send('Configure uma forma de pagamentro padrão antes de utilizar o sistema').status(404)
+    }
+
+    if (!defaultUser) {
+      response.send('Configure uma usuário padrão antes de utilizar o sistema').status(404)
+    }
+
+    const formaPagamento = await this.formaPagamentoService.find(defaultPayment)
     const dataPrevistaRecebimento = await this.financeiroService.setDataPrevistaPagamento(formaPagamento.qtdDiasRecebimento)
 
     clients = await Promise.all(
