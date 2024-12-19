@@ -6,6 +6,8 @@ import { formatIndexFilters } from '../../shared/utils/filters'
 import { LogService } from '../services/log.service'
 import { generateRandomString } from '../../shared/utils/encrypt'
 import { EmailService } from '../services/mail.service'
+import { htmlEmailCadastro } from '../../shared/helper/html'
+import { PessoaService } from '../services/pessoa.service'
 
 @injectable()
 class UsuarioController {
@@ -14,7 +16,8 @@ class UsuarioController {
     private usuarioRepository: UsuarioRepository,
     private authService: AuthService = new AuthService(usuarioRepository),
     private logService: LogService,
-    private emailService: EmailService
+    private emailService: EmailService,
+    private pessoaService: PessoaService
   ) { }
 
   index = async (request: Request, response: Response): Promise<void> => {
@@ -135,11 +138,7 @@ class UsuarioController {
     const userName: string = body.email
     const password = generateRandomString(8)
     const subject: string = 'Seu cadastro na Prados Turismo'
-    const textEmail: string = `
-                    Holá seu cadastro foi efetuado com sucesso na prados!
-                    segue seus dados de acesso:
-                    Login: ${userName}
-                    senha: ${password}`
+    const textEmail: string = htmlEmailCadastro(userName, password)
 
     const userClient = await this.usuarioRepository.create({
       nome: userName,
@@ -152,6 +151,22 @@ class UsuarioController {
       meta: null,
       comissao: null
     })
+
+    await this.pessoaService.create({
+      nome: body.nome,
+      cpf: body.cpf,
+      telefoneWpp: body.telefone,
+      email: userName,
+      sexo: "M",
+      observacoes: "Cadastrado via criação de usuário no site",
+      telefone: body.telefone,
+      contato: null,
+      dataNascimento: null,
+      emissor: null,
+      rg: null,
+      telefoneContato: null,
+      usuarioCadastro: user
+    }, null)
 
     await this.emailService.sendEmail(userName, subject, textEmail, 3)
 
