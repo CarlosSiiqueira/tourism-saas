@@ -325,3 +325,87 @@ export const htmlEmailReserva = async (
             </body>
         </html>`;
 }
+
+export const htmlEmailCadastro = (username: string, password: string): string => {
+
+    return `<!DOCTYPE html>
+            <html lang="pt-BR">
+            <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Bem-vindo ao Prado</title>
+            <style>
+                body {
+                font-family: Arial, sans-serif;
+                background-color: #f4f4f4;
+                margin: 0;
+                padding: 0;
+                }
+                .container {
+                width: 100%;
+                max-width: 600px;
+                margin: 20px auto;
+                background: #ffffff;
+                border-radius: 8px;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                overflow: hidden;
+                }
+                .header {
+                background-color: #dd7f11;
+                padding: 20px;
+                text-align: center;
+                color: #ffffff;
+                }
+                .header h1 {
+                margin: 0;
+                font-size: 24px;
+                }
+                .content {
+                padding: 20px;
+                line-height: 1.6;
+                color: #333333;
+                }
+                .content a {
+                color: #dd7f11;
+                text-decoration: none;
+                }
+                .footer {
+                text-align: center;
+                padding: 10px;
+                font-size: 12px;
+                color: #999999;
+                background-color: #f9f9f9;
+                }
+                .logo {
+                display: flex;
+                justify-content: center;
+                padding: 20px 0;
+                }
+                .logo img {
+                max-width: 150px;
+                height: auto;
+                }
+            </style>
+            </head>
+            <body>
+            <div class="logo">
+                <img src="https://tourism-saas-web-git-main-carlossiiqueiras-projects.vercel.app/images/prados/logo_laranja.png" alt="Logomarca do Prado">
+            </div>
+            <div class="container">
+                <div class="header">
+                <h1>Boas-vindas à Prados Turismo</h1>
+                </div>
+                <div class="content">
+                <p>Olá, <strong>${username}</strong>.</p>
+                <p>Obrigado por criar uma conta em Prado. O seu nome de usuário é <strong>${username}</strong> e sua senha é <strong>${password}</strong>. 
+                Você pode acessar sua conta para ver pedidos, alterar sua senha e muito mais em: 
+                <a href="https://www.pradosturismo.com.br/minha-conta/">https://www.pradosturismo.com.br/minha-conta/</a></p>
+                <p>Estamos ansiosos para atendê-lo(a) em breve.</p>
+                </div>
+                <div class="footer">
+                Prados Turismo — Built by <a href="https://woocommerce.com/" target="_blank">Carlos Siqueira</a>
+                </div>
+            </div>
+            </body>
+            </html>`;
+}
