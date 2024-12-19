@@ -1,16 +1,17 @@
 import { IIndex } from "./Helper"
 
 export interface ICreditoCliente {
-  index(data: IIndex): Promise<{
+  index (data: IIndex): Promise<{
     count: number
     rows: ICreditoClienteResponse[]
   }>
-  create(data: ICreditoClienteDTO): Promise<string>
-  find(id: string): Promise<ICreditoClienteResponse>
-  findAll(): Promise<ICreditoClienteResponse[]>
-  delete(id: string): Promise<ICreditoClienteResponse>
-  update(data: ICreditoClienteDTO, id: string): Promise<ICreditoClienteResponse>
-  findByCliente(idCliente: string): Promise<ICreditoClienteResponse[]>
+  create (data: ICreditoClienteDTO): Promise<string>
+  find (id: string): Promise<ICreditoClienteResponse>
+  findAll (): Promise<ICreditoClienteResponse[]>
+  delete (id: string): Promise<ICreditoClienteResponse>
+  update (data: ICreditoClienteDTO, id: string): Promise<ICreditoClienteResponse>
+  findByCliente (idCliente: string): Promise<ICreditoClienteResponse[]>
+  setUtilizadoEm (id: string, data: Date, valor: number): Promise<string>
 }
 
 export interface ICreditoClienteDTO {

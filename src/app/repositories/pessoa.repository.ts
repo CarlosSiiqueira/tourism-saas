@@ -146,7 +146,7 @@ class PessoaRepository implements IPessoa {
 
   }
 
-  find = async (id: string): Promise<IPessoaResponse | null> => {
+  find = async (id: string): Promise<IPessoaResponse> => {
 
     const pessoa = await this.prisma.pessoas.findFirst({
       where: {

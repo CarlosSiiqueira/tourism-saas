@@ -187,6 +187,25 @@ class ComissaoRepository implements IComissao {
 
     return comissao;
   }
+
+  setPaid = async (id: string, date: Date): Promise<string> => {
+
+    const comissao = await this.prisma.comissao.update({
+      data: {
+        pagoEm: date
+      },
+      where: {
+        id: id
+      }
+    })
+
+    if (!comissao) {
+      throw new Warning('Registro não encontrado', 400)
+    }
+
+    return 'Pagamento Registrado com sucesso'
+
+  }
 }
 
 export { ComissaoRepository }

@@ -207,6 +207,25 @@ class CreditoClienteRepository implements ICreditoCliente {
 
     return creditoCliente
   }
+
+  setUtilizadoEm = async (id: string, data: Date, valor: number): Promise<string> => {
+
+    const creditoCliente = await this.prisma.creditoClientes.update({
+      data: {
+        utilizadoEm: data,
+        valor
+      },
+      where: {
+        id: id
+      }
+    })
+
+    if (!creditoCliente) {
+      throw new Warning('Registro não encontrado', 400)
+    }
+
+    return 'Data registrada com sucesso'
+  }
 }
 
 export { CreditoClienteRepository }

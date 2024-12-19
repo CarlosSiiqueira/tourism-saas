@@ -3,7 +3,7 @@ import { IIndex } from "./Helper"
 export interface IPessoa {
   index (data: IIndex): Promise<{ count: number, rows: IPessoaResponse[] }>
   create (data: IPessoaDTO, codigoEndereco: string): Promise<string>
-  find (id: string): Promise<IPessoaResponse | null>
+  find (id: string): Promise<IPessoaResponse>
   findAll (): Promise<IPessoaResponse[]>
   findByCpf (cpf: string): Promise<IPessoaResponse | null>
   delete (id: string): Promise<IPessoaDeleteResponse>

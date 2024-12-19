@@ -3,11 +3,12 @@ import { IExcursaoPassageirosListResponse, IExcursaoPassageirosResponse } from "
 import { IExcursaoQuartosResponse } from "../interfaces/ExcursaoQuartos";
 import { ExcursaoRepository } from "../repositories/excursao.repository";
 import { IExcursaoOnibusResponse } from "../interfaces/ExcursaoOnibus";
+import { IExcursaoResponse } from "../interfaces/Excursao";
 
 @injectable()
 export class ExcursaoService {
 
-  constructor(
+  constructor (
     @inject("ExcursaoRepository")
     private excursaoRepository: ExcursaoRepository
   ) { }
@@ -45,6 +46,10 @@ export class ExcursaoService {
     })
 
     return passageiros;
+  }
+
+  find = async (id: string): Promise<IExcursaoResponse> => {
+    return await this.excursaoRepository.find(id)
   }
 
 }

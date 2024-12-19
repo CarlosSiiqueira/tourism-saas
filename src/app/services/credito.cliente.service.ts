@@ -6,7 +6,7 @@ import { ICreditoClienteDTO, ICreditoClienteResponse } from "../interfaces/Credi
 @injectable()
 export class CreditoClienteService {
 
-  constructor(
+  constructor (
     @inject('CreditoClienteRepository')
     private creditoClienteRepository: CreditoClienteRepository
   ) { }
@@ -38,5 +38,9 @@ export class CreditoClienteService {
     const credito = await this.creditoClienteRepository.findByCliente(idCliente)
 
     return credito
+  }
+
+  setUtilizadoEm = async (id: string, date: Date, valor: number): Promise<string> => {
+    return await this.creditoClienteRepository.setUtilizadoEm(id, date, valor)
   }
 }

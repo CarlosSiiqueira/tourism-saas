@@ -25,4 +25,8 @@ export class ComissaoService {
     return comissao;
   }
 
+  setPaid = async (id: string, date: Date): Promise<string> => {
+    return await this.comissaoRepository.setPaid(id, date)
+  }
+
 }

@@ -81,7 +81,7 @@ class ExcursaoRepository implements IExcursao {
         case 'origem':
           Object.assign(where, {
             Pacotes: {
-              origem: value
+              origem: parseInt(value)
             }
           })
           break;
@@ -98,6 +98,7 @@ class ExcursaoRepository implements IExcursao {
               id: value
             }
           })
+
           break;
       }
     })

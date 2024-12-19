@@ -14,6 +14,10 @@ import { LogService } from '../services/log.service'
 import { ComissaoService } from '../services/comissao.service'
 import { IPessoaDTO } from '../interfaces/Pessoa'
 import { ConfiguracaoService } from '../services/configuracoes.service'
+import { pagarme } from '../api/pagarme'
+import { OpcionalReserva, PagarmeLinkRequestBody } from '../interfaces/Helper'
+import { ExcursaoService } from '../services/excursao.service'
+import { formattingDate } from '../../shared/helper/date'
 
 @injectable()
 class FinanceiroController {
@@ -30,7 +34,8 @@ class FinanceiroController {
     private contaBancariaService: ContaBancariaService,
     private logService: LogService,
     private comissaoService: ComissaoService,
-    private configService: ConfiguracaoService
+    private configService: ConfiguracaoService,
+    private excursaoService: ExcursaoService
   ) { }
 
   index = async (request: Request, response: Response): Promise<void> => {
@@ -325,6 +330,136 @@ class FinanceiroController {
     }
 
     response.status(301).send('Não foi possivel realizar procedimento')
+  }
+
+  generatePaymentLink = async (request: Request, response: Response): Promise<void> => {
+
+    const { opcionais } = request.body
+    const { cliente } = request.body
+    const { idExcursao } = request.body
+    const paymentMethod: Array<string> = request.body.paymentMethods
+
+    const customer = await this.pessoaService.find(cliente)
+    const excursao = await this.excursaoService.find(idExcursao)
+    const phones = {}
+    const pixSettings = { expires_in: 2 }
+
+    let country_code = "55"
+    var area_code;
+    var number;
+    var area_code_mobile;
+    var number_mobile;
+    var opcionaisItems;
+
+    if (customer.telefone) {
+      area_code = customer.telefone?.slice(0, 2) || '85'
+      number = customer?.telefone?.slice(2) || ''
+    }
+
+    if (customer.telefoneWpp) {
+      area_code_mobile = customer.telefoneWpp?.slice(0, 2) || '85'
+      number_mobile = customer?.telefoneWpp?.slice(2) || ''
+    }
+
+    if (opcionais.length) {
+      opcionaisItems = opcionais.map((opcional: OpcionalReserva) => {
+        return {
+          amount: Math.round(opcional.valor * 100),
+          name: opcional.nome,
+          default_quantity: opcional.quantidade
+        }
+      })
+    }
+
+    const requestLink: PagarmeLinkRequestBody = {
+      is_building: false,
+      payment_settings: {
+        credit_card_settings: {
+          operation_type: "auth_and_capture",
+          installments: [
+            {
+              number: 1,
+              total: 12000
+            },
+            {
+              number: 2,
+              total: 6000
+            }
+          ]
+        },
+        accepted_payment_methods: paymentMethod
+      },
+      cart_settings: {
+        items: [
+          {
+            amount: Math.round(excursao.valor * 100),
+            name: `${formattingDate(excursao.dataInicio.toDateString())} à ${formattingDate(excursao.dataFim.toDateString())} - ${excursao.nome}`,
+            description: "",
+            default_quantity: request.body.quantidade
+          }
+        ]
+      },
+      name: `${formattingDate(excursao.dataInicio.toDateString())} à ${formattingDate(excursao.dataFim.toDateString())} - ${excursao.nome}`,
+      type: "order",
+      customer_settings: {
+        customer: {
+          type: "individual",
+          email: customer.email,
+          name: customer.nome,
+          document: customer.cpf,
+          document_type: "CPF",
+        }
+      },
+      layout_settings: {
+        image_url: "https://tourism-saas-web-git-main-carlossiiqueiras-projects.vercel.app/images/prados/logo_laranja.png",
+        primary_color: "#dd7f11"
+      }
+    }
+
+    if (area_code && number) {
+      Object.assign(phones, {
+        home_phone: {
+          country_code,
+          area_code,
+          number
+        }
+
+      })
+    }
+
+    if (area_code_mobile && number_mobile) {
+      Object.assign(phones, {
+        mobile_phone: {
+          country_code,
+          area_code: area_code_mobile,
+          number: number_mobile
+        }
+      })
+    }
+
+    if (requestLink.customer_settings.customer && phones) {
+      Object.assign(requestLink.customer_settings.customer, {
+        phones: {
+          ...phones
+        }
+      });
+    }
+
+    if (paymentMethod.includes('pix')) {
+      Object.assign(requestLink.payment_settings, {
+        pix_settings: {
+          ...pixSettings
+        }
+      })
+    }
+
+    if (opcionaisItems.length) {
+      requestLink.cart_settings.items = requestLink.cart_settings.items.concat(opcionaisItems)
+    }
+
+    const paymentLink = await pagarme.post('/paymentlinks', requestLink)
+
+    response.send(paymentLink.data).status(201)
   }
 }
 

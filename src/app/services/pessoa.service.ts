@@ -72,4 +72,8 @@ export class PessoaService {
   updateRank = async (id: string, idRank: string): Promise<string> => {
     return await this.pessoaRepository.updateRank(id, idRank)
   }
+
+  find = async (id: string): Promise<IPessoaResponse> => {
+    return await this.pessoaRepository.find(id)
+  }
 }

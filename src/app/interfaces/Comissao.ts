@@ -12,6 +12,7 @@ export interface IComissao {
   delete (id: string): Promise<IComissaoResponse>
   update (data: IComissaoDTO, id: string): Promise<IComissaoResponse>
   findByFinanceiro (idFinanceiro: string): Promise<IComissaoResponse | null>
+  setPaid (id: string, date: Date): Promise<string>
 }
 
 export interface IComissaoDTO {
