@@ -113,3 +113,7 @@ export interface IPessoaFilter {
     mode: string
   }
 }
+
+export interface IPessoaReservaDTO extends IPessoaDTO {
+  localEmbarque: string
+}

@@ -12,7 +12,7 @@ import { ExcursaoPassageiroService } from '../services/excursao.passageiro.servi
 import { ContaBancariaService } from '../services/conta.bancaria.service'
 import { LogService } from '../services/log.service'
 import { ComissaoService } from '../services/comissao.service'
-import { IPessoaDTO } from '../interfaces/Pessoa'
+import { IPessoaReservaDTO } from '../interfaces/Pessoa'
 import { ConfiguracaoService } from '../services/configuracoes.service'
 import { pagarme } from '../api/pagarme'
 import { OpcionalReserva, PagarmeLinkRequestBody } from '../interfaces/Helper'
@@ -79,15 +79,16 @@ class FinanceiroController {
 
   shopping = async (request: Request, response: Response): Promise<void> => {
 
-    const localEmbarque: string = request.body.localEmbarque
     const excursaoId: string = request.body.excursaoId
-    let dataCliente: IPessoaDTO[] = request.body.clients
-    let clients: string[];
+    const criancas: number = request.body.criancas
+    let dataCliente: IPessoaReservaDTO[] = request.body.clients
+    const localEmbarque = dataCliente[0].localEmbarque
+    let clients: { codigoCliente: string, localEmbarque: string }[];
 
     const config = (await this.configService.findByType('default-user')).configuracao
     let defaultUser = config ? JSON.parse(config.toString()).id : '1'
 
-    const formaPagamento = await this.formaPagamentoService.find(request.body.payment_method)
+    const formaPagamento = await this.formaPagamentoService.find('64d767e3-1a24-446b-8040-77a01ad25b54')
     const dataPrevistaRecebimento = await this.financeiroService.setDataPrevistaPagamento(formaPagamento.qtdDiasRecebimento)
 
     clients = await Promise.all(
@@ -101,7 +102,7 @@ class FinanceiroController {
           const cliente = await this.pessoaService.create({
             nome: `${customer.nome}`,
             cpf: customer.cpf,
-            sexo: 'M',
+            sexo: customer.sexo,
             email: customer.email,
             telefone: customer.telefone,
             dataNascimento: customer.dataNascimento || null,
@@ -109,7 +110,7 @@ class FinanceiroController {
             telefoneWpp: null,
             contato: null,
             telefoneContato: null,
-            usuarioCadastro: '1',
+            usuarioCadastro: defaultUser,
             rg: customer.rg,
             emissor: customer.emissor || null
           }, null)
@@ -117,7 +118,7 @@ class FinanceiroController {
           codigoCliente = cliente
         }
 
-        return codigoCliente
+        return { codigoCliente, localEmbarque: customer.localEmbarque }
       })
 
     )
@@ -126,19 +127,19 @@ class FinanceiroController {
 
       const reserva = await this.reservaService.create({
         idExcursao: excursaoId,
-        passageiros: clients,
+        passageiros: clients.map((customer) => { return customer.codigoCliente }),
         codigoUsuario: defaultUser,
         desconto: 0,
         localEmbarqueId: localEmbarque,
-        criancasColo: 0
+        criancasColo: criancas
       })
 
       await Promise.all(
         clients.map(async (customer) => {
           const passageiro = await this.excursaoPassageiroService.create({
             idExcursao: excursaoId,
-            idPassageiro: customer,
-            localEmbarque: localEmbarque,
+            idPassageiro: customer.codigoCliente,
+            localEmbarque: customer.localEmbarque,
             reserva: reserva
           })
         }))
@@ -158,7 +159,7 @@ class FinanceiroController {
       })
     }
 
-    response.status(200).send('reserva registrada com sucesso')
+    response.status(201).send('reserva registrada com sucesso')
   }
 
   find = async (request: Request, response: Response): Promise<void> => {
