@@ -3,14 +3,19 @@ import { PassageiroEmbarqueRepository } from "../repositories/passageiro.embarqu
 import { Request, Response } from 'express'
 import { formatIndexFilters } from "../../shared/utils/filters";
 import { LogService } from "../services/log.service";
+import { EmailService } from "../services/mail.service";
+import { htmlEmailViagem } from "../../shared/helper/html";
+import { ExcursaoPassageiroService } from "../services/excursao.passageiro.service";
 
 @injectable()
 class PassageiroEmbarqueController {
 
-  constructor(
+  constructor (
     @inject("PassageiroEmbarqueRepository")
     private passageiroEmbarqueRepository: PassageiroEmbarqueRepository,
-    private logService: LogService
+    private logService: LogService,
+    private emailService: EmailService,
+    private excursaoPassageiroService: ExcursaoPassageiroService
   ) { }
 
   index = async (request: Request, response: Response): Promise<void> => {
@@ -24,8 +29,21 @@ class PassageiroEmbarqueController {
   create = async (request: Request, response: Response): Promise<void> => {
 
     let user = JSON.parse(request.headers.user as string);
+    const { codigoExcursao } = request.body
+    const { codigoPassageiro } = request.body
 
     const res = await this.passageiroEmbarqueRepository.create(request.body)
+
+    const passageiros = await this.excursaoPassageiroService.find(codigoExcursao)
+
+    const passageiro = passageiros.find((pessoa) => { return pessoa.id == codigoPassageiro })
+
+    await this.emailService.sendEmail(
+      passageiro?.Pessoa.email || '',
+      'Prados Turismo te deseja uma boa viagem',
+      htmlEmailViagem(passageiro?.Pessoa.nome || '', passageiro?.Excursao.nome || ''),
+      3
+    )
 
     await this.logService.create({
       tipo: 'CREATE',
