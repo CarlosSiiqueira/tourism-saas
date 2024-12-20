@@ -32,7 +32,8 @@ export class PessoaService {
     dataNascimento,
     usuarioCadastro,
     rg,
-    emissor }: IPessoaDTO, codigoEndereco: string | null): Promise<string> => {
+    emissor,
+    userId }: IPessoaDTO, codigoEndereco: string | null): Promise<string> => {
 
     const pessoa = await this.pessoaRepository.create({
       nome,
@@ -47,7 +48,8 @@ export class PessoaService {
       dataNascimento,
       usuarioCadastro,
       rg,
-      emissor
+      emissor,
+      userId
     }, codigoEndereco)
 
 
@@ -75,5 +77,9 @@ export class PessoaService {
 
   find = async (id: string): Promise<IPessoaResponse> => {
     return await this.pessoaRepository.find(id)
+  }
+
+  setUser = async (id: string, userId: string): Promise<string> => {
+    return await this.pessoaRepository.setUser(id, userId);
   }
 }

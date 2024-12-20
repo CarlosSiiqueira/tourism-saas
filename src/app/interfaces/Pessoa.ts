@@ -9,6 +9,7 @@ export interface IPessoa {
   delete (id: string): Promise<IPessoaDeleteResponse>
   update (data: IPessoaDTO, id: string, codigoEndereco: string): Promise<IPessoaResponse>
   updateRank (id: string, idRank: string): Promise<string>
+  setUser (id: string, userId: string): Promise<string>
 }
 
 export interface IPessoaDTO {
@@ -26,6 +27,7 @@ export interface IPessoaDTO {
   rg: string | null
   emissor: string | null
   rankingClientesId?: string | null
+  userId?: string | null
 }
 
 export interface IPessoaResponse extends IPessoaDTO {

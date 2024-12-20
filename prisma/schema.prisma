@@ -45,6 +45,8 @@ model Pessoas {
   usuarioCadastro     String
   Ranking             RankingClientes?      @relation(fields: [rankingClientesId], references: [id])
   rankingClientesId   String?
+  UsuarioVinculado    Usuarios?             @relation(fields: [userId], references: [id], name: "UsuarioVinculado")
+  userId              String?
   Endereco            Endereco[]
   Vendas              Vendas[]
   Transacoes          Transacoes[]
@@ -91,6 +93,7 @@ model Usuarios {
   Configuracoes         Configuracoes[]
   Comissao              Comissao[]
   Imagens               Imagens[]
+  PessoaVinculada       Pessoas[]               @relation("UsuarioVinculado")
 }
 
 model Pacotes {

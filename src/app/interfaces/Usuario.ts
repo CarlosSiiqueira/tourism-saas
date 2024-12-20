@@ -8,7 +8,7 @@ export interface IUsuario {
   delete (id: string): Promise<IUsuarioResponse>
   update (data: IUsuarioDTO, id: string): Promise<IUsuarioResponse>
   login (username: string, password: string): Promise<IUsuarioResponse>
-  loginUserClient (username: string, password: string): Promise<IUsuarioResponse>
+  loginUserClient (username: string, password: string): Promise<IUsuarioClientResponse>
   changePassword (id: string, data: IUsuarioChangePassword): Promise<IUsuarioResponse>
 }
 
@@ -45,4 +45,11 @@ export interface IUsuarioFilter {
 export interface IUsuarioChangePassword {
   password: string
   confirmationPassword: string
+}
+
+export interface IUsuarioClientResponse {
+  id: string
+  nome: string
+  username: string
+  email: string
 }

@@ -96,7 +96,8 @@ class PessoaRepository implements IPessoa {
     usuarioCadastro,
     rg,
     emissor,
-    rankingClientesId }: IPessoaDTO, codigoEndereco: string | null): Promise<string> => {
+    rankingClientesId,
+    userId }: IPessoaDTO, codigoEndereco: string | null): Promise<string> => {
 
     try {
 
@@ -135,6 +136,7 @@ class PessoaRepository implements IPessoa {
           rg,
           emissor,
           rankingClientesId,
+          userId,
           ...addressConnect
         }
       })
@@ -303,6 +305,24 @@ class PessoaRepository implements IPessoa {
     }
 
     return 'Rank alterado com sucesso'
+  }
+
+  setUser = async (id: string, userId: string): Promise<string> => {
+
+    const pessoa = await this.prisma.pessoas.update({
+      data: {
+        userId
+      },
+      where: {
+        id
+      }
+    })
+
+    if (!pessoa) {
+      throw new Warning("Não foi possível vincular usuário ao cliente")
+    }
+
+    return id
   }
 }
 

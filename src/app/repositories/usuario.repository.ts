@@ -2,7 +2,7 @@ import { generatePassword, verifyPassword } from "../../shared/utils/encrypt"
 import prismaManager from "../database/database"
 import { Warning } from "../errors"
 import { IIndex } from "../interfaces/Helper"
-import { IUsuario, IUsuarioDTO, IUsuarioResponse, IUsuarioLogin, IUsuarioFilter, IUsuarioChangePassword } from "../interfaces/Usuario"
+import { IUsuario, IUsuarioDTO, IUsuarioResponse, IUsuarioLogin, IUsuarioFilter, IUsuarioChangePassword, IUsuarioClientResponse } from "../interfaces/Usuario"
 import crypto from 'crypto'
 
 class UsuarioRepository implements IUsuario {
@@ -213,12 +213,36 @@ class UsuarioRepository implements IUsuario {
     return usuario
   }
 
-  loginUserClient = async (username: string, password: string): Promise<IUsuarioResponse> => {
+  loginUserClient = async (username: string, senha: string): Promise<IUsuarioClientResponse> => {
 
     const user = await this.prisma.usuarios.findUnique({
       where: {
         username,
         tipo: 3
+      },
+      include: {
+        PessoaVinculada: {
+          include: {
+            Ranking: true,
+            Reservas: {
+              include: {
+                Excursao: true,
+                Opcionais: {
+                  include: {
+                    Produto: true
+                  }
+                },
+                Transacoes: true,
+                LocalEmbarque: true,
+                CreditoClientes: {
+                  include: {
+                    Reserva: true
+                  }
+                }
+              }
+            },
+          }
+        }
       }
     })
 
@@ -226,13 +250,15 @@ class UsuarioRepository implements IUsuario {
       throw new Warning("Login ou senha incorretos", 401)
     }
 
-    const passwordVerified = verifyPassword(password, user.salt || "", user.password)
+    const passwordVerified = verifyPassword(senha, user.salt || "", user.password)
 
     if (!passwordVerified) {
       throw new Warning("Login ou senha incorretos", 401)
     }
 
-    return user
+    const { password, salt, meta, comissao, ...userWithoutPass } = user
+
+    return userWithoutPass
   }
 
   changePassword = async (id: string, data: IUsuarioChangePassword): Promise<IUsuarioResponse> => {

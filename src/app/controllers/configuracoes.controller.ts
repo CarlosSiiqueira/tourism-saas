@@ -7,7 +7,7 @@ import { LogService } from "../services/log.service";
 @injectable()
 class ConfiguracoesController {
 
-  constructor(
+  constructor (
     @inject("ConfiguracoesRepository")
     private configuracoesRepository: ConfiguracoesRepository,
     private logService: LogService
@@ -49,6 +49,13 @@ class ConfiguracoesController {
   findAll = async (request: Request, response: Response): Promise<void> => {
 
     const res = await this.configuracoesRepository.findAll()
+
+    response.status(200).send(res)
+  }
+
+  findByType = async (request: Request, response: Response): Promise<void> => {
+
+    const res = await this.configuracoesRepository.findByType(request.params.tipo)
 
     response.status(200).send(res)
   }

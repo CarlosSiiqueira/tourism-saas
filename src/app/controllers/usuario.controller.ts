@@ -152,21 +152,30 @@ class UsuarioController {
       comissao: null
     })
 
-    await this.pessoaService.create({
-      nome: body.nome,
-      cpf: body.cpf,
-      telefoneWpp: body.telefone,
-      email: userName,
-      sexo: "M",
-      observacoes: "Cadastrado via criação de usuário no site",
-      telefone: body.telefone,
-      contato: null,
-      dataNascimento: null,
-      emissor: null,
-      rg: null,
-      telefoneContato: null,
-      usuarioCadastro: user
-    }, null)
+    const pessoa = await this.pessoaService.findByCpf(body.cpf)
+
+    if (pessoa && userClient) {
+      await this.pessoaService.setUser(pessoa.id, userClient)
+    }
+
+    if (!pessoa) {
+      await this.pessoaService.create({
+        nome: body.nome,
+        cpf: body.cpf,
+        telefoneWpp: body.telefone,
+        email: userName,
+        sexo: "M",
+        observacoes: "Cadastrado via criação de usuário no site",
+        telefone: body.telefone,
+        contato: null,
+        dataNascimento: null,
+        emissor: null,
+        rg: null,
+        telefoneContato: null,
+        usuarioCadastro: user,
+        userId: userClient
+      }, null)
+    }
 
     await this.emailService.sendEmail(userName, subject, textEmail, 3)
 
