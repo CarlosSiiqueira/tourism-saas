@@ -9,5 +9,6 @@ configuracao.get('/findAll', configuracoesController.findAll)
 configuracao.post('/create', configuracoesController.create)
 configuracao.put('/update/:id', configuracoesController.update)
 configuracao.delete('/delete/:id', configuracoesController.delete)
+configuracao.get('/findByType/:tipo', configuracoesController.findByType)
 
 export { configuracao }
