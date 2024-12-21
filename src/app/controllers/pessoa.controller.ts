@@ -8,7 +8,7 @@ import { LogService } from '../services/log.service'
 
 @injectable()
 class PessoaController {
-  constructor(
+  constructor (
     @inject("PessoaRepository")
     private pessoaRepository: PessoaRepository,
     private enderecoService: EnderecoService,
@@ -137,6 +137,15 @@ class PessoaController {
     }
 
     response.status(200).send(res)
+  }
+
+  getDataPessoa = async (request: Request, response: Response): Promise<void> => {
+
+    const { id } = request.params
+
+    const pessoa = await this.pessoaRepository.getDataPessoa(id)
+
+    response.send(pessoa).status(200)
   }
 
 }

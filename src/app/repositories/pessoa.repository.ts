@@ -155,7 +155,8 @@ class PessoaRepository implements IPessoa {
         id
       },
       include: {
-        Endereco: true
+        Endereco: true,
+        Ranking: true
       }
     })
 
@@ -323,6 +324,41 @@ class PessoaRepository implements IPessoa {
     }
 
     return id
+  }
+
+  getDataPessoa = async (id: string): Promise<IPessoaResponse> => {
+
+    const pessoa = await this.prisma.pessoas.findUnique({
+      where: {
+        id
+      },
+      include: {
+        Ranking: true,
+        Reservas: {
+          include: {
+            Excursao: true,
+            Opcionais: {
+              include: {
+                Produto: true
+              }
+            },
+            Transacoes: true,
+            LocalEmbarque: true,
+            CreditoClientes: {
+              include: {
+                Reserva: true
+              }
+            }
+          }
+        },
+      }
+    })
+
+    if (!pessoa) {
+      throw new Warning("Não foi possível encontrar o cliente")
+    }
+
+    return pessoa
   }
 }
 

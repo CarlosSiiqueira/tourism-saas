@@ -221,28 +221,7 @@ class UsuarioRepository implements IUsuario {
         tipo: 3
       },
       include: {
-        PessoaVinculada: {
-          include: {
-            Ranking: true,
-            Reservas: {
-              include: {
-                Excursao: true,
-                Opcionais: {
-                  include: {
-                    Produto: true
-                  }
-                },
-                Transacoes: true,
-                LocalEmbarque: true,
-                CreditoClientes: {
-                  include: {
-                    Reserva: true
-                  }
-                }
-              }
-            },
-          }
-        }
+        PessoaVinculada: true
       }
     })
 

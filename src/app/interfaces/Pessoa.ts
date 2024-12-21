@@ -10,6 +10,7 @@ export interface IPessoa {
   update (data: IPessoaDTO, id: string, codigoEndereco: string): Promise<IPessoaResponse>
   updateRank (id: string, idRank: string): Promise<string>
   setUser (id: string, userId: string): Promise<string>
+  getDataPessoa (id: string): Promise<IPessoaResponse>
 }
 
 export interface IPessoaDTO {
