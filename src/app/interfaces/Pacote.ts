@@ -28,6 +28,7 @@ export interface IPacoteDTO {
   usuarioCadastro: string
   opcionais?: [string]
   galeria?: [string]
+  inclusos?: string[]
 }
 
 export interface IPacoteResponse extends IPacoteDTO {

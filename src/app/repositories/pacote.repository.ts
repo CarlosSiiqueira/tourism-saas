@@ -80,7 +80,8 @@ class PacoteRepository implements IPacote {
           Produto: true,
           Imagem: true,
           ImagemBloqueado: true,
-          Galeria: true
+          Galeria: true,
+          Inclusos: true
         }
       })
     ])
@@ -98,7 +99,8 @@ class PacoteRepository implements IPacote {
     categoria,
     usuarioCadastro,
     opcionais,
-    galeria }: IPacoteDTO): Promise<{ 'pacote': IPacoteResponse, 'success': boolean }> => {
+    galeria,
+    inclusos }: IPacoteDTO): Promise<{ 'pacote': IPacoteResponse, 'success': boolean }> => {
 
     try {
 
@@ -106,6 +108,7 @@ class PacoteRepository implements IPacote {
 
       const opcional = {}
       const galeriaFotos = {}
+      const itemsInclusos = {}
 
       if (opcionais) {
         Object.assign(opcional,
@@ -127,6 +130,16 @@ class PacoteRepository implements IPacote {
         )
       }
 
+      if (inclusos) {
+        Object.assign(itemsInclusos,
+          {
+            Inclusos: {
+              connect: inclusos.map((item) => { return { id: item } })
+            }
+          }
+        )
+      }
+
       const pacote = await this.prisma.pacotes.create({
         data: {
           id,
@@ -139,7 +152,8 @@ class PacoteRepository implements IPacote {
           categoria,
           usuarioCadastro,
           ...opcional,
-          ...galeriaFotos
+          ...galeriaFotos,
+          ...itemsInclusos
         }
       })
 
@@ -159,7 +173,8 @@ class PacoteRepository implements IPacote {
       include: {
         Produto: true,
         Imagem: true,
-        ImagemBloqueado: true
+        ImagemBloqueado: true,
+        Inclusos: true
       }
     })
 
@@ -176,7 +191,8 @@ class PacoteRepository implements IPacote {
       include: {
         Produto: true,
         Imagem: true,
-        ImagemBloqueado: true
+        ImagemBloqueado: true,
+        Inclusos: true
       }
     })
 
@@ -199,12 +215,14 @@ class PacoteRepository implements IPacote {
     tipoTransporte,
     usuarioCadastro,
     opcionais,
-    galeria }: IPacoteDTO, id: string): Promise<{ 'pacote': IPacoteResponse, 'success': boolean }> => {
+    galeria,
+    inclusos }: IPacoteDTO, id: string): Promise<{ 'pacote': IPacoteResponse, 'success': boolean }> => {
 
     try {
 
       const opcional = {}
       const galeriaFotos = {}
+      const itemsInclusos = {}
 
       await this.prisma.pacotes.update({
         where: {
@@ -240,6 +258,16 @@ class PacoteRepository implements IPacote {
         )
       }
 
+      if (inclusos) {
+        Object.assign(itemsInclusos,
+          {
+            Inclusos: {
+              connect: inclusos.map((item) => { return { id: item } })
+            }
+          }
+        )
+      }
+
       const pacote = await this.prisma.pacotes.update({
         data: {
           nome,
@@ -253,7 +281,8 @@ class PacoteRepository implements IPacote {
           tipoTransporte,
           usuarioCadastro,
           ...opcional,
-          ...galeriaFotos
+          ...galeriaFotos,
+          ...itemsInclusos
         },
         where: {
           id
