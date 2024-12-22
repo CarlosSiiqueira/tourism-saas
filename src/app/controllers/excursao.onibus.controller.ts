@@ -6,7 +6,7 @@ import { LogService } from '../services/log.service'
 
 @injectable()
 class ExcursaoOnibusController {
-  constructor(
+  constructor (
     @inject("ExcursaoOnibusRepository")
     private excursaoOnibusRepository: ExcursaoOnibusRepository,
     private logService: LogService
@@ -68,6 +68,27 @@ class ExcursaoOnibusController {
     }
 
     response.status(200).send(excursaoOnibus)
+  }
+
+  delete = async (request: Request, response: Response): Promise<void> => {
+
+    let user = JSON.parse(request.headers.user as string);
+    const { idPassageiro, excursaoId } = request.params
+
+    const onibus = await this.excursaoOnibusRepository.deleteManyByIdPassageiro([idPassageiro], excursaoId)
+
+    if (onibus) {
+      await this.logService.create({
+        tipo: 'DELETE',
+        newData: {},
+        oldData: JSON.stringify(onibus),
+        rotina: 'Excursões/Onibus',
+        usuariosId: user.id
+      })
+    }
+
+    response.status(200).send(onibus)
+
   }
 }
 

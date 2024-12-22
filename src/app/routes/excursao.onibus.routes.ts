@@ -8,5 +8,6 @@ excursaoOnibus.get('/index/:idExcursao', excursaoOnibusController.index)
 excursaoOnibus.get('/find/:idCadeira', excursaoOnibusController.find)
 excursaoOnibus.get('/findAll/:idExcursao', excursaoOnibusController.findAll)
 excursaoOnibus.put('/update/:id', excursaoOnibusController.update)
+excursaoOnibus.delete('/delete/:idPassageiro/:excursaoId', excursaoOnibusController.delete)
 
 export { excursaoOnibus }

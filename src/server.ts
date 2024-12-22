@@ -23,7 +23,8 @@ app.use(cors({
     /http?:\/\/localhost:\d+/,
     'http://127.0.0.1:3000',
     'http://127.0.0.1:5000',
-    'https://reactjs-five-lovat.vercel.app'
+    'https://reactjs-five-lovat.vercel.app',
+    'https://prados-turismo-angular.vercel.app'
   ]
 }))
 
