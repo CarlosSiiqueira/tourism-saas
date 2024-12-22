@@ -20,31 +20,31 @@ class ExcursaoQuartosRepository implements IExcursaoQuartos {
 
       switch (key) {
         case 'nome':
-          Object.assign(where, {
-            OR: [
-              {
-                Passageiros: {
-                  Pessoa: {
-                    nome: {
-                      contains: value,
-                      mode: "insensitive"
+          if (value !== '') {
+            Object.assign(where, {
+              OR: [
+                {
+                  Passageiros: {
+                    every: {
+                      Pessoa: {
+                        nome: {
+                          contains: value,
+                          mode: 'insensitive'
+                        }
+                      }
                     }
                   }
                 }
-              }
-            ]
-          })
+              ]
+            })
+          }
           break;
 
         case 'idTipoQuarto':
           Object.assign(where, {
-            OR: [
-              {
-                TipoQuarto: {
-                  id: value
-                }
-              }
-            ]
+            TipoQuarto: {
+              id: value
+            }
           })
           break;
 

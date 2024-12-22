@@ -47,7 +47,14 @@ class ExcursaoOnibusRepository implements IExcursaoOnibus {
         include: {
           Passageiro: {
             include: {
-              Pessoa: true
+              Pessoa: true,
+              LocalEmbarque: true,
+              Reservas: true
+            }
+          },
+          Excursao: {
+            include: {
+              LocalEmbarque: true
             }
           }
         }
@@ -104,8 +111,18 @@ class ExcursaoOnibusRepository implements IExcursaoOnibus {
         id: idCadeira
       },
       include: {
-        Passageiro: true,
-        Excursao: true
+        Passageiro: {
+          include: {
+            Pessoa: true,
+            LocalEmbarque: true,
+            Reservas: true
+          }
+        },
+        Excursao: {
+          include: {
+            LocalEmbarque: true
+          }
+        }
       }
     })
 
@@ -123,8 +140,18 @@ class ExcursaoOnibusRepository implements IExcursaoOnibus {
         codigoExcursao: idExcursao
       },
       include: {
-        Passageiro: true,
-        Excursao: true
+        Passageiro: {
+          include: {
+            Pessoa: true,
+            LocalEmbarque: true,
+            Reservas: true
+          }
+        },
+        Excursao: {
+          include: {
+            LocalEmbarque: true
+          }
+        }
       }
     })
 
@@ -151,7 +178,18 @@ class ExcursaoOnibusRepository implements IExcursaoOnibus {
         id: id
       },
       include: {
-        Passageiro: true
+        Passageiro: {
+          include: {
+            Pessoa: true,
+            LocalEmbarque: true,
+            Reservas: true
+          }
+        },
+        Excursao: {
+          include: {
+            LocalEmbarque: true
+          }
+        }
       }
     })
 

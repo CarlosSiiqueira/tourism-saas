@@ -5,14 +5,16 @@ import { format } from 'fast-csv';
 import { Readable } from 'stream';
 import { ExcursaoQuartosService } from "../services/excursao.quarto.service";
 import { ExcursaoPassageiroService } from "../services/excursao.passageiro.service";
+import { ExcursaoOnibusService } from "../services/excursao.onibus.service";
 
 @injectable()
 class FilesController {
 
-  constructor(
+  constructor (
     private pessoaService: PessoaService,
     private excursaoQuartosService: ExcursaoQuartosService,
-    private excursaoPassageiroService: ExcursaoPassageiroService
+    private excursaoPassageiroService: ExcursaoPassageiroService,
+    private excursaoOnibusService: ExcursaoOnibusService
   ) { }
 
   generateCsvPessoas = async (request: Request, response: Response): Promise<void> => {
@@ -109,6 +111,33 @@ class FilesController {
 
     readableStream.pipe(csvStream).pipe(response);
   }
+
+  generateCsvOnibus = async (request: Request, response: Response): Promise<void> => {
+
+    response.setHeader('Content-Disposition', 'attachment; filename=data.csv');
+    response.setHeader('Content-Type', 'text/csv; charset=utf-8');
+
+    const { idExcursao } = request.params
+
+    const passageiros = await this.excursaoOnibusService.findAll(idExcursao)
+
+    const jsonData = passageiros.map((onibus) => {
+      return {
+        'Excursão': onibus.Excursao.nome,
+        'Reserva': onibus.Passageiro.Reservas.reserva,
+        'Passageiro': onibus.Passageiro.Pessoa.nome,
+        'Local de Embarque': onibus.Passageiro.LocalEmbarque.nome,
+        'Poltrona': onibus.numeroCadeira
+      }
+    })
+
+    const csvStream = format({ headers: true });
+    const readableStream = Readable.from(jsonData);
+
+    readableStream.pipe(csvStream).pipe(response);
+
+  }
+
 }
 
 export { FilesController }

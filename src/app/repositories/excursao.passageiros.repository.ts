@@ -33,7 +33,7 @@ class ExcursaoPassageirosRepository implements IExcursaoPassageiros {
           Object.assign(where, {
             OR: [
               {
-                Pessoas: {
+                Pessoa: {
                   nome: {
                     contains: value,
                     mode: "insensitive"

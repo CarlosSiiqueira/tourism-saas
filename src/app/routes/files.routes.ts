@@ -6,5 +6,6 @@ const files = Router()
 files.get('/csv-pessoas', filesController.generateCsvPessoas)
 files.get('/csv-quartos/:idExcursao', filesController.generateCsvQuartos)
 files.get('/csv-passageiros/:idExcursao', filesController.generateCsvPassageiros)
+files.get('/csv-onibus/:idExcursao', filesController.generateCsvOnibus)
 
 export { files }
