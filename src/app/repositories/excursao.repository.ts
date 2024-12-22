@@ -145,7 +145,8 @@ class ExcursaoRepository implements IExcursao {
               Imagem: true,
               ImagemBloqueado: true,
               Produto: true,
-              Galeria: true
+              Galeria: true,
+              Inclusos: true
             }
           },
           LocalEmbarque: {}
@@ -238,7 +239,8 @@ class ExcursaoRepository implements IExcursao {
             Produto: true,
             Galeria: true,
             Imagem: true,
-            ImagemBloqueado: true
+            ImagemBloqueado: true,
+            Inclusos: true
           }
         },
         LocalEmbarque: {}
@@ -284,7 +286,8 @@ class ExcursaoRepository implements IExcursao {
             Produto: true,
             Galeria: true,
             Imagem: true,
-            ImagemBloqueado: true
+            ImagemBloqueado: true,
+            Inclusos: true
           }
         },
         LocalEmbarque: {}
