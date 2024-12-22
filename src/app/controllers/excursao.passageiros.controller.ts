@@ -10,7 +10,7 @@ import { OpcionaisService } from '../services/opcionais.service'
 @injectable()
 class ExcursaoPassageirosController {
 
-  constructor(
+  constructor (
     @inject("ExcursaoPassageirosRepository")
     private excursaoPassageirosRepository: ExcursaoPassageirosRepository,
     private excursaoService: ExcursaoService,
@@ -60,11 +60,13 @@ class ExcursaoPassageirosController {
 
   listPassageirosNoRoom = async (request: Request, response: Response): Promise<void> => {
 
-    const passageiros = await this.excursaoPassageirosRepository.listPassageiros(request.params.idExcursao)
-    const quartos = await this.excursaoQuartoService.findPassageirosWithRoom(request.params.idExcursao)
-    const res = await this.excursaoService.filterPassageirosWithoutRoom(passageiros, quartos);
+    const { idExcursao } = request.params
 
-    response.status(200).send(res)
+    const quartos = await this.excursaoQuartoService.findPassageirosWithRoom(idExcursao)
+    const passengersWithRoom = quartos.map((room) => { return room.Passageiros.map((passenger) => { return passenger.id }) })
+    const passageiros = await this.excursaoPassageirosRepository.listPassengersExcludingSome(idExcursao, passengersWithRoom.flat())
+
+    response.status(200).send(passageiros)
   }
 
   delete = async (request: Request, response: Response): Promise<void> => {

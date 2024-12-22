@@ -518,6 +518,93 @@ class ExcursaoPassageirosRepository implements IExcursaoPassageiros {
 
     return count
   }
+
+  listPassengersExcludingSome = async (idExcursao: string, excludedPassenger: string[]): Promise<IExcursaoPassageirosResponse[]> => {
+
+    const passageiros = await this.prisma.excursaoPassageiros.findMany({
+      where: {
+        idExcursao,
+        id: {
+          notIn: excludedPassenger
+        }
+      },
+      select: {
+        id: true,
+        idExcursao: true,
+        idPassageiro: true,
+        localEmbarque: true,
+        reserva: true,
+        Pessoa: {
+          select: {
+            id: true,
+            nome: true,
+            cpf: true,
+            sexo: true,
+            dataCadastro: true,
+            observacoes: true,
+            telefone: true,
+            telefoneWpp: true,
+            email: true,
+            contato: true,
+            telefoneContato: true,
+            ativo: true,
+            dataNascimento: true,
+            usuarioCadastro: true
+          }
+        },
+        LocalEmbarque: {
+          select: {
+            nome: true,
+            observacoes: true,
+            horaEmbarque: true,
+            dataCadastro: true,
+            codigoEndereco: true,
+            usuarioCadastro: true,
+            ativo: true
+          }
+        },
+        Excursao: {
+          select: {
+            nome: true,
+            dataInicio: true,
+            dataFim: true,
+            observacoes: true,
+            dataCadastro: true,
+            ativo: true,
+            gerouFinanceiro: true,
+            vagas: true,
+            codigoPacote: true,
+            usuarioCadastro: true
+          }
+        },
+        Reservas: {
+          select: {
+            id: true,
+            reserva: true,
+            status: true,
+            codigoUsuario: true,
+            desconto: true,
+            plataforma: true,
+            Opcionais: {
+              select: {
+                id: true,
+                qtd: true,
+                idReserva: true,
+                Produto: {
+                  select: {
+                    id: true,
+                    nome: true
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    })
+
+    return passageiros
+  }
 }
 
 export { ExcursaoPassageirosRepository }

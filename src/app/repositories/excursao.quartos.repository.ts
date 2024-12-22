@@ -47,6 +47,12 @@ class ExcursaoQuartosRepository implements IExcursaoQuartos {
             ]
           })
           break;
+
+        case 'idExcursao':
+          Object.assign(where, {
+            codigoExcursao: value
+          })
+          break
       }
     })
 

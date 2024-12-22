@@ -13,6 +13,7 @@ export interface IExcursaoPassageiros {
   delete (idPassageiro: string, idExcursao: string): Promise<string[]>
   deleteMultiple (idPassageiros: Array<string>, idExcursao: string): Promise<string[]>
   countTripsByPassenger (idPessoa: string): Promise<number>
+  listPassengersExcludingSome (idExcursao: string, excludedPassenger: string[]): Promise<IExcursaoPassageirosResponse[]>
 }
 
 export interface IExcursaoPassageirosDTO {
