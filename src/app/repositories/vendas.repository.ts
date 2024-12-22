@@ -83,8 +83,8 @@ class VendasRepository implements IVendas {
     codigoFormaPagamento,
     codigoProduto = null,
     codigoExcursao = null,
-    usuarioCadastro
-  }: IVendasDTO): Promise<string> => {
+    usuarioCadastro,
+    numeroComprovante }: IVendasDTO): Promise<string> => {
 
     try {
 
@@ -101,7 +101,8 @@ class VendasRepository implements IVendas {
           codigoFormaPagamento,
           codigoProduto,
           codigoExcursao,
-          usuarioCadastro
+          usuarioCadastro,
+          numeroComprovante
         }
       })
 

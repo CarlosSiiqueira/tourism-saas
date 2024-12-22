@@ -10,7 +10,7 @@ import { OpcionaisService } from "../services/opcionais.service";
 @injectable()
 class VendasController {
 
-  constructor(
+  constructor (
     @inject("VendasRepository")
     private vendasRepository: VendasRepository,
     private financeiroService: FinanceiroService,
@@ -120,18 +120,18 @@ class VendasController {
     if (venda) {
       const formaPagamento = await this.formaPagamentoService.find(venda.codigoFormaPagamento)
 
-      request.body.tipo = 2
-      request.body.observacao = 'venda efetivada'
-      request.body.ativo = true
-      request.body.data = await this.financeiroService.setDataPrevistaPagamento(formaPagamento.qtdDiasRecebimento)
-      request.body.usuarioCadastro = venda.usuarioCadastro
-      request.body.valor = request.body.total
-      request.body.codigoExcursao = venda.codigoExcursao
-      request.body.codigoProduto = venda.codigoProduto
-      request.body.valor = venda.valorTotal
-      request.body.codigoFormaPagamento = formaPagamento.id
-
-      const res = await this.financeiroService.create(request.body);
+      const res = await this.financeiroService.create({
+        tipo: 2,
+        observacao: 'venda efetivada',
+        ativo: true,
+        data: await this.financeiroService.setDataPrevistaPagamento(formaPagamento.qtdDiasRecebimento),
+        usuarioCadastro: venda.usuarioCadastro,
+        valor: venda.valorTotal,
+        codigoExcursao: venda.codigoExcursao,
+        codigoProduto: venda.codigoProduto,
+        codigoFormaPagamento: formaPagamento.id,
+        numeroComprovanteBancario: venda.numeroComprovante
+      });
 
       await this.logService.create({
         tipo: 'UPDATE',

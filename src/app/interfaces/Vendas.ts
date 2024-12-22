@@ -1,11 +1,11 @@
 export interface IVendas {
-  create(data: IVendasDTO): Promise<string>
-  find(id: string): Promise<IVendasResponse | null>
-  findAll(): Promise<IVendasResponse[]>
-  delete(id: string): Promise<IVendasResponse>
-  update(data: IVendasDTO, id: string): Promise<IVendasResponse>
-  efetivar(id: string): Promise<IVendasResponse>
-  desEfetivar(id: string): Promise<IVendasResponse>
+  create (data: IVendasDTO): Promise<string>
+  find (id: string): Promise<IVendasResponse | null>
+  findAll (): Promise<IVendasResponse[]>
+  delete (id: string): Promise<IVendasResponse>
+  update (data: IVendasDTO, id: string): Promise<IVendasResponse>
+  efetivar (id: string): Promise<IVendasResponse>
+  desEfetivar (id: string): Promise<IVendasResponse>
 }
 
 export interface IVendasDTO {
@@ -19,6 +19,7 @@ export interface IVendasDTO {
   codigoProduto: string | null
   codigoExcursao: string | null
   usuarioCadastro: string
+  numeroComprovante?: string | null
 }
 
 export interface IVendasResponse extends IVendasDTO {
