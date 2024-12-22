@@ -18,6 +18,7 @@ import { pagarme } from '../api/pagarme'
 import { OpcionalReserva, PagarmeLinkRequestBody } from '../interfaces/Helper'
 import { ExcursaoService } from '../services/excursao.service'
 import { formattingDate } from '../../shared/helper/date'
+import { OpcionaisService } from '../services/opcionais.service'
 
 @injectable()
 class FinanceiroController {
@@ -26,16 +27,15 @@ class FinanceiroController {
     private financeiroRepository: FinanceiroRepository,
     private financeiroService: FinanceiroService,
     private formaPagamentoService: FormaPagamentoService,
-    private pacoteService: PacoteService,
     private reservaService: ReservaService,
     private pessoaService: PessoaService,
-    private enderecoService: EnderecoService,
     private excursaoPassageiroService: ExcursaoPassageiroService,
     private contaBancariaService: ContaBancariaService,
     private logService: LogService,
     private comissaoService: ComissaoService,
     private configService: ConfiguracaoService,
-    private excursaoService: ExcursaoService
+    private excursaoService: ExcursaoService,
+    private opcionaisService: OpcionaisService
   ) { }
 
   index = async (request: Request, response: Response): Promise<void> => {
@@ -84,6 +84,7 @@ class FinanceiroController {
     let dataCliente: IPessoaReservaDTO[] = request.body.clients
     const localEmbarque = dataCliente[0].localEmbarque
     let clients: { codigoCliente: string, localEmbarque: string }[];
+    const { opcionais } = request.body
 
     const config = (await this.configService.findByType('default-user')).configuracao
     const paymentConfig = (await this.configService.findByType('default-forma-pagamento')).configuracao
@@ -134,6 +135,7 @@ class FinanceiroController {
     )
 
     if (clients.length) {
+      let observacoes = ''
 
       const reserva = await this.reservaService.create({
         idExcursao: excursaoId,
@@ -154,12 +156,29 @@ class FinanceiroController {
           })
         }))
 
-      const financeiro = await this.financeiroRepository.create({
+      if (opcionais.length) {
+        observacoes += "Opcionais: \n"
+        await Promise.all(
+          request.body.opcionais.map(async (opt: { id: string, quantidade: number, valor: number, nome: string }) => {
+            if (opt.quantidade) {
+              observacoes += `${opt.quantidade}x ${opt.nome} \n`
+              return await this.opcionaisService.create({
+                idReserva: reserva,
+                idProduto: opt.id,
+                codigoUsuario: defaultUser,
+                qtd: opt.quantidade
+              })
+            }
+          })
+        )
+      }
+
+      await this.financeiroRepository.create({
         tipo: 2,
         valor: parseFloat(request.body.total),
         vistoAdmin: false,
         efetivado: false,
-        observacao: '',
+        observacao: observacoes,
         ativo: true,
         idReserva: reserva,
         codigoExcursao: excursaoId,
