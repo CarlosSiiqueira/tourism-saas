@@ -15,7 +15,7 @@ import { ComissaoService } from '../services/comissao.service'
 import { IPessoaReservaDTO } from '../interfaces/Pessoa'
 import { ConfiguracaoService } from '../services/configuracoes.service'
 import { pagarme } from '../api/pagarme'
-import { OpcionalReserva, PagarmeLinkRequestBody } from '../interfaces/Helper'
+import { OpcionalReserva, PagarmeLinkItem, PagarmeLinkRequestBody } from '../interfaces/Helper'
 import { ExcursaoService } from '../services/excursao.service'
 import { formattingDate } from '../../shared/helper/date'
 import { OpcionaisService } from '../services/opcionais.service'
@@ -159,7 +159,7 @@ class FinanceiroController {
       if (opcionais.length) {
         observacoes += "Opcionais: \n"
         await Promise.all(
-          request.body.opcionais.map(async (opt: { id: string, quantidade: number, valor: number, nome: string }) => {
+          opcionais.map(async (opt: { id: string, quantidade: number, valor: number, nome: string }) => {
             if (opt.quantidade) {
               observacoes += `${opt.quantidade}x ${opt.nome} \n`
               return await this.opcionaisService.create({
@@ -393,12 +393,17 @@ class FinanceiroController {
 
     if (opcionais.length) {
       opcionaisItems = opcionais.map((opcional: OpcionalReserva) => {
-        return {
-          amount: Math.round(opcional.valor * 100),
-          name: opcional.nome,
-          default_quantity: opcional.quantidade
+        if (opcional.quantidade) {
+          return {
+            amount: Math.round(opcional.valor * 100),
+            name: opcional.nome,
+            default_quantity: opcional.quantidade,
+            description: ''
+          }
         }
       })
+
+      opcionaisItems = opcionaisItems.filter((item: PagarmeLinkItem) => !!item)
     }
 
     const requestLink: PagarmeLinkRequestBody = {
