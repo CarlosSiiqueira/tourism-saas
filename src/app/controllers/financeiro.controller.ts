@@ -373,6 +373,7 @@ class FinanceiroController {
     const excursao = await this.excursaoService.find(idExcursao)
     const phones = {}
     const pixSettings = { expires_in: 2 }
+    const installmentsAmount = excursao.valor >= 2000 ? 10 : 5
 
     let country_code = "55"
     var area_code;
@@ -411,16 +412,10 @@ class FinanceiroController {
       payment_settings: {
         credit_card_settings: {
           operation_type: "auth_and_capture",
-          installments: [
-            {
-              number: 1,
-              total: 12000
-            },
-            {
-              number: 2,
-              total: 6000
-            }
-          ]
+          installments: Array.from({ length: installmentsAmount }, (_, index) => ({
+            number: index + 1,
+            total: Math.round(excursao.valor * 100),
+          })),
         },
         accepted_payment_methods: paymentMethod
       },
