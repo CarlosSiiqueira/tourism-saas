@@ -12,5 +12,6 @@ reserva.patch('/delete/:id', reservaController.delete)
 reserva.post('/cancelar/:id', reservaController.cancelar)
 reserva.get('/send-ticket-mail/:id', reservaController.sendTicketMail)
 reserva.post('/efetiva-reserva/:id', reservaController.efetivaReserva)
+reserva.get('/download-voucher-reserva/:id', reservaController.downloadVoucherReserva)
 
 export { reserva }

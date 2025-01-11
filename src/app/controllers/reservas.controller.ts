@@ -17,6 +17,7 @@ import { formattingDate } from '../../shared/helper/date'
 import { IPagarmeLinkDTO } from '../interfaces/Helper'
 import { PessoaService } from '../services/pessoa.service'
 import { ExcursaoService } from '../services/excursao.service'
+import { Warning } from '../errors'
 
 @injectable()
 class ReservaController {
@@ -49,116 +50,120 @@ class ReservaController {
   create = async (request: Request, response: Response): Promise<void> => {
 
     const passageiro = await this.excursaoPassageiroService.findByIdPessoa(request.body.passageiros, request.body.idExcursao)
-    let resp = 'Esse Passageiro já está nessa excursão'
+    let resp = ''
     let user = JSON.parse(request.headers.user as string);
     const { opcionais } = request.body
     const { passageiros } = request.body
     const { idExcursao } = request.body
+    const excursao = await this.excursaoService.find(idExcursao)
+    const vagas = excursao.vagas
 
-    if (!passageiro.length) {
-      let observacoes = ''
-      const reserva = await this.reservaRepository.create(request.body)
-      const formaPagamento = await this.formaPagamentoService.find(request.body.codigoFormaPagamento)
+    if (passageiro.length || vagas < passageiros.length) {
+      resp += passageiro.length ? 'Passageiro já está na excursão' : ''
+      resp += vagas < passageiros.length ? '\n Excursão Lotada!' : ''
+      throw new Warning(resp, 409)
+    }
 
-      if (opcionais.length) {
-        observacoes += "Opcionais: \n"
-        await Promise.all(
-          request.body.opcionais.map(async (opt: { id: string, quantidade: number, valor: number, nome: string }) => {
-            if (opt.quantidade) {
-              observacoes += `${opt.quantidade}x ${opt.nome} \n`
-              return await this.opcionaisService.create({
-                idReserva: reserva,
-                idProduto: opt.id,
-                codigoUsuario: request.body.codigoUsuario,
-                qtd: opt.quantidade
-              })
-            }
-          })
-        )
-      }
+    let observacoes = ''
+    const reserva = await this.reservaRepository.create(request.body)
+    const formaPagamento = await this.formaPagamentoService.find(request.body.codigoFormaPagamento)
 
-      await this.logService.create({
-        tipo: 'CREATE',
-        newData: JSON.stringify(await this.reservaRepository.find(reserva)),
-        oldData: null,
-        rotina: 'Reservas',
-        usuariosId: user.id
-      })
-
-      const dataFinanceiro = await this.financeiroService.setDataPrevistaPagamento(formaPagamento.qtdDiasRecebimento)
-
-      const financeiro = await this.financeiroService.create({
-        idReserva: reserva || '',
-        tipo: 2,
-        observacao: observacoes,
-        ativo: true,
-        data: dataFinanceiro,
-        usuarioCadastro: request.body.codigoUsuario,
-        valor: request.body.total,
-        codigoExcursao: idExcursao,
-        codigoFormaPagamento: formaPagamento.id,
-        codigoContaBancaria: request.body?.codigoContaBancaria
-      })
-
-      await this.logService.create({
-        tipo: 'CREATE',
-        newData: JSON.stringify(await this.financeiroService.find(financeiro)),
-        oldData: null,
-        rotina: 'Reservas/Financeiro',
-        usuariosId: user.id
-      })
-
+    if (opcionais.length) {
+      observacoes += "Opcionais: \n"
       await Promise.all(
-        passageiros.map(async (passageiro: string) => {
-          return await this.excursaoPassageiroService.create({
-            idExcursao: idExcursao,
-            idPassageiro: passageiro,
-            localEmbarque: request.body.localEmbarqueId,
-            reserva: reserva
-          })
+        request.body.opcionais.map(async (opt: { id: string, quantidade: number, valor: number, nome: string }) => {
+          if (opt.quantidade) {
+            observacoes += `${opt.quantidade}x ${opt.nome} \n`
+            return await this.opcionaisService.create({
+              idReserva: reserva,
+              idProduto: opt.id,
+              codigoUsuario: request.body.codigoUsuario,
+              qtd: opt.quantidade
+            })
+          }
         })
       )
+    }
 
-      if (request.body.passengerLink) {
+    await this.logService.create({
+      tipo: 'CREATE',
+      newData: JSON.stringify(await this.reservaRepository.find(reserva)),
+      oldData: null,
+      rotina: 'Reservas',
+      usuariosId: user.id
+    })
 
-        let opcionaisReserva
-        let dataLink: IPagarmeLinkDTO = {
-          opcionais: [],
-          paymentMethods: ['credit_card', 'pix'],
-          quantidade: passageiros.length
-        }
+    const dataFinanceiro = await this.financeiroService.setDataPrevistaPagamento(formaPagamento.qtdDiasRecebimento)
 
-        const customer = await this.pessoaService.find(request.body.passengerLink)
-        const excursao = await this.excursaoService.find(idExcursao)
+    const financeiro = await this.financeiroService.create({
+      idReserva: reserva || '',
+      tipo: 2,
+      observacao: observacoes,
+      ativo: true,
+      data: dataFinanceiro,
+      usuarioCadastro: request.body.codigoUsuario,
+      valor: request.body.total,
+      codigoExcursao: idExcursao,
+      codigoFormaPagamento: formaPagamento.id,
+      codigoContaBancaria: request.body?.codigoContaBancaria
+    })
 
-        if (opcionais.length) {
+    await this.logService.create({
+      tipo: 'CREATE',
+      newData: JSON.stringify(await this.financeiroService.find(financeiro)),
+      oldData: null,
+      rotina: 'Reservas/Financeiro',
+      usuariosId: user.id
+    })
 
-          opcionaisReserva = await this.opcionaisService.findByReserva(reserva)
+    await Promise.all(
+      passageiros.map(async (passageiro: string) => {
+        return await this.excursaoPassageiroService.create({
+          idExcursao: idExcursao,
+          idPassageiro: passageiro,
+          localEmbarque: request.body.localEmbarqueId,
+          reserva: reserva
+        })
+      })
+    )
 
-          dataLink.opcionais = opcionaisReserva.map((opt) => {
-            return {
-              nome: opt.Produto.nome,
-              valor: opt.Produto.valor,
-              quantidade: opt.qtd
-            }
-          })
-        }
+    if (request.body.passengerLink) {
 
-        try {
-
-          const data = await this.financeiroService.generatePaymentLink(dataLink, customer, excursao)
-          await this.reservaRepository.updatePaymentLinkId(reserva, data.id)
-
-          await this.emailService.sendEmail(customer.email, 'Link de pagamento Prados Turismo', '', 3)
-
-        } catch (error) {
-          response.status(200).send(`${error} \n Ocorreu um erro ao gerar link de pagamento.`)
-        }
+      let opcionaisReserva
+      let dataLink: IPagarmeLinkDTO = {
+        opcionais: [],
+        paymentMethods: ['credit_card', 'pix'],
+        quantidade: passageiros.length
       }
 
-      resp = 'Reserva criada com sucesso'
+      const customer = await this.pessoaService.find(request.body.passengerLink)
+
+      if (opcionais.length) {
+
+        opcionaisReserva = await this.opcionaisService.findByReserva(reserva)
+
+        dataLink.opcionais = opcionaisReserva.map((opt) => {
+          return {
+            nome: opt.Produto.nome,
+            valor: opt.Produto.valor,
+            quantidade: opt.qtd
+          }
+        })
+      }
+
+      try {
+
+        const data = await this.financeiroService.generatePaymentLink(dataLink, customer, excursao)
+        await this.reservaRepository.updatePaymentLinkId(reserva, data.id)
+
+        await this.emailService.sendEmail(customer.email, 'Link de pagamento Prados Turismo', '', 3)
+
+      } catch (error) {
+        throw new Warning('Ocorreu um erro ao gerar link de pagamento', 404)
+      }
     }
-    response.status(200).send(resp)
+
+    response.status(200).send('Reserva criada com sucesso')
   }
 
   find = async (request: Request, response: Response): Promise<void> => {
@@ -269,6 +274,11 @@ class ReservaController {
     const { passageiros } = request.body
     const { idExcursao } = request.body
     const { id } = request.params
+    const excursao = await this.excursaoService.find(idExcursao)
+
+    if (excursao.vagas < passageiros.length) {
+      throw new Warning('Excursão lotada', 409)
+    }
 
     const currentReserva = await this.reservaRepository.find(id)
     const financeiro = await this.financeiroService.find(request.body.Transacoes[0].id)
@@ -333,7 +343,6 @@ class ReservaController {
       }
 
       const customer = await this.pessoaService.find(request.body.passengerLink)
-      const excursao = await this.excursaoService.find(idExcursao)
 
       if (opcionais.length) {
 
@@ -412,6 +421,18 @@ class ReservaController {
     }
 
     response.send(reserva).status(200)
+  }
+
+  downloadVoucherReserva = async (request: Request, response: Response): Promise<void> => {
+
+    response.setHeader('Content-Disposition', 'attachment; filename=data.pdf');
+    response.setHeader('Content-Type', 'application/pdf');
+
+    const reserva = await this.reservaRepository.find(request.params.id)
+    const html = await htmlTicket(reserva);
+    const pdf = await this.pdfService.generatePdf(html)
+
+    response.send(pdf).status(200)
   }
 }
 

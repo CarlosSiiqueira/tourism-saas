@@ -100,6 +100,13 @@ class ExcursaoRepository implements IExcursao {
           })
 
           break;
+
+        case 'ativo':
+          Object.assign(where, {
+            ativo: Boolean(value)
+          })
+
+          break;
       }
     })
 
@@ -134,6 +141,7 @@ class ExcursaoRepository implements IExcursao {
           publicadoSite: true,
           concluida: true,
           qtdMinVendas: true,
+          destacado: true,
           ExcursaoPassageiros: {
             include: {
               Pessoa: true,
@@ -173,7 +181,8 @@ class ExcursaoRepository implements IExcursao {
     codigoPacote,
     usuarioCadastro,
     localEmbarque,
-    qtdMinVendas
+    qtdMinVendas,
+    destacado
   }: IExcursaoDTO): Promise<string> => {
 
     try {
@@ -196,6 +205,7 @@ class ExcursaoRepository implements IExcursao {
           usuarioCadastro: usuarioCadastro,
           valor,
           qtdMinVendas,
+          destacado,
           LocalEmbarque: {
             connect: localEmbarque.map((localEmbarqueId) => ({ id: localEmbarqueId }))
           }
@@ -228,6 +238,7 @@ class ExcursaoRepository implements IExcursao {
         usuarioCadastro: true,
         valor: true,
         qtdMinVendas: true,
+        destacado: true,
         ExcursaoPassageiros: {
           include: {
             Pessoa: true,
@@ -275,6 +286,7 @@ class ExcursaoRepository implements IExcursao {
         usuarioCadastro: true,
         valor: true,
         qtdMinVendas: true,
+        destacado: true,
         ExcursaoPassageiros: {
           include: {
             Pessoa: true,
@@ -309,7 +321,9 @@ class ExcursaoRepository implements IExcursao {
 
     const excursao = await this.prisma.excursao.update({
       data: {
-        ativo: false
+        ativo: false,
+        destacado: false,
+        publicadoSite: false
       },
       where: {
         id: id
@@ -321,7 +335,6 @@ class ExcursaoRepository implements IExcursao {
     }
 
     return id
-
   }
 
   update = async ({
@@ -335,7 +348,8 @@ class ExcursaoRepository implements IExcursao {
     usuarioCadastro,
     valor,
     localEmbarque,
-    qtdMinVendas
+    qtdMinVendas,
+    destacado
   }: IExcursaoDTO, id: string): Promise<IExcursaoResponse> => {
 
     dataInicio = dateValidate(dataInicio)
@@ -365,6 +379,7 @@ class ExcursaoRepository implements IExcursao {
         usuarioCadastro: usuarioCadastro,
         valor: valor,
         qtdMinVendas,
+        destacado,
         LocalEmbarque: {
           connect: localEmbarque.map((localEmbarqueId) => ({ id: localEmbarqueId }))
         }

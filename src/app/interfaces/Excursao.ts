@@ -28,6 +28,7 @@ export interface IExcursaoDTO {
   valor: number
   localEmbarque: [string]
   qtdMinVendas: number
+  destacado: boolean
 }
 
 export interface IExcursaoResponse {
