@@ -1,18 +1,19 @@
 import { IIndex } from "./Helper"
 
 export interface IFormaPagamento {
-  index(data: IIndex): Promise<{ count: number, rows: IFormaPagamentoResponse[] }>
-  create(data: IFormaPagamentoDTO): Promise<string[]>
-  find(id: string): Promise<IFormaPagamentoResponse | null>
-  findAll(): Promise<IFormaPagamentoResponse[]>
-  delete(id: string): Promise<IFormaPagamentoResponse>
-  update(data: IFormaPagamentoDTO, id: string): Promise<string>
+  index (data: IIndex): Promise<{ count: number, rows: IFormaPagamentoResponse[] }>
+  create (data: IFormaPagamentoDTO): Promise<string[]>
+  find (id: string): Promise<IFormaPagamentoResponse | null>
+  findAll (): Promise<IFormaPagamentoResponse[]>
+  delete (id: string): Promise<IFormaPagamentoResponse>
+  update (data: IFormaPagamentoDTO, id: string): Promise<string>
 }
 
 export interface IFormaPagamentoDTO {
   nome: string
   dataCadastro: Date
   taxa: number
+  taxa1x: number | null
   taxa2x: number | null
   taxa3x: number | null
   taxa4x: number | null
@@ -26,6 +27,7 @@ export interface IFormaPagamentoDTO {
   taxa12x: number | null
   qtdDiasRecebimento: number
   ativo: boolean
+  creditCard: boolean
   usuarioCadastro: string
 }
 

@@ -125,6 +125,7 @@ model FormaPagamento {
   nome               String
   dataCadastro       DateTime @default(now())
   taxa               Float
+  taxa1x             Float?
   taxa2x             Float?
   taxa3x             Float?
   taxa4x             Float?
@@ -138,6 +139,7 @@ model FormaPagamento {
   taxa12x            Float?
   qtdDiasRecebimento Int
   ativo              Boolean  @default(true)
+  creditCard         Boolean  @default(false)
 
   Usuarios        Usuarios     @relation(fields: [usuarioCadastro], references: [id])
   usuarioCadastro String

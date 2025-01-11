@@ -84,6 +84,7 @@ class FormaPagamentoRepository implements IFormaPagamento {
   create = async ({
     nome,
     taxa,
+    taxa1x,
     taxa2x,
     taxa3x,
     taxa4x,
@@ -96,7 +97,8 @@ class FormaPagamentoRepository implements IFormaPagamento {
     taxa11x,
     taxa12x,
     qtdDiasRecebimento,
-    usuarioCadastro
+    usuarioCadastro,
+    creditCard
   }: IFormaPagamentoDTO): Promise<string[]> => {
 
     try {
@@ -108,6 +110,7 @@ class FormaPagamentoRepository implements IFormaPagamento {
           id,
           nome,
           taxa,
+          taxa1x,
           taxa2x,
           taxa3x,
           taxa4x,
@@ -120,7 +123,8 @@ class FormaPagamentoRepository implements IFormaPagamento {
           taxa11x,
           taxa12x,
           qtdDiasRecebimento,
-          usuarioCadastro
+          usuarioCadastro,
+          creditCard
         }
       })
 
@@ -183,6 +187,7 @@ class FormaPagamentoRepository implements IFormaPagamento {
   update = async ({
     nome,
     taxa,
+    taxa1x,
     taxa2x,
     taxa3x,
     taxa4x,
@@ -195,7 +200,8 @@ class FormaPagamentoRepository implements IFormaPagamento {
     taxa11x,
     taxa12x,
     qtdDiasRecebimento,
-    usuarioCadastro
+    usuarioCadastro,
+    creditCard
   }: IFormaPagamentoDTO, id: string): Promise<string> => {
 
     const formaPagamento = await this.prisma.formaPagamento.update({
@@ -203,6 +209,7 @@ class FormaPagamentoRepository implements IFormaPagamento {
         nome,
         dataCadastro: new Date(),
         taxa,
+        taxa1x,
         taxa2x,
         taxa3x,
         taxa4x,
@@ -215,7 +222,8 @@ class FormaPagamentoRepository implements IFormaPagamento {
         taxa11x,
         taxa12x,
         qtdDiasRecebimento,
-        usuarioCadastro
+        usuarioCadastro,
+        creditCard
       },
       where: {
         id: id
