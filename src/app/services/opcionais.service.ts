@@ -1,6 +1,6 @@
 import { inject, injectable } from "tsyringe";
 import { OpcionaisRepository } from "../repositories/opcionais.repository";
-import { IOpcionaisDTO, IOpcionaisGroupByResponse } from "../interfaces/Opcionais";
+import { IOpcionaisDTO, IOpcionaisGroupByResponse, IOpcionaisResponse } from "../interfaces/Opcionais";
 
 interface IOptionalSumary {
   sum: number,
@@ -11,7 +11,7 @@ interface IOptionalSumary {
 @injectable()
 export class OpcionaisService {
 
-  constructor(@inject("OpcionaisRepository")
+  constructor (@inject("OpcionaisRepository")
   private opcionaisRepository: OpcionaisRepository) { }
 
   create = async (data: IOpcionaisDTO): Promise<string> => {
@@ -39,5 +39,9 @@ export class OpcionaisService {
     )
 
     return summary
+  }
+
+  findByReserva = async (idReserva: string): Promise<IOpcionaisResponse[]> => {
+    return await this.opcionaisRepository.findByReserva(idReserva)
   }
 }

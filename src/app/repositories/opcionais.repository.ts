@@ -222,6 +222,24 @@ class OpcionaisRepository implements IOpcionais {
 
     return opcionais
   }
+
+  findByReserva = async (idReserva: string): Promise<IOpcionaisResponse[]> => {
+
+    const opcionais = await this.prisma.opcionais.findMany({
+      where: {
+        idReserva
+      },
+      include: {
+        Produto: true
+      }
+    })
+
+    if (!opcionais) {
+      throw new Warning('Opcional não encontrado', 400)
+    }
+
+    return opcionais
+  }
 }
 
 export { OpcionaisRepository }

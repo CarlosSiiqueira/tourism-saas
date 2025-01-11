@@ -1,17 +1,18 @@
 import { IIndex } from "./Helper"
 
 export interface IOpcionais {
-  index(data: IIndex): Promise<{
+  index (data: IIndex): Promise<{
     count: number
     rows: IOpcionaisResponse[]
   }>
-  create(data: IOpcionaisDTO): Promise<string>
-  find(id: string): Promise<IOpcionaisResponse>
-  findAll(): Promise<IOpcionaisResponse[]>
-  delete(id: string): Promise<string>
-  update(data: IOpcionaisDTO, id: string): Promise<string[]>
-  summary(idExcursao: string): Promise<IOpcionaisGroupByResponse[]>
-  findByProduto(idProduto: string): Promise<IOpcionaisResponse>
+  create (data: IOpcionaisDTO): Promise<string>
+  find (id: string): Promise<IOpcionaisResponse>
+  findAll (): Promise<IOpcionaisResponse[]>
+  delete (id: string): Promise<string>
+  update (data: IOpcionaisDTO, id: string): Promise<string[]>
+  summary (idExcursao: string): Promise<IOpcionaisGroupByResponse[]>
+  findByProduto (idProduto: string): Promise<IOpcionaisResponse>
+  findByReserva (idReserva: string): Promise<IOpcionaisResponse[]>
 }
 
 export interface IOpcionaisDTO {
@@ -26,6 +27,7 @@ export interface IOpcionaisResponse extends IOpcionaisDTO {
   Produto: {
     id: string
     nome: string
+    valor: number
   }
 }
 

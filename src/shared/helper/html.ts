@@ -576,3 +576,7 @@ export const htmlEmailViagem = (cliente: string, excursao: string): string => {
             </body>
             </html>`
 }
+
+export const htmlEmailPagamento = (url: string, cliente: string): string => {
+    return ''
+}

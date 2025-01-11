@@ -114,7 +114,8 @@ class ReservaRepository implements IReserva {
               FormaPagamento: {
                 select: {
                   id: true,
-                  nome: true
+                  nome: true,
+                  creditCard: true
                 }
               },
               ContaBancaria: {
@@ -352,6 +353,24 @@ class ReservaRepository implements IReserva {
     }
 
     return ['Opcionais adicionados à reserva']
+  }
+
+  updatePaymentLinkId = async (id: string, idPaymentLink: string): Promise<string> => {
+
+    const reserva = await this.prisma.reservas.update({
+      where: {
+        id
+      },
+      data: {
+        idPaymentLink
+      }
+    })
+
+    if (!reserva) {
+      throw new Warning("Registro não encontrado", 400)
+    }
+
+    return 'Link de pagamento adicionado à reserva'
   }
 }
 

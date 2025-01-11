@@ -407,14 +407,15 @@ model TipoQuarto {
 }
 
 model Reservas {
-  id           String   @id @default(uuid())
-  reserva      Int      @default(autoincrement())
-  dataCadastro DateTime @default(now())
-  status       Boolean  @default(false)
-  desconto     Int
-  plataforma   Int      @default(1)
-  criancasColo Int      @default(0)
-  excluida     Boolean  @default(false)
+  id            String   @id @default(uuid())
+  reserva       Int      @default(autoincrement())
+  dataCadastro  DateTime @default(now())
+  status        Boolean  @default(false)
+  desconto      Int
+  plataforma    Int      @default(1)
+  criancasColo  Int      @default(0)
+  excluida      Boolean  @default(false)
+  idPaymentLink String?
 
   Usuario             Usuarios?             @relation(fields: [codigoUsuario], references: [id])
   codigoUsuario       String?

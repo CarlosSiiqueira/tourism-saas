@@ -192,3 +192,9 @@ export interface OpcionalReserva {
   valor: number,
   quantidade: number
 }
+
+export interface IPagarmeLinkDTO {
+  opcionais: OpcionalReserva[],
+  paymentMethods: Array<string>,
+  quantidade: number
+}

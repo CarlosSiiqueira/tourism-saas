@@ -374,13 +374,16 @@ class FinanceiroController {
     const phones = {}
     const pixSettings = { expires_in: 2 }
     const installmentsAmount = excursao.valor >= 2000 ? 10 : 5
+    const quantidadeExcursao = request.body.quantidade
+    const country_code = "55"
+    const valorTotalExcursao = excursao.valor
 
-    let country_code = "55"
     var area_code;
     var number;
     var area_code_mobile;
     var number_mobile;
     var opcionaisItems;
+    var valorTotalOpcionais = 0
 
     if (customer.telefone) {
       area_code = customer.telefone?.slice(0, 2) || '85'
@@ -405,6 +408,8 @@ class FinanceiroController {
       })
 
       opcionaisItems = opcionaisItems.filter((item: PagarmeLinkItem) => !!item)
+
+      valorTotalOpcionais = opcionaisItems.reduce((value: number, opcional: PagarmeLinkItem) => value + (opcional.amount * opcional.default_quantity), 0)
     }
 
     const requestLink: PagarmeLinkRequestBody = {
@@ -414,7 +419,7 @@ class FinanceiroController {
           operation_type: "auth_and_capture",
           installments: Array.from({ length: installmentsAmount }, (_, index) => ({
             number: index + 1,
-            total: Math.round(excursao.valor * 100),
+            total: Math.round((valorTotalExcursao * quantidadeExcursao) * 100) + valorTotalOpcionais,
           })),
         },
         accepted_payment_methods: paymentMethod
@@ -422,10 +427,10 @@ class FinanceiroController {
       cart_settings: {
         items: [
           {
-            amount: Math.round(excursao.valor * 100),
+            amount: Math.round(valorTotalExcursao * 100),
             name: `${formattingDate(excursao.dataInicio.toDateString())} à ${formattingDate(excursao.dataFim.toDateString())} - ${excursao.nome}`,
             description: "",
-            default_quantity: request.body.quantidade
+            default_quantity: quantidadeExcursao
           }
         ]
       },

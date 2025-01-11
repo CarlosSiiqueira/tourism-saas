@@ -14,6 +14,9 @@ import { PdfService } from '../services/pdf.service'
 import { htmlEmailCredito, htmlEmailReserva, htmlTicket } from '../../shared/helper/html'
 import { EmailService } from '../services/mail.service'
 import { formattingDate } from '../../shared/helper/date'
+import { IPagarmeLinkDTO } from '../interfaces/Helper'
+import { PessoaService } from '../services/pessoa.service'
+import { ExcursaoService } from '../services/excursao.service'
 
 @injectable()
 class ReservaController {
@@ -29,7 +32,9 @@ class ReservaController {
     private excursaoQuartosService: ExcursaoQuartosService,
     private excursaoOnibusService: ExcursaoOnibusService,
     private pdfService: PdfService,
-    private emailService: EmailService
+    private emailService: EmailService,
+    private pessoaService: PessoaService,
+    private excursaoService: ExcursaoService
   ) { }
 
   index = async (request: Request, response: Response): Promise<void> => {
@@ -46,15 +51,18 @@ class ReservaController {
     const passageiro = await this.excursaoPassageiroService.findByIdPessoa(request.body.passageiros, request.body.idExcursao)
     let resp = 'Esse Passageiro já está nessa excursão'
     let user = JSON.parse(request.headers.user as string);
+    const { opcionais } = request.body
+    const { passageiros } = request.body
+    const { idExcursao } = request.body
 
     if (!passageiro.length) {
       let observacoes = ''
       const reserva = await this.reservaRepository.create(request.body)
       const formaPagamento = await this.formaPagamentoService.find(request.body.codigoFormaPagamento)
 
-      if (request.body.opcionais.length) {
+      if (opcionais.length) {
         observacoes += "Opcionais: \n"
-        const opcionais = await Promise.all(
+        await Promise.all(
           request.body.opcionais.map(async (opt: { id: string, quantidade: number, valor: number, nome: string }) => {
             if (opt.quantidade) {
               observacoes += `${opt.quantidade}x ${opt.nome} \n`
@@ -77,17 +85,20 @@ class ReservaController {
         usuariosId: user.id
       })
 
-      request.body.idReserva = reserva || ''
-      request.body.tipo = 2
-      observacoes += request.body.criancasColo > 0 ? `${request.body.criancasColo}x crianças de colo nessa Reserva \n` : ''
-      request.body.observacao = observacoes
-      request.body.ativo = true
-      request.body.data = await this.financeiroService.setDataPrevistaPagamento(formaPagamento.qtdDiasRecebimento)
-      request.body.usuarioCadastro = request.body.codigoUsuario
-      request.body.valor = request.body.total
-      request.body.codigoExcursao = request.body.idExcursao
+      const dataFinanceiro = await this.financeiroService.setDataPrevistaPagamento(formaPagamento.qtdDiasRecebimento)
 
-      const financeiro = await this.financeiroService.create(request.body)
+      const financeiro = await this.financeiroService.create({
+        idReserva: reserva || '',
+        tipo: 2,
+        observacao: observacoes,
+        ativo: true,
+        data: dataFinanceiro,
+        usuarioCadastro: request.body.codigoUsuario,
+        valor: request.body.total,
+        codigoExcursao: idExcursao,
+        codigoFormaPagamento: formaPagamento.id,
+        codigoContaBancaria: request.body?.codigoContaBancaria
+      })
 
       await this.logService.create({
         tipo: 'CREATE',
@@ -98,15 +109,52 @@ class ReservaController {
       })
 
       await Promise.all(
-        request.body.passageiros.map(async (passageiro: string) => {
+        passageiros.map(async (passageiro: string) => {
           return await this.excursaoPassageiroService.create({
-            idExcursao: request.body.idExcursao,
+            idExcursao: idExcursao,
             idPassageiro: passageiro,
             localEmbarque: request.body.localEmbarqueId,
             reserva: reserva
           })
         })
       )
+
+      if (request.body.passengerLink) {
+
+        let opcionaisReserva
+        let dataLink: IPagarmeLinkDTO = {
+          opcionais: [],
+          paymentMethods: ['credit_card', 'pix'],
+          quantidade: passageiros.length
+        }
+
+        const customer = await this.pessoaService.find(request.body.passengerLink)
+        const excursao = await this.excursaoService.find(idExcursao)
+
+        if (opcionais.length) {
+
+          opcionaisReserva = await this.opcionaisService.findByReserva(reserva)
+
+          dataLink.opcionais = opcionaisReserva.map((opt) => {
+            return {
+              nome: opt.Produto.nome,
+              valor: opt.Produto.valor,
+              quantidade: opt.qtd
+            }
+          })
+        }
+
+        try {
+
+          const data = await this.financeiroService.generatePaymentLink(dataLink, customer, excursao)
+          await this.reservaRepository.updatePaymentLinkId(reserva, data.id)
+
+          await this.emailService.sendEmail(customer.email, 'Link de pagamento Prados Turismo', '', 3)
+
+        } catch (error) {
+          response.status(200).send(`${error} \n Ocorreu um erro ao gerar link de pagamento.`)
+        }
+      }
 
       resp = 'Reserva criada com sucesso'
     }
@@ -217,41 +265,45 @@ class ReservaController {
 
     let observacoes = ''
     let user = JSON.parse(request.headers.user as string);
+    const { opcionais } = request.body
+    const { passageiros } = request.body
+    const { idExcursao } = request.body
+    const { id } = request.params
 
-    const currentReserva = await this.reservaRepository.find(request.params.id)
+    const currentReserva = await this.reservaRepository.find(id)
     const financeiro = await this.financeiroService.find(request.body.Transacoes[0].id)
-    await this.excursaoPassageiroService.deleteMultiple(request.body.passageiros, request.body.idExcursao)
-    const reserva = await this.reservaRepository.update(request.body, request.params.id)
+    await this.excursaoPassageiroService.deleteMultiple(passageiros, idExcursao)
+    const reserva = await this.reservaRepository.update(request.body, id)
 
     await this.logService.create({
       tipo: 'UPDATE',
-      newData: JSON.stringify({ id: request.params.id, ...request.body }),
+      newData: JSON.stringify({ id: id, ...request.body }),
       oldData: JSON.stringify(currentReserva),
       rotina: 'Reservas',
       usuariosId: user.id
     })
 
     await Promise.all(
-      request.body.passageiros.map(async (passageiro: string) => {
+      passageiros.map(async (passageiro: string) => {
         return await this.excursaoPassageiroService.create({
-          idExcursao: request.body.idExcursao,
+          idExcursao: idExcursao,
           idPassageiro: passageiro,
           localEmbarque: request.body.localEmbarqueId,
-          reserva: request.params.id
+          reserva: id
         })
       })
     )
 
-    if (request.body.opcionais.length) {
+    if (opcionais.length) {
       observacoes += "Opcionais: \n"
-      await this.opcionaisService.deleteByReservaId(request.params.id)
+      await this.opcionaisService.deleteByReservaId(id)
 
-      const opcionais = await Promise.all(
-        request.body.opcionais.map(async (opt: { id: string, quantidade: number, valor: number, nome: string }) => {
+      await Promise.all(
+        opcionais.map(async (opt: { id: string, quantidade: number, valor: number, nome: string }) => {
           if (opt.quantidade) {
             observacoes += `${opt.quantidade}x ${opt.nome} \n`
             return await this.opcionaisService.create({
-              idReserva: request.params.id,
+              idReserva: id,
               idProduto: opt.id,
               codigoUsuario: request.body.codigoUsuario,
               qtd: opt.quantidade
@@ -269,6 +321,43 @@ class ReservaController {
       observacoes += request.body.criancasColo > 0 ? `${request.body.criancasColo}x nessa Reserva` : ''
       financeiro.observacao = observacoes
       await this.financeiroService.update(financeiro, financeiro.id)
+    }
+
+    if (request.body.passengerLink) {
+
+      let opcionaisReserva
+      let dataLink: IPagarmeLinkDTO = {
+        opcionais: [],
+        paymentMethods: ['credit_card', 'pix'],
+        quantidade: passageiros.length
+      }
+
+      const customer = await this.pessoaService.find(request.body.passengerLink)
+      const excursao = await this.excursaoService.find(idExcursao)
+
+      if (opcionais.length) {
+
+        opcionaisReserva = await this.opcionaisService.findByReserva(request.params.id)
+
+        dataLink.opcionais = opcionaisReserva.map((opt) => {
+          return {
+            nome: opt.Produto.nome,
+            valor: opt.Produto.valor,
+            quantidade: opt.qtd
+          }
+        })
+      }
+
+      try {
+
+        const data = await this.financeiroService.generatePaymentLink(dataLink, customer, excursao)
+        await this.reservaRepository.updatePaymentLinkId(id, data.id)
+
+        await this.emailService.sendEmail(customer.email, 'Link de pagamento Prados Turismo', '', 3)
+
+      } catch (error) {
+        response.status(200).send(`${error} \n Ocorreu um erro ao gerar link de pagamento.`)
+      }
     }
 
     response.status(200).send(reserva)
