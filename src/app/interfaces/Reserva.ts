@@ -13,6 +13,7 @@ export interface IReserva {
   setConfirm (id: string, status: boolean): Promise<string>
   setOpcionais (opcionais: string[], id: string): Promise<string[]>
   updatePaymentLinkId (id: string, idPaymentLink: string): Promise<string>
+  findByPaymentLinkId (idPaymentLink: string): Promise<IReservaResponse>
 }
 
 export interface IReservaDTO {

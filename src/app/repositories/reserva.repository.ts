@@ -372,6 +372,44 @@ class ReservaRepository implements IReserva {
 
     return 'Link de pagamento adicionado à reserva'
   }
+
+  findByPaymentLinkId = async (idPaymentLink: string): Promise<IReservaResponse> => {
+
+    const reserva = await this.prisma.reservas.findFirst({
+      where: {
+        idPaymentLink
+      },
+      include: {
+        Pessoa: true,
+        Excursao: true,
+        Usuario: true,
+        Transacoes: {
+          include: {
+            FormaPagamento: true,
+            ContaBancaria: true
+          }
+        },
+        LocalEmbarque: true,
+        Opcionais: {
+          include: {
+            Produto: true
+          }
+        },
+        ExcursaoPassageiros: {
+          include: {
+            Pessoa: true,
+            LocalEmbarque: true
+          }
+        }
+      }
+    })
+
+    if (!reserva) {
+      throw new Warning("Registro não encontrado", 400)
+    }
+
+    return reserva
+  }
 }
 
 export { ReservaRepository }

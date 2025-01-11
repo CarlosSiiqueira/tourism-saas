@@ -400,6 +400,19 @@ class ReservaController {
 
     response.send('Email enviado').status(200)
   }
+
+  efetivaReserva = async (request: Request, response: Response): Promise<void> => {
+
+    const { data } = request.body
+
+    const reserva = await this.reservaRepository.findByPaymentLinkId(data.id)
+
+    if (reserva) {
+      await this.reservaRepository.setConfirm(reserva.id, true)
+    }
+
+    response.send(reserva).status(200)
+  }
 }
 
 export { ReservaController }
